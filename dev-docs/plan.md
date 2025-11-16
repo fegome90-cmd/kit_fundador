@@ -136,7 +136,7 @@ antes de que un equipo adopte el script interactivo. Para mantener la trazabilid
 
 ## 📝 Workflow con Templates de Prompts
 
-El proyecto incluye **15 templates estructurados** para diferentes tipos de tareas en [`dev-docs/prompt_example/`](./prompt_example/). Estos templates ayudan a mantener consistencia y calidad al trabajar con agentes IA o al documentar tareas manuales.
+El proyecto incluye **19 templates estructurados** para diferentes tipos de tareas en [`dev-docs/prompt_example/`](./prompt_example/). Estos templates ayudan a mantener consistencia y calidad al trabajar con agentes IA o al documentar tareas manuales.
 
 ### Catálogo de Templates
 
@@ -166,20 +166,29 @@ El proyecto incluye **15 templates estructurados** para diferentes tipos de tare
 |----------|---------|-----------------|-----------------|
 | **7. Handoff** | `template_7_general_handoff.md` | Traspasos entre equipos/agentes | Variable |
 
-#### Templates de Investigación y Planificación (12-15)
+#### Templates de Investigación y Planificación (12-14)
 
 | Template | Archivo | Uso Recomendado | Duración Típica |
 |----------|---------|-----------------|-----------------|
 | **12. Investigación Técnica** | `template_12_technical_research.md` | Análisis de alternativas, PoC, comparativas | Variable |
 | **13. Planificación de Infraestructura** | `template_13_infrastructure_plan.md` | CI/CD, DevOps, IaC | 2-5 días |
 | **14. Architecture Decision Record** | `template_14_architecture_decision_record.md` | Documentar decisiones de arquitectura | < 1 día |
-| **15. Plan de Pruebas** | `template_15_testing_plan.md` | Estrategia de testing (TDD/BDD, E2E) | 1-3 días |
+
+#### Templates de Testing (15-19)
+
+| Template | Archivo | Uso Recomendado | Duración Típica |
+|----------|---------|-----------------|-----------------|
+| **15. Plan de Pruebas General** | `template_15_testing_plan.md` | Estrategia de testing completa (TDD/BDD, unitarias, E2E) | 1-3 días |
+| **16. Plan de Pruebas Unitarias** | `template_16_unit_testing_plan.md` | Pruebas de funciones/métodos/componentes aislados | < 1 día |
+| **17. Plan de Pruebas de Integración** | `template_17_integration_testing_plan.md` | Integración entre módulos, servicios, capas | 1-2 días |
+| **18. Plan de Pruebas E2E** | `template_18_e2e_testing_plan.md` | Flujos completos de usuario en entorno integrado | 1-3 días |
+| **19. Estrategia TDD/BDD** | `template_19_tdd_bdd_strategy.md` | Desarrollo guiado por pruebas | Variable |
 
 ### Integración con Agent Profiles
 
 Los templates se integran con los perfiles de agente documentados en [`dev-docs/agent-profiles/`](./agent-profiles/):
 
-- **EJECUTOR** → Usa templates 1-5, 12-15 para planificar, implementar, investigar y documentar
+- **EJECUTOR** → Usa templates 1-5, 12-19 para planificar, implementar, investigar, documentar y testing
 - **VALIDADOR** → Usa templates 6, 8-11 para auditorías (general y especializadas)
 - **HANDOFF** → Usa template 7 para traspasos de contexto
 
@@ -207,7 +216,13 @@ Ver guía completa de integración en: [`dev-docs/agent-profiles/PROMPTS.md`](./
 - Investigación técnica/comparativa → **Template 12**
 - Planificación de infraestructura (CI/CD, DevOps) → **Template 13**
 - Documentar decisión de arquitectura (ADR) → **Template 14**
-- Plan de pruebas (Testing strategy) → **Template 15**
+
+**Testing:**
+- Plan de pruebas general (estrategia completa) → **Template 15**
+- Pruebas unitarias (funciones/componentes) → **Template 16**
+- Pruebas de integración (módulos/servicios) → **Template 17**
+- Pruebas E2E (flujos de usuario) → **Template 18**
+- Estrategia TDD/BDD (desarrollo guiado por tests) → **Template 19**
 
 **Handoff:**
 - Traspaso de contexto → **Template 7**

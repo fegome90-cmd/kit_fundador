@@ -57,8 +57,24 @@
 │  └─► Template 14: ADR                │
 │                                      │
 ├─ PLANIFICAR estrategia de testing    │
-│  └─► Template 15: Testing Plan      │
-│                                      │
+│  │                                   │
+│  ├─ ¿Qué tipo de testing?            │
+│  │  │                                │
+│  │  ├─ General (toda la estrategia) │
+│  │  │  └─► Template 15: Testing Plan│
+│  │  │                                │
+│  │  ├─ Pruebas Unitarias             │
+│  │  │  └─► Template 16: Unit Tests  │
+│  │  │                                │
+│  │  ├─ Pruebas de Integración        │
+│  │  │  └─► Template 17: Integration │
+│  │  │                                │
+│  │  ├─ Pruebas E2E                   │
+│  │  │  └─► Template 18: E2E Tests   │
+│  │  │                                │
+│  │  └─ Estrategia TDD/BDD            │
+│  │     └─► Template 19: TDD/BDD     │
+│  │                                   │
 └─ TRASPASAR contexto a otro agente    │
    └─► Template 7: Handoff             │
 ```
@@ -83,7 +99,11 @@
 | **12: Technical Research** | Variable | Media | Investigación técnica, análisis de alternativas, PoC | No |
 | **13: Infrastructure Plan** | 2-5 días | Alta | CI/CD, DevOps, planificación de infraestructura | No |
 | **14: ADR** | < 1 día | Baja | Documentar decisiones de arquitectura | No |
-| **15: Testing Plan** | 1-3 días | Media | Estrategia de testing (TDD/BDD, unitarias, E2E) | No |
+| **15: Testing Plan** | 1-3 días | Media | Estrategia de testing general (TDD/BDD, unitarias, E2E) | No |
+| **16: Unit Testing Plan** | < 1 día | Baja-Media | Plan de pruebas unitarias de funciones/componentes | No |
+| **17: Integration Testing Plan** | 1-2 días | Media | Plan de pruebas de integración entre módulos/servicios | No |
+| **18: E2E Testing Plan** | 1-3 días | Media | Plan de pruebas E2E de flujos de usuario completos | No |
+| **19: TDD/BDD Strategy** | Variable | Media | Estrategia de desarrollo guiado por pruebas | No |
 
 ---
 
@@ -149,6 +169,23 @@
 | "Plan de pruebas para funcionalidad de exportación a PDF" | 15: Testing Plan |
 | "Estrategia de testing para migración a React 19" | 15: Testing Plan |
 | "Definir casos de prueba E2E para flujo de checkout" | 15: Testing Plan |
+
+### 🧪 Testing Especializado
+
+| Descripción | Template |
+|-------------|----------|
+| "Plan de pruebas unitarias para el módulo de validación" | 16: Unit Testing Plan |
+| "Casos de prueba para el componente UserProfile" | 16: Unit Testing Plan |
+| "Tests unitarios para la clase ShoppingCart con cobertura >90%" | 16: Unit Testing Plan |
+| "Pruebas de integración entre frontend y API REST" | 17: Integration Testing Plan |
+| "Integración de microservicios con message queue (RabbitMQ)" | 17: Integration Testing Plan |
+| "Tests de integración para capa de datos con PostgreSQL" | 17: Integration Testing Plan |
+| "Flujo E2E de registro y onboarding de usuario" | 18: E2E Testing Plan |
+| "Proceso completo de checkout en e-commerce (Cypress)" | 18: E2E Testing Plan |
+| "Flujo de creación, edición y eliminación de proyectos" | 18: E2E Testing Plan |
+| "Estrategia TDD para implementar carrito de compras" | 19: TDD/BDD Strategy |
+| "BDD scenarios para sistema de notificaciones push" | 19: TDD/BDD Strategy |
+| "Desarrollo guiado por tests para módulo de autenticación" | 19: TDD/BDD Strategy |
 
 ---
 
@@ -299,17 +336,21 @@ Template 5 (Daily Task) → Cambio → Merge
 - Investigar/comparar tecnologías → 12
 - Planificar infraestructura → 13
 - Documentar decisión (ADR) → 14
-- Planificar testing → 15
+- Planificar testing general → 15
+- Plan de pruebas unitarias → 16
+- Plan de pruebas de integración → 17
+- Plan de pruebas E2E → 18
+- Estrategia TDD/BDD → 19
 
 **"¿Cuánto tiempo?"**
 - < 2h → 5
-- 2h-1d → 3, 5
-- 1-5d → 2, 4, 8, 9, 10, 11
+- 2h-1d → 3, 5, 16
+- 1-5d → 2, 4, 8, 9, 10, 11, 15, 17, 18
 - > 5d → 1
 
 **"¿Necesito gate?"**
 - Sí → 6, 8, 9, 10, 11 (auditorías)
-- No → 1, 2, 3, 4, 5, 7
+- No → 1-5, 7, 12-19
 
 **"¿Qué tipo de auditoría?"**
 - Gate general (4 dimensiones) → 6
@@ -318,9 +359,16 @@ Template 5 (Daily Task) → Cambio → Merge
 - Código (deuda técnica) → 10
 - UI/UX (WCAG, usabilidad) → 11
 
+**"¿Qué tipo de testing?"**
+- Estrategia general (cobertura completa) → 15
+- Pruebas unitarias (funciones/componentes) → 16
+- Pruebas de integración (módulos/servicios) → 17
+- Pruebas E2E (flujos de usuario) → 18
+- TDD/BDD (desarrollo guiado por tests) → 19
+
 **"¿Cambio de contexto?"**
 - Sí → 7 (handoff)
-- No → 1-6, 8-11
+- No → 1-6, 8-19
 
 ---
 

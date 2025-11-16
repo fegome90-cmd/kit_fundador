@@ -1,6 +1,6 @@
 # 📝 Catálogo de Templates de Prompts
 
-Esta carpeta contiene **15 templates de prompts estructurados** para diferentes tipos de tareas de desarrollo. Estos templates ayudan a mantener consistencia, claridad y trazabilidad en el trabajo con agentes IA o en documentación de tareas.
+Esta carpeta contiene **19 templates de prompts estructurados** para diferentes tipos de tareas de desarrollo. Estos templates ayudan a mantener consistencia, claridad y trazabilidad en el trabajo con agentes IA o en documentación de tareas.
 
 ## 🎯 Propósito
 
@@ -323,6 +323,88 @@ Los templates sirven para:
 
 ---
 
+### 16. Plan de Pruebas Unitarias - `template_16_unit_testing_plan.md`
+
+**Cuándo usar**: Planificar pruebas unitarias de funciones, métodos y componentes
+
+**Características**:
+- Alcance específico de unidades a probar
+- Identificación de dependencias a mockear
+- Casos de prueba por función/método (happy path, bordes, errores)
+- Casos de prueba para componentes UI (renderizado, interacciones, accesibilidad)
+- Criterios de aceptación (cobertura ≥90%, velocidad)
+
+**Ejemplo de uso**:
+```markdown
+"Plan de pruebas unitarias para el módulo de validación"
+"Casos de prueba para el componente UserProfile"
+"Tests unitarios para la clase ShoppingCart"
+```
+
+---
+
+### 17. Plan de Pruebas de Integración - `template_17_integration_testing_plan.md`
+
+**Cuándo usar**: Verificar integración entre módulos, servicios o capas
+
+**Características**:
+- Puntos de integración a probar (API↔DB, UI↔API, Service↔Service)
+- Componentes mockeados vs reales
+- Escenarios de integración detallados
+- Manejo de fallos de comunicación
+- Datos de prueba y fixtures
+- Verificación de contratos entre servicios
+
+**Ejemplo de uso**:
+```markdown
+"Pruebas de integración entre frontend y API REST"
+"Integración de microservicios con message queue"
+"Tests de integración para capa de datos con PostgreSQL"
+```
+
+---
+
+### 18. Plan de Pruebas E2E - `template_18_e2e_testing_plan.md`
+
+**Cuándo usar**: Validar flujos completos de usuario en entorno integrado
+
+**Características**:
+- Identificación de flujos críticos de usuario
+- Configuración de entorno de prueba (Staging/QA)
+- Flujos detallados con sintaxis Cypress/Playwright
+- Gestión de datos de prueba (seeding, usuarios, servicios externos)
+- Estrategia multi-navegador y multi-dispositivo
+- Archivado de screenshots y videos de fallos
+
+**Ejemplo de uso**:
+```markdown
+"Flujo E2E de registro y onboarding de usuario"
+"Proceso completo de checkout en e-commerce"
+"Flujo de creación, edición y eliminación de proyectos"
+```
+
+---
+
+### 19. Estrategia TDD/BDD - `template_19_tdd_bdd_strategy.md`
+
+**Cuándo usar**: Definir estrategia de desarrollo guiado por pruebas
+
+**Características**:
+- Escenarios de comportamiento (Given-When-Then)
+- Tests de aceptación previos a implementación
+- Plan de implementación Red-Green-Refactor
+- Casos de prueba BDD para features
+- Ciclo iterativo guiado por tests
+
+**Ejemplo de uso**:
+```markdown
+"Estrategia TDD para implementar carrito de compras"
+"BDD scenarios para sistema de notificaciones"
+"Desarrollo guiado por tests para módulo de autenticación"
+```
+
+---
+
 ## 🔄 Flujo de Trabajo Recomendado
 
 ### Para Implementaciones Grandes
@@ -369,7 +451,7 @@ Estos templates se integran con los perfiles de agente existentes en `dev-docs/a
 
 | Agent Profile | Templates Recomendados |
 |---------------|------------------------|
-| **EJECUTOR** | Templates 1-5, 12-15 (implementación, investigación, planificación, testing) |
+| **EJECUTOR** | Templates 1-5, 12-19 (implementación, investigación, planificación, testing) |
 | **VALIDADOR** | Templates 6, 8-11 (auditorías general y especializadas) |
 | **HANDOFF** | Template 7 (traspaso) |
 
@@ -384,7 +466,13 @@ Estos templates se integran con los perfiles de agente existentes en `dev-docs/a
 - **Template 12**: Investigación Técnica (análisis de alternativas, PoC, comparativas)
 - **Template 13**: Planificación de Infraestructura (CI/CD, DevOps, IaC)
 - **Template 14**: Architecture Decision Record (ADR - documentar decisiones)
-- **Template 15**: Plan de Pruebas (estrategia TDD/BDD, unitarias, integración, E2E)
+- **Template 15**: Plan de Pruebas General (estrategia TDD/BDD, cobertura completa)
+
+**Testing Especializado (Templates 16-19):**
+- **Template 16**: Plan de Pruebas Unitarias (funciones, métodos, componentes)
+- **Template 17**: Plan de Pruebas de Integración (módulos, servicios, capas)
+- **Template 18**: Plan de Pruebas E2E (flujos de usuario completos)
+- **Template 19**: Estrategia TDD/BDD (desarrollo guiado por pruebas)
 
 Ver: [`dev-docs/agent-profiles/README.md`](../agent-profiles/README.md)
 
