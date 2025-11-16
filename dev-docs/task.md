@@ -60,9 +60,9 @@ _(sin tareas activas)_
 ### [TASK-007] Ajustar guías de tooling y scripts
 - **Completado**: 2025-01-15
 - **Duración real**: 45 min
-- **Notas**: `package.json` usa placeholders, `dev-docs/tooling-guide.md` explica cómo alinear linters multi-lenguaje y README documenta suites opcionales.
+- **Notas**: `package.json` expone stubs funcionales (`src/index.ts`, `scripts/seed.ts`), `dev-docs/tooling-guide.md` explica cómo alinear linters multi-lenguaje y README documenta suites opcionales.
 - **Criterios de Aceptación**:
-  - [x] Scripts apuntan a `<project-entrypoint>`
+  - [x] Scripts de npm apuntan a archivos reales editables por el consumidor
   - [x] lint-staged documentado para múltiples lenguajes
   - [x] Tests Bash/Python documentados como opcionales
 

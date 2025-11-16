@@ -50,7 +50,7 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 
 ### Fase 2 – Tooling mínimo y scripts ✅
 
-1. ✅ Ajustar `package.json` para que los comandos apunten a placeholders (`<project-entrypoint>`, `<build-output>`, `<seed-script>`), evitando rutas inexistentes. → ver `package.json`.
+1. ✅ Ajustar `package.json` para que los comandos apunten a stubs reales (`src/index.ts`, `dist/index.js`, `scripts/seed.ts`), evitando rutas inexistentes. → ver `package.json`.
 2. ✅ Proveer instrucciones para conectar linting/formatting y `lint-staged` a los lenguajes que el usuario habilite. → ver `dev-docs/tooling-guide.md` y `README.md#🧰-personaliza-scripts-y-linters`.
 3. ✅ Decidir si los tests Bash/Python permanecen como ejemplo y documentar cómo activarlos. → ver `dev-docs/tooling-guide.md#3-suites-de-pruebas-opcionales` y `README.md#🧪-suites-opcionales-multi-lenguaje`.
 

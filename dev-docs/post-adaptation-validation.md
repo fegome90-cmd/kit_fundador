@@ -13,7 +13,7 @@
 
 - [ ] Password hasher reemplazado por implementación real (bcrypt, argon2, KMS, etc.).
 - [ ] `DomainEventDispatcher` conectado a la cola/bus elegido o al menos a un stub de aplicación.
-- [ ] Entry point (`<project-entrypoint>`) creado y scripts (`dev`, `start`, `seed`) apuntan al archivo correcto.
+- [ ] Entry point definitivo documentado (reemplazando el stub `src/index.ts`) y scripts (`dev`, `start`, `seed`) apuntan al archivo correcto.
 - [ ] Se documentó en `dev-docs/context.md` qué servicios externos se consumen y cómo se configuran.
 
 ## 3. Configuración y seguridad

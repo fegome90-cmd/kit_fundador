@@ -3,8 +3,8 @@
 Este starkit entrega un cascarón mínimamente opinado. Cada equipo que lo adopta debe **terminar de cablear sus servicios** para que el código sea ejecutable. Usa esta lista como guía inmediata tras clonar el repositorio.
 
 ## 1. Entry points y scripts
-- [ ] Crear el entrypoint real del proyecto (por ejemplo, `src/index.ts`, `main.py` o similar) y actualizar los scripts de `package.json`/`Makefile` para apuntar a ese archivo.
-- [ ] Revisar los comandos de `make`, `npm` o el runner elegido y remplazar los placeholders (`<project-entrypoint>`, `<your-test-command>`, etc.).
+- [ ] Personalizar los stubs `src/index.ts` y `scripts/seed.ts` (o reemplazarlos) para que arranquen tu aplicación real y actualicen los scripts de `package.json`/`Makefile` en caso de cambiar las rutas.
+- [ ] Revisar los comandos de `make`, `npm` o el runner elegido y asegurarte de que apuntan a los archivos definitivos (`src/http/server.ts`, `main.py`, etc.) en lugar de los stubs.
 - [ ] Definir cómo se ejecutarán los tests en el stack seleccionado (Jest, Pytest, Go test, etc.) y actualizar `lint-staged` u otros hooks.
 
 ## 2. Dependencias y servicios implícitos

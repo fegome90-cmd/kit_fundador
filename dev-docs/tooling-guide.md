@@ -5,13 +5,14 @@ las herramientas que elijas. Usa esta guía como referencia al actualizar `packa
 
 ## 1. Entry points y scripts de npm
 
-- `package.json` usa tokens como `<project-entrypoint>`, `<build-output>` y `<seed-script>`. Reemplázalos por las rutas reales
-  de tu servicio. Ejemplos:
+- `package.json` ya apunta a `src/index.ts`, `dist/index.js` y `scripts/seed.ts`, que son stubs funcionales. Úsalos como punto de
+  partida o reemplázalos por completo cuando definas tu bootstrap real. Ejemplos:
   - TypeScript: `src/http/server.ts` para desarrollo y `dist/http/server.js` tras compilar.
   - Python: crea un wrapper en `scripts/start_api.py` y ajusta los comandos para llamar a `python scripts/start_api.py`.
 - Si tu stack no usa `ts-node`/`node`, modifica por completo los comandos `dev`/`start` para invocar tu runtime (por ejemplo,
   `uvicorn app.main:app --reload`).
-- Actualiza `seed:dev` o crea nuevos scripts (`seed:local`, `db:reset`, etc.) apuntando a tus scripts reales.
+- Actualiza `seed:dev` o crea nuevos scripts (`seed:local`, `db:reset`, etc.) apuntando a tus scripts reales o extendiendo el stub
+  `scripts/seed.ts`.
 
 > 📌 Recomendación: documenta los reemplazos en `dev-docs/task.md` dentro de la task activa para que todo el equipo conozca el nuevo entry point.
 

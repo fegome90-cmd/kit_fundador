@@ -142,10 +142,10 @@ Cuando todos los placeholders hayan sido reemplazados, ejecuta una última pasad
 
 ## 🧰 Personaliza scripts y linters
 
-Los scripts incluidos en `package.json` contienen tokens (`<project-entrypoint>`, `<build-output>`, `<seed-script>`) que debes
-reemplazar cuando definas el entry point real de tu servicio. Sigue las pautas de `dev-docs/tooling-guide.md` para ajustar los
-comandos `dev`, `start`, `seed`, `lint`, `format` y `type-check`, así como para extender `lint-staged` si trabajas con múltiples
-lenguajes.
+Los scripts incluidos en `package.json` apuntan a `src/index.ts`, `dist/index.js` y `scripts/seed.ts`, archivos stub que mantienen
+los comandos funcionando desde el primer día. Cuando definas tu entry point real, personaliza esos archivos o actualiza los scripts
+para apuntar a tu implementación definitiva. Sigue las pautas de `dev-docs/tooling-guide.md` para ajustar los comandos `dev`,
+`start`, `seed`, `lint`, `format` y `type-check`, así como para extender `lint-staged` si trabajas con múltiples lenguajes.
 
 ## 🧪 Suites opcionales multi-lenguaje
 
