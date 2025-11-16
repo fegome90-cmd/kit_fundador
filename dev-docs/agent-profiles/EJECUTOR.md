@@ -52,6 +52,259 @@ Antes de codificar, escribir:
 
 ---
 
+## 📋 PRE-IMPLEMENTATION CHECKLIST (RESEARCH-BASED)
+
+**Basado en**: Chen et al 2024 - "A Deep Dive Into LLM Code Generation Mistakes"
+
+**Objetivo**: Prevenir 68% de errores más comunes identificados empíricamente
+
+### ⚠️ PASO 1: Análisis de Especificación (Previene MCQS - 48% de errores)
+
+**Problema**: LLMs se confunden por specs ambiguas → 48% de errores provienen de aquí
+
+**OBLIGATORIO - Completar ANTES de codificar**:
+
+- [ ] **Leer especificación 2 veces completas**
+  - Primera lectura: entender objetivo general
+  - Segunda lectura: buscar ambigüedades
+
+- [ ] **Identificar términos ambiguos y documentar interpretación**:
+
+  | Término | ¿Qué puede significar? | Mi interpretación |
+  |---------|------------------------|-------------------|
+  | "same" | ¿Idénticos o equivalentes? ¿Misma frecuencia? | |
+  | "all" | ¿100% literal o mayoría? | |
+  | "remove" | ¿Eliminar completamente o filtrar? | |
+  | "check" | ¿Validar con error o retornar boolean? | |
+  | "process" | ¿Qué transformación específica? | |
+
+- [ ] **Documentar interpretación final en comentario del código**
+
+**Ejemplo**:
+```typescript
+/**
+ * Spec: "Remove duplicates from array"
+ *
+ * INTERPRETACIÓN ELEGIDA:
+ * - "Remove" = eliminar todas las copias, dejar solo únicos
+ * - "Duplicates" = elementos que aparecen más de una vez
+ *
+ * Input: [1,2,2,3] → Output: [1,3] (elimina 2 completamente)
+ *
+ * ALTERNATIVA DESCARTADA:
+ * - Solo eliminar copias extras (dejar una): [1,2,3]
+ *
+ * RAZÓN: Wording "remove duplicates" implica eliminar todos los duplicados
+ */
+function removeDuplicates(arr: number[]): number[] {
+  // Implementation...
+}
+```
+
+- [ ] **Si hay ambigüedad** → ⛔ **STOP** - Request clarification (NO adivinar)
+
+---
+
+### 🎯 PASO 2: Identificación de Edge Cases (Previene EC - 20% de errores)
+
+**Problema**: LLMs omiten corner cases → 20% de errores
+
+**OBLIGATORIO: Listar TODOS los edge cases ANTES de implementar**
+
+#### Template de Edge Cases:
+
+```markdown
+## Edge Cases para [nombre_función]
+
+### 1. Empty Inputs
+- [ ] Empty array: []
+- [ ] Empty string: ""
+- [ ] null
+- [ ] undefined
+
+### 2. Single Element
+- [ ] Array con 1 elemento: [x]
+- [ ] String de 1 caracter: "a"
+
+### 3. Boundary Values
+- [ ] 0 (cero)
+- [ ] -1 (negativo pequeño)
+- [ ] MAX_INT / MAX_VALUE
+- [ ] MIN_INT / MIN_VALUE
+- [ ] Infinity / -Infinity
+
+### 4. Type Mismatches
+- [ ] String cuando se espera number
+- [ ] Number cuando se espera string
+- [ ] Object cuando se espera primitive
+
+### 5. Invalid Inputs
+- [ ] Negative cuando debe ser positive
+- [ ] Out of range values
+- [ ] Malformed data
+
+### 6. Large Inputs
+- [ ] Array de 10,000+ elementos
+- [ ] String muy larga (10KB+)
+- [ ] Performance considerations
+```
+
+**Mínimo requerido**: 5 edge cases identificados y documentados
+
+---
+
+### 🔢 PASO 3: Análisis de Condicionales (Previene CE - 35% de errores)
+
+**Problema**: Conditional errors son el 35% de bugs
+
+**Para CADA condicional que planees escribir**:
+
+```typescript
+// Planning phase - ANTES de implementar
+// Condicional planeado: if (count > threshold)
+
+// Tests requeridos:
+// 1. count = threshold - 1  (false - justo debajo)
+// 2. count = threshold      (false - en boundary)
+// 3. count = threshold + 1  (true - justo encima)
+
+// Condicional planeado: if (array.length === 0)
+
+// Tests requeridos:
+// 1. length = 0   (true - empty)
+// 2. length = 1   (false - single element)
+// 3. length = 10  (false - normal case)
+```
+
+**Checklist de Condicionales**:
+
+- [ ] Cada `if` tiene test para boundary value
+- [ ] Cada `if` tiene test para value just above boundary
+- [ ] Cada `if` tiene test para value just below boundary
+- [ ] No uso coerción implícita (usar `===` no `==`)
+- [ ] Profundidad de nesting ≤ 3 (si >3 → extraer función)
+
+---
+
+### 📐 PASO 4: Operaciones Matemáticas (Previene MFLE - 10-15% de errores)
+
+**Si la función incluye matemáticas o fórmulas**:
+
+- [ ] **Documentar fórmula ANTES de implementar**
+
+```typescript
+// ✅ BUENO
+// Formula: average = (a + b) / 2
+const avg = (a + b) / 2;
+
+// ❌ MALO
+const avg = (a + b + 1) / 2; // ¿Por qué +1? Error común de LLM
+```
+
+- [ ] **Verificar no hay off-by-one en la fórmula**
+- [ ] **Planear property-based test** (si aplica)
+
+```typescript
+// Property: avg(a, b) debe estar entre min(a,b) y max(a,b)
+// Property: avg(n, n) debe ser n
+```
+
+---
+
+### 🔍 PASO 5: Array/Index Operations (Previene IOM - 5-7% de errores)
+
+**Si la función usa arrays/índices**:
+
+- [ ] **Planear tests para boundaries de arrays**:
+
+```markdown
+Tests requeridos:
+1. Empty array (length = 0)
+2. Single element (length = 1)
+3. First element access (index = 0)
+4. Last element access (index = length - 1)
+5. Off-by-one scenarios
+```
+
+- [ ] **Verificar fórmulas de slicing**:
+```typescript
+// ❌ Common mistake: array[i-1:i-4:-1]
+// ✅ Probablemente debería ser: array[0:i]
+```
+
+---
+
+### 📤 PASO 6: Output Format Planning (Previene MOFE - 15-20% de errores)
+
+**Antes de implementar, especificar formato exacto del output**:
+
+```markdown
+## Output Specification
+
+**Return Type**: [exact type]
+**Format**: [exact format with examples]
+
+Examples:
+- Input: ... → Output: ... (exact format shown)
+- Edge case input: ... → Output: ...
+
+Format validations to test:
+- [ ] Type is exactly correct (string vs string[], number vs string)
+- [ ] No extra/missing characters (slashes, quotes, etc)
+- [ ] Date/time format exact (if applicable)
+```
+
+---
+
+### ✅ PASO 7: Test Planning (Mínimo 8-10 tests por función)
+
+Antes de escribir código, planear:
+
+```markdown
+## Test Plan for [función]
+
+### Happy Path (1 test)
+- [ ] Normal case con valores típicos
+
+### Edge Cases (5+ tests)
+- [ ] Empty input
+- [ ] Single element
+- [ ] Boundary value 1
+- [ ] Boundary value 2
+- [ ] Large input
+
+### Error Cases (2+ tests)
+- [ ] Invalid type
+- [ ] Out of range
+
+### Boundary Tests para Condicionales (3+ tests)
+- [ ] At boundary
+- [ ] Just above
+- [ ] Just below
+```
+
+**Mínimo total**: 8-10 tests por función no trivial
+
+---
+
+## 🚦 QUALITY GATE - Antes de Empezar a Codificar
+
+**NO escribas código hasta completar TODO lo anterior**:
+
+- [ ] ✅ Especificación analizada y ambigüedades resueltas
+- [ ] ✅ Mínimo 5 edge cases identificados y listados
+- [ ] ✅ Todos los condicionales tienen tests de boundary planeados
+- [ ] ✅ Fórmulas matemáticas documentadas (si aplica)
+- [ ] ✅ Array boundaries planeados (si aplica)
+- [ ] ✅ Output format especificado con precisión
+- [ ] ✅ Mínimo 8-10 tests planeados
+
+**Tiempo estimado para este checklist**: 10-15% del tiempo total de la task
+
+**ROI**: Previene 68% de errores comunes según research (Chen et al 2024)
+
+---
+
 ## 🔴 TDD Workflow (ESTRICTO)
 
 ### Paso 1: RED - Escribir Test que Falla
