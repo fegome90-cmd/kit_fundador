@@ -5,29 +5,35 @@
 
 ## Current Session
 
-**Started**: [TIMESTAMP]
-**Last Updated**: [TIMESTAMP]
-**Agent**: Claude Sonnet 4.5
+**Started**: 2025-01-16T00:00:00Z
+**Last Updated**: 2025-01-16T00:00:00Z
+**Agent**: gpt-5-codex
 
 ## Active Tasks
 
-- [TASK-000] Inicializar proyecto con Kit Fundador
-  - Status: Completed
-  - Blockers: None
-  - Next Steps: Definir dominio y crear primera entidad
+- _(sin tareas activas)_
+- Próximo foco sugerido: [TASK-003] database & migrations, seguido de [TASK-004] primer use case.
 
 ## Recent Changes
 
+- `dev-docs/domain/ubiquitous-language.md` ahora describe el bounded context **Identity & Access** y documenta `UserAccount`.
+- `dev-docs/domain/invariants.md` lista las reglas activas para `User`, `Email` y `Password`.
+- `dev-docs/plan.md`, `dev-docs/task.md`, `.context/project-state.json` y README referencian los nuevos artefactos.
+
 ### Last 5 Commits
 ```
+docs: document baseline tech stack decisions
 chore: Initialize project with Kit Fundador v2.0
 ```
 
 ## Pending Decisions
 
-1. **Tech Stack Selection**: Definir lenguaje y framework principal
-   - Needs input from: Tech Lead
-   - Options: TypeScript/Node, Python/FastAPI, Go, Rust
+1. **Database provider para Task-003**
+   - Needs input from: Platform lead
+   - Deliverable: ADR corto que seleccione Postgres/Prisma o alternativa.
+2. **Framework de migrations**
+   - Needs input from: Platform lead
+   - Blocked by: Decisión de DB; actualizar `dev-docs/task.md` cuando se defina.
 
 ## Known Issues
 
@@ -35,10 +41,10 @@ chore: Initialize project with Kit Fundador v2.0
 
 ## Context for Next Session
 
-Proyecto recién inicializado. Siguiente paso es:
-1. Definir tech stack en config/tech-stack.json
-2. Completar dev-docs/context.md con información del dominio
-3. Crear primera entidad del dominio
+Stack base documentado (TypeScript + Express + Jest + ESLint/Prettier + esbuild). Próximos pasos sugeridos:
+1. Arrancar [TASK-003] enfocándose en documentación/plantillas de base de datos y migraciones.
+2. Preparar blueprint del primer use case ([TASK-004]) alineado con el aggregate `User`.
+3. Mantener `dev-docs/plan.md` y `.context/project-state.json` sincronizados tras cada fase.
 
 Archivos clave a revisar:
 - `config/rules/ai-guardrails.json` - Reglas del agente

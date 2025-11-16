@@ -11,12 +11,14 @@ import { User } from '@domain/entities/User';
 import { Email } from '@domain/value-objects/Email';
 import { Password } from '@domain/value-objects/Password';
 
+const STRONG_PASSWORD = 'SecurePass123!';
+
 describe('User Entity', () => {
   describe('create', () => {
     it('should create a valid user', () => {
       // Arrange
       const email = Email.create('test@example.com');
-      const password = Password.create('SecurePass123!');
+      const password = Password.create(STRONG_PASSWORD);
       
       // Act
       const user = User.create({
@@ -38,7 +40,7 @@ describe('User Entity', () => {
     it('should raise UserCreated domain event', () => {
       // Arrange
       const email = Email.create('test@example.com');
-      const password = Password.create('SecurePass123!');
+      const password = Password.create(STRONG_PASSWORD);
       
       // Act
       const user = User.create({
@@ -55,7 +57,7 @@ describe('User Entity', () => {
 
     it('should default to user role if not specified', () => {
       const email = Email.create('test@example.com');
-      const password = Password.create('SecurePass123!');
+      const password = Password.create(STRONG_PASSWORD);
       
       const user = User.create({
         email,
@@ -73,7 +75,7 @@ describe('User Entity', () => {
       const user = User.create({
         email: Email.create('test@example.com'),
         name: 'Test User',
-        password: Password.create('SecurePass123!'),
+        password: Password.create(STRONG_PASSWORD),
       });
       
       // Act
@@ -88,7 +90,7 @@ describe('User Entity', () => {
       const user = User.create({
         email: Email.create('test@example.com'),
         name: 'Test User',
-        password: Password.create('SecurePass123!'),
+        password: Password.create(STRONG_PASSWORD),
       });
       user.verifyEmail();
       
@@ -102,7 +104,7 @@ describe('User Entity', () => {
       const user = User.create({
         email: Email.create('test@example.com'),
         name: 'Old Name',
-        password: Password.create('SecurePass123!'),
+        password: Password.create(STRONG_PASSWORD),
       });
       
       user.changeName('New Name');
@@ -114,7 +116,7 @@ describe('User Entity', () => {
       const user = User.create({
         email: Email.create('test@example.com'),
         name: 'Test User',
-        password: Password.create('SecurePass123!'),
+        password: Password.create(STRONG_PASSWORD),
       });
       
       expect(() => user.changeName('')).toThrow('Name cannot be empty');
@@ -150,10 +152,10 @@ describe('User Entity', () => {
       const user = User.create({
         email: Email.create('test@example.com'),
         name: 'Test User',
-        password: Password.create('OldPass123!'),
+        password: Password.create('OldPass1234!'),
       });
-      
-      const newPassword = Password.create('NewPass456!');
+
+      const newPassword = Password.create('NewPass4567!');
       user.changePassword(newPassword);
       
       expect(user.updatedAt).toBeDefined();
@@ -163,23 +165,22 @@ describe('User Entity', () => {
       const user = User.create({
         email: Email.create('test@example.com'),
         name: 'Test User',
-        password: Password.create('Pass123!'),
+        password: Password.create(STRONG_PASSWORD),
       });
-      
+
       const oldUpdatedAt = user.updatedAt;
-      
-      // Small delay to ensure timestamp difference
-      setTimeout(() => {
-        user.changePassword(Password.create('NewPass123!'));
-        expect(user.updatedAt.getTime()).toBeGreaterThan(oldUpdatedAt.getTime());
-      }, 10);
+
+      user.changePassword(Password.create('NewSecurePass123!'));
+
+      expect(user.updatedAt).not.toBe(oldUpdatedAt);
+      expect(user.updatedAt.getTime()).toBeGreaterThanOrEqual(oldUpdatedAt.getTime());
     });
   });
 
   describe('fromPersistence', () => {
     it('should reconstitute user from persistence', () => {
       const email = Email.create('persisted@example.com');
-      const password = Password.create('Pass123!');
+      const password = Password.create(STRONG_PASSWORD);
       const now = new Date();
       
       const user = User.fromPersistence({
@@ -204,7 +205,7 @@ describe('User Entity', () => {
       const user = User.create({
         email: Email.create('json@example.com'),
         name: 'JSON User',
-        password: Password.create('Pass123!'),
+        password: Password.create(STRONG_PASSWORD),
         role: 'user',
       });
       
@@ -223,7 +224,7 @@ describe('User Entity', () => {
       const user = User.create({
         email: Email.create('test@example.com'),
         name: 'Test User',
-        password: Password.create('Pass123!'),
+        password: Password.create(STRONG_PASSWORD),
       });
       
       expect(user.getDomainEvents().length).toBeGreaterThan(0);

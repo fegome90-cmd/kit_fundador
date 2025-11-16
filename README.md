@@ -8,6 +8,12 @@
 - ✅ **Python** (FastAPI + Pytest + SQLAlchemy)
 - ✅ **JSON/Config** (para cualquier otro lenguaje)
 
+## 🧩 Decisiones del stack base
+
+- El perfil predeterminado del starkit usa **TypeScript + Node.js 20** con Express mínimo para exponer ejemplos de handlers.
+- Los comandos de lint, build y testing se alinean con **ESLint + Prettier + Jest + esbuild**; tómalos como referencia y reemplázalos en cuanto cierres tu propio stack.
+- Consulta [`dev-docs/tech-stack-decisions.md`](dev-docs/tech-stack-decisions.md) y [`config/tech-stack.json`](config/tech-stack.json) antes de proponer dependencias nuevas o sugerir frameworks alternativos.
+
 ## 🎯 Propósito
 
 Este kit proporciona la infraestructura completa para que un agente IA (como Claude) pueda iniciar y mantener un proyecto de software de calidad profesional, con énfasis en:
@@ -107,6 +113,62 @@ make test
 make validate
 ```
 
+## 🧭 Post-clone Checklist
+
+Este repositorio es un **starkit agnóstico**: incluye ejemplos, no una aplicación completa. Después de clonar, sigue estos pasos
+para dejarlo operativo en tu contexto:
+
+1. **Entry point real** → crea el archivo de arranque de tu servicio (`src/index.ts`, `main.py`, etc.) y actualiza los scripts
+   (`package.json`, `Makefile`, `docker-compose`) para apuntar a él.
+2. **Dependencias implícitas** → importa manualmente módulos como `crypto` y reemplaza los helpers ficticios (`hashed_${plainPassword}`,
+   event dispatcher en memoria) por servicios reales.
+3. **Tooling** → decide tu stack de lint/test (ESLint, Pytest, Go test, etc.) y actualiza `lint-staged`, hooks y pipelines según
+   corresponda. Consulta la [Guía de Tooling](dev-docs/tooling-guide.md) para reemplazar los placeholders de `package.json` y
+   alinear linters/formatters multi-lenguaje.
+4. **Documentación viva** → completa `dev-docs/context.md`, `dev-docs/plan.md` y `dev-docs/task.md` con las decisiones de tu
+   producto.
+
+> 📄 Consulta `dev-docs/consumer-checklist.md` para una lista detallada y marcable de responsabilidades.
+
+## ✅ Validación post-adaptación
+
+Cuando todos los placeholders hayan sido reemplazados, ejecuta una última pasada de calidad:
+
+1. Corre lint, tests y type-check con los comandos reales de tu stack (no dejes los ejemplos sin verificar).
+2. Confirma que los servicios ficticios (hasher, dispatcher, entrypoint) fueron sustituidos y documentados en `dev-docs/context.md`.
+3. Sincroniza README, `dev-docs/plan.md` y `dev-docs/task.md` para que reflejen los comandos y responsables actuales.
+
+> 📄 Usa la [Guía de Validación Post-Adaptación](dev-docs/post-adaptation-validation.md) para seguir un checklist completo y registrar hallazgos.
+
+## 🧰 Personaliza scripts y linters
+
+Los scripts incluidos en `package.json` contienen tokens (`<project-entrypoint>`, `<build-output>`, `<seed-script>`) que debes
+reemplazar cuando definas el entry point real de tu servicio. Sigue las pautas de `dev-docs/tooling-guide.md` para ajustar los
+comandos `dev`, `start`, `seed`, `lint`, `format` y `type-check`, así como para extender `lint-staged` si trabajas con múltiples
+lenguajes.
+
+## 🧪 Suites opcionales multi-lenguaje
+
+- `tests/integration/test_setup_script.sh` demuestra cómo validar assets de las plantillas desde Bash. Ejecútalo manualmente o
+  expón un script (`npm run test:templates`) si quieres integrarlo al pipeline.
+- `tests/unit/python/` contiene ejemplos de Pytest para el value object `Email`. Son ilustrativos y no forman parte del comando
+  `npm test`; habilítalos creando un script propio (`npm run test:py`) o desde tu `Makefile` si tu stack final usa Python. Para
+  ejecutarlos directamente basta con instalar tus dependencias (`pip install -r requirements.txt` o equivalente) y correr
+  `pytest tests/unit/python`. Si no vas a mantener una suite en Python, documenta la decisión en `dev-docs/context.md` y borra
+  la carpeta para evitar ruido en tu pipeline.
+
+## 🧱 Plantillas de dominio y eventos
+
+- Los value objects (`Email`, `Password`) usan constantes exportadas (regex, dominios bloqueados, longitud mínima) para que
+  puedas sustituir reglas desde un único punto sin tocar la lógica interna.
+- El aggregate `User` sólo modela operaciones básicas y acumula eventos en memoria; la responsabilidad de despacharlos recae en
+  tu capa de aplicación a través de un `DomainEventDispatcher` propio.
+- Sigue el patrón `save → publish → clear` para evitar publicar eventos que no llegaron a persistirse.
+- El bounded context **Identity & Access** ya está descrito en [`dev-docs/domain/ubiquitous-language.md`](dev-docs/domain/ubiquitous-language.md);
+  úsalo como blueprint y duplica la plantilla incluida al añadir nuevos contextos.
+
+> 📄 Consulta `dev-docs/domain/domain-integration-points.md` para detalles y un checklist de implementación.
+
 ## 🛠️ Comandos Principales
 
 ```bash
@@ -149,6 +211,7 @@ make reset            # Reset completo (clean + up + migrate + seed)
 - **[dev-docs/context.md](dev-docs/context.md)**: Visión general del proyecto
 - **[dev-docs/plan.md](dev-docs/plan.md)**: Roadmap y milestones
 - **[dev-docs/domain/ubiquitous-language.md](dev-docs/domain/ubiquitous-language.md)**: Glosario del dominio
+- **[dev-docs/consumer-checklist.md](dev-docs/consumer-checklist.md)**: Checklist post-clonado para equipos que adopten el kit
 
 ## 🏗️ Arquitectura
 
