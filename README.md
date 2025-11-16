@@ -221,6 +221,20 @@ en un proyecto real, sigue el [plan de ejecución](dev-docs/setup/setup-sh-remed
 
 Documenta qué fases aplicaste en `dev-docs/task.md` antes de continuar con las tareas principales del roadmap.
 
+## 🗄️ Blueprint de base de datos y migraciones
+
+Aunque el starkit no provisiona una base de datos real, TASK-003 exige que cada equipo defina su propia estrategia de
+persistencia. Consulta [`dev-docs/infrastructure/database-blueprint.md`](dev-docs/infrastructure/database-blueprint.md)
+para seguir una guía agnóstica que cubre:
+
+- Servicios recomendados en `docker-compose.dev.yml` (ejemplo con Postgres, adaptable a otros motores).
+- Archivos esperados (`.env.example`, `db/migrations/`, seeds) y su relación con `package.json`/`Makefile`.
+- Minitareas, revisiones y comandos de testing que puedes usar para adaptar el kit sin añadir dependencias
+  obligatorias.
+
+Completa la checklist del blueprint y actualiza `dev-docs/task.md` cuando definas tu stack real para que el resto del
+equipo conozca el estado de TASK-003.
+
 ## 🧭 Post-clone Checklist
 
 Este repositorio es un **starkit agnóstico**: incluye ejemplos, no una aplicación completa. Después de clonar, sigue estos pasos
