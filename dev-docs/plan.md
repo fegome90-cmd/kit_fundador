@@ -48,11 +48,11 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 2. ✅ Añadir checklist post-clonado que recuerde revisar dependencias implícitas y definir servicios concretos. → `dev-docs/consumer-checklist.md` sirve como lista marcable.
 3. ✅ Señalar explícitamente que las clases actuales son ejemplos ilustrativos y deben ser extendidas o reemplazadas. → se advierte en el README y en la checklist.
 
-### Fase 2 – Tooling mínimo y scripts
+### Fase 2 – Tooling mínimo y scripts ✅
 
-1. Ajustar `package.json` para que los comandos apunten a placeholders (`<project-entrypoint>`), evitando rutas inexistentes.
-2. Proveer instrucciones para conectar linting/formatting y `lint-staged` a los lenguajes que el usuario habilite.
-3. Decidir si los tests Bash/Python permanecen como ejemplo y documentar cómo activarlos.
+1. ✅ Ajustar `package.json` para que los comandos apunten a placeholders (`<project-entrypoint>`, `<build-output>`, `<seed-script>`), evitando rutas inexistentes. → ver `package.json`.
+2. ✅ Proveer instrucciones para conectar linting/formatting y `lint-staged` a los lenguajes que el usuario habilite. → ver `dev-docs/tooling-guide.md` y `README.md#🧰-personaliza-scripts-y-linters`.
+3. ✅ Decidir si los tests Bash/Python permanecen como ejemplo y documentar cómo activarlos. → ver `dev-docs/tooling-guide.md#3-suites-de-pruebas-opcionales` y `README.md#🧪-suites-opcionales-multi-lenguaje`.
 
 ### Fase 3 – Plantillas de dominio y eventos
 

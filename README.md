@@ -117,11 +117,26 @@ para dejarlo operativo en tu contexto:
 2. **Dependencias implícitas** → importa manualmente módulos como `crypto` y reemplaza los helpers ficticios (`hashed_${plainPassword}`,
    event dispatcher en memoria) por servicios reales.
 3. **Tooling** → decide tu stack de lint/test (ESLint, Pytest, Go test, etc.) y actualiza `lint-staged`, hooks y pipelines según
-   corresponda.
+   corresponda. Consulta la [Guía de Tooling](dev-docs/tooling-guide.md) para reemplazar los placeholders de `package.json` y
+   alinear linters/formatters multi-lenguaje.
 4. **Documentación viva** → completa `dev-docs/context.md`, `dev-docs/plan.md` y `dev-docs/task.md` con las decisiones de tu
    producto.
 
 > 📄 Consulta `dev-docs/consumer-checklist.md` para una lista detallada y marcable de responsabilidades.
+
+## 🧰 Personaliza scripts y linters
+
+Los scripts incluidos en `package.json` contienen tokens (`<project-entrypoint>`, `<build-output>`, `<seed-script>`) que debes
+reemplazar cuando definas el entry point real de tu servicio. Sigue las pautas de `dev-docs/tooling-guide.md` para ajustar los
+comandos `dev`, `start`, `seed`, `lint`, `format` y `type-check`, así como para extender `lint-staged` si trabajas con múltiples
+lenguajes.
+
+## 🧪 Suites opcionales multi-lenguaje
+
+- `tests/integration/test_setup_script.sh` demuestra cómo validar assets de las plantillas desde Bash. Ejecútalo manualmente o
+  expón un script (`npm run test:templates`) si quieres integrarlo al pipeline.
+- `tests/unit/python/` contiene ejemplos de Pytest para el value object `Email`. Son ilustrativos y no forman parte del comando
+  `npm test`; habilítalos creando un script propio (`npm run test:py`) o desde tu `Makefile` si tu stack final usa Python.
 
 ## 🛠️ Comandos Principales
 

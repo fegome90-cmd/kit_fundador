@@ -60,25 +60,6 @@
   - [ ] Contract tests pasando
   - [ ] E2E test funcional
 
-### [TASK-006] Documentar responsabilidades del consumidor del starkit
-- **Prioridad**: Alta
-- **Estimación**: 1 hora
-- **Dependencias**: Auditoría commit 7f0912b revisada
-- **Descripción**: Añadir en README/dev-docs un checklist post-clonado que destaque entrypoints, importaciones y servicios que debe proveer el equipo que adopte el kit.
-- **Criterios de Aceptación**:
-  - [ ] README actualizado con sección "Post-clone checklist"
-  - [ ] dev-docs incluye recordatorio de importaciones (ej. `crypto`) y hashing
-  - [ ] Referencia explícita a que las clases actuales son ejemplos ilustrativos
-
-### [TASK-007] Ajustar guías de tooling y scripts
-- **Prioridad**: Media
-- **Estimación**: 1 hora
-- **Dependencias**: TASK-006
-- **Descripción**: Reemplazar rutas hardcodeadas en `package.json` por placeholders y documentar cómo alinear linting/formatting a cualquier stack.
-- **Criterios de Aceptación**:
-  - [ ] Scripts apuntan a `<project-entrypoint>`
-  - [ ] lint-staged documentado para múltiples lenguajes
-  - [ ] Tests Bash/Python documentados como opcionales
 
 ### [TASK-008] Afinar plantillas de dominio y eventos
 - **Prioridad**: Media
@@ -125,6 +106,15 @@
   - [x] README actualizado con sección "Post-clone checklist"
   - [x] dev-docs incluye recordatorio de importaciones (ej. `crypto`) y hashing
   - [x] Referencia explícita a que las clases actuales son ejemplos ilustrativos
+
+### [TASK-007] Ajustar guías de tooling y scripts
+- **Completado**: 2025-01-15
+- **Duración real**: 45 min
+- **Notas**: `package.json` usa placeholders, `dev-docs/tooling-guide.md` explica cómo alinear linters multi-lenguaje y README documenta suites opcionales.
+- **Criterios de Aceptación**:
+  - [x] Scripts apuntan a `<project-entrypoint>`
+  - [x] lint-staged documentado para múltiples lenguajes
+  - [x] Tests Bash/Python documentados como opcionales
 
 ## Backlog 💭
 
