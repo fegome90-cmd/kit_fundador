@@ -1,6 +1,12 @@
 # Kit Fundador v2.0
 
-> Template profesional para iniciar cualquier proyecto con LLM siguiendo Clean Architecture, DDD, TDD y mejores prácticas.
+> Template **agnóstico de lenguaje** para iniciar proyectos con LLM siguiendo Clean Architecture, DDD, TDD y mejores prácticas.
+
+## 🌐 Stacks Soportados
+
+- ✅ **TypeScript** (Node.js + Express + Jest + Prisma)
+- ✅ **Python** (FastAPI + Pytest + SQLAlchemy)
+- ✅ **JSON/Config** (para cualquier otro lenguaje)
 
 ## 🎯 Propósito
 
@@ -21,23 +27,32 @@ proyecto/
 ├── .context/                    # Context management para IA
 │   ├── project-state.json      # Estado persistente
 │   └── active-context.md       # Memoria de sesión
-├── .github/workflows/          # CI/CD pipelines
-├── dev-docs/                   # Documentación de desarrollo
+├── templates/                   # Templates por lenguaje
+│   ├── typescript/             # Template TypeScript completo
+│   ├── python/                 # Template Python completo
+│   └── shared/                 # Recursos compartidos
+├── dev-docs/                   # Documentación universal
 │   ├── architecture/           # ADRs, diagramas
 │   ├── domain/                 # DDD documentation
+│   ├── agent-profiles/         # Sistema Ejecutor/Validador
 │   ├── context.md             # Contexto del proyecto
 │   ├── plan.md                # Roadmap
 │   └── task.md                # Backlog
 ├── config/                     # Configuración
 │   ├── rules/                 # Reglas del agente IA
-│   ├── contracts/             # API contracts (OpenAPI)
-│   └── observability/         # Prometheus, Grafana
-├── src/                       # Código fuente
+│   ├── tech-stack.json        # Stack tecnológico
+│   └── observability/         # Prometheus, Grafana, SLOs
+├── src/                       # Código fuente (después de setup)
 │   ├── domain/               # Core domain (sin dependencias)
 │   ├── application/          # Use cases
 │   └── infrastructure/       # Frameworks, DB, APIs
 ├── tests/                    # Tests organizados por tipo
+│   ├── unit/                 # Tests unitarios (70%)
+│   ├── integration/          # Tests de integración (20%)
+│   └── e2e/                  # Tests end-to-end (10%)
 └── scripts/                  # Automation scripts
+    ├── setup.sh              # ⭐ Setup interactivo
+    └── validate-architecture.sh  # Validación de arquitectura
 ```
 
 ## 🚀 Quick Start
@@ -54,7 +69,10 @@ chmod +x scripts/setup.sh
 ./scripts/setup.sh
 
 # Seleccionar tech stack cuando se solicite
-# Opciones: typescript, python, go, rust
+# Opciones disponibles:
+#   1) TypeScript + Node.js (Express, Jest, Prisma)
+#   2) Python (FastAPI, Pytest, SQLAlchemy)
+#   3) JSON/Config only (para usar con cualquier lenguaje)
 ```
 
 ### 2. Configurar Proyecto
