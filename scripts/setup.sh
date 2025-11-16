@@ -24,7 +24,7 @@ cat << "EOF"
 EOF
 echo -e "${NC}"
 
-# Function to display menu
+# show_menu displays the technology stack selection menu and a cancel option.
 show_menu() {
     echo -e "${YELLOW}Selecciona tu stack tecnológico:${NC}\n"
     echo "  1) TypeScript + Node.js (Express, Jest, Prisma)"
@@ -35,7 +35,7 @@ show_menu() {
     echo ""
 }
 
-# Function to setup TypeScript
+# setup_typescript sets up a TypeScript + Node.js project by copying template files into the workspace, writing config/tech-stack.json describing the stack, and installing npm dependencies if npm is available.
 setup_typescript() {
     echo -e "${GREEN}Configurando proyecto TypeScript...${NC}"
 
@@ -94,7 +94,7 @@ JSON_END
     echo "  make dev                 # Con Docker Compose"
 }
 
-# Function to setup Python
+# setup_python configures a Python (FastAPI) project by copying template files, writing config/tech-stack.json, creating a virtual environment and installing dependencies if python3 is available, and printing next-step instructions.
 setup_python() {
     echo -e "${GREEN}Configurando proyecto Python...${NC}"
 
@@ -158,7 +158,7 @@ JSON_END
     echo "  make dev                  # Con Docker Compose"
 }
 
-# Function to setup JSON only
+# setup_json creates a minimal JSON/config-only project structure with placeholder `.gitkeep` files, writes a default `config/tech-stack.json`, and prints next-step guidance.
 setup_json() {
     echo -e "${GREEN}Configurando proyecto con solo JSON/Config...${NC}"
 
@@ -210,7 +210,7 @@ JSON_END
     echo "  3. Revisa dev-docs/ para guías de arquitectura"
 }
 
-# Function to cleanup
+# cleanup_templates prints a notice that template files are being cleaned from the project, reminds the user that the templates/ directory is kept for reference, and shows the command to remove it (rm -rf templates/).
 cleanup_templates() {
     echo -e "${YELLOW}Limpiando templates...${NC}"
 
@@ -220,7 +220,8 @@ cleanup_templates() {
     echo -e "${BLUE}  Puedes eliminar templates/ cuando quieras: rm -rf templates/${NC}"
 }
 
-# Function to update context
+# update_context writes .context/project-state.json recording initialization timestamp, selected language, phase, and a default last_session with suggested next steps.
+# Accepts a single argument `lang` that is stored as the project's language identifier (e.g., "typescript", "python", "generic").
 update_context() {
     local lang=$1
 
