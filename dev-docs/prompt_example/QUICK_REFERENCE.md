@@ -75,6 +75,23 @@
 │  │  └─ Estrategia TDD/BDD            │
 │  │     └─► Template 19: TDD/BDD     │
 │  │                                   │
+├─ DEFINIR guardrails y control        │
+│  │                                   │
+│  ├─ Guardrails anti-drift           │
+│  │  └─► Template 20: Anti-Drift     │
+│  │                                   │
+│  ├─ Métricas y KPIs de éxito        │
+│  │  └─► Template 21: Success Matrix │
+│  │                                   │
+│  └─ Briefing de misión              │
+│     └─► Template 22: Mission Brief  │
+│                                      │
+├─ ANALIZAR alternativas técnicas      │
+│  └─► Template 24: Trade-off Analysis│
+│                                      │
+├─ REGISTRAR conocimiento aprendido    │
+│  └─► Template 23: Knowledge Record  │
+│                                      │
 └─ TRASPASAR contexto a otro agente    │
    └─► Template 7: Handoff             │
 ```
@@ -104,6 +121,11 @@
 | **17: Integration Testing Plan** | 1-2 días | Media | Plan de pruebas de integración entre módulos/servicios | No |
 | **18: E2E Testing Plan** | 1-3 días | Media | Plan de pruebas E2E de flujos de usuario completos | No |
 | **19: TDD/BDD Strategy** | Variable | Media | Estrategia de desarrollo guiado por pruebas | No |
+| **20: Anti-Drift Guardrails** | Variable | N/A | Definir límites estrictos y mecanismos anti-desviación | Sí (Éxito/Fallo) |
+| **21: Success Criteria Matrix** | Variable | N/A | Definir métricas y KPIs cuantificables (4 dimensiones) | Sí (Score) |
+| **22: Agent Mission Briefing** | Variable | N/A | Asignar tareas formalmente a agentes con directiva clara | No |
+| **23: Knowledge Index Record** | < 1 día | Baja | Capturar aprendizajes y conocimiento post-misión | No |
+| **24: Trade-off Analysis** | 1-2 días | Media | Comparar alternativas técnicas con criterios ponderados | Sí (Score) |
 
 ---
 
@@ -186,6 +208,26 @@
 | "Estrategia TDD para implementar carrito de compras" | 19: TDD/BDD Strategy |
 | "BDD scenarios para sistema de notificaciones push" | 19: TDD/BDD Strategy |
 | "Desarrollo guiado por tests para módulo de autenticación" | 19: TDD/BDD Strategy |
+
+### 🎯 Meta-Organización y Control
+
+| Descripción | Template |
+|-------------|----------|
+| "Definir guardrails estrictos para implementación crítica de endpoint POST /api/orders" | 20: Anti-Drift Guardrails |
+| "Establecer límites y verificación de evidencia para migración de base de datos" | 20: Anti-Drift Guardrails |
+| "Crear marco de control anti-drift para refactor de sistema de pagos" | 20: Anti-Drift Guardrails |
+| "Definir KPIs y métricas para sprint de optimización de performance" | 21: Success Criteria Matrix |
+| "Matriz de criterios de éxito para release de versión 2.0" | 21: Success Criteria Matrix |
+| "Scoring cuantificable para proyecto de migración a React 18" | 21: Success Criteria Matrix |
+| "Briefing formal para agente de refactor de módulo LegacyUserService" | 22: Agent Mission Briefing |
+| "Asignación de misión para implementación de sistema de caché distribuido" | 22: Agent Mission Briefing |
+| "Directiva clara para tarea de migración de autenticación a OAuth 2.0" | 22: Agent Mission Briefing |
+| "Documentar aprendizajes y patrones de migración a Node.js v20" | 23: Knowledge Index Record |
+| "Registrar patrones y anti-patrones descubiertos en implementación de WebSockets" | 23: Knowledge Index Record |
+| "Capturar conocimiento de resolución de issue crítico de memoria" | 23: Knowledge Index Record |
+| "Comparar frameworks de CSS (Tailwind vs Styled Components vs actual)" | 24: Trade-off Analysis |
+| "Evaluar alternativas de base de datos (PostgreSQL vs MongoDB vs DynamoDB)" | 24: Trade-off Analysis |
+| "Análisis ponderado de opciones de deployment (Vercel vs AWS vs Railway)" | 24: Trade-off Analysis |
 
 ---
 
@@ -341,16 +383,22 @@ Template 5 (Daily Task) → Cambio → Merge
 - Plan de pruebas de integración → 17
 - Plan de pruebas E2E → 18
 - Estrategia TDD/BDD → 19
+- Definir guardrails anti-drift → 20
+- Matriz de criterios de éxito → 21
+- Briefing de misión para agente → 22
+- Registrar conocimiento post-misión → 23
+- Análisis de trade-offs → 24
 
 **"¿Cuánto tiempo?"**
 - < 2h → 5
-- 2h-1d → 3, 5, 16
-- 1-5d → 2, 4, 8, 9, 10, 11, 15, 17, 18
+- 2h-1d → 3, 5, 16, 23
+- 1-5d → 2, 4, 8, 9, 10, 11, 15, 17, 18, 24
 - > 5d → 1
+- Variable → 12, 13, 19, 20, 21, 22
 
 **"¿Necesito gate?"**
-- Sí → 6, 8, 9, 10, 11 (auditorías)
-- No → 1-5, 7, 12-19
+- Sí → 6, 8, 9, 10, 11, 20, 21 (auditorías y scoring)
+- No → 1-5, 7, 12-19, 22-24
 
 **"¿Qué tipo de auditoría?"**
 - Gate general (4 dimensiones) → 6

@@ -1,6 +1,6 @@
 # 📝 Catálogo de Templates de Prompts
 
-Esta carpeta contiene **19 templates de prompts estructurados** para diferentes tipos de tareas de desarrollo. Estos templates ayudan a mantener consistencia, claridad y trazabilidad en el trabajo con agentes IA o en documentación de tareas.
+Esta carpeta contiene **24 templates de prompts estructurados** para diferentes tipos de tareas de desarrollo. Estos templates ayudan a mantener consistencia, claridad y trazabilidad en el trabajo con agentes IA o en documentación de tareas.
 
 ## 🎯 Propósito
 
@@ -405,6 +405,114 @@ Los templates sirven para:
 
 ---
 
+### 20. Guardrails Anti-Drift - `template_20_anti_drift_guardrails.md`
+
+**Cuándo usar**: Definir límites estrictos y mecanismos anti-desviación para tareas críticas
+
+**Características**:
+- Mission Statement (declaración inequívoca del objetivo)
+- Boundary Markers (límites de alcance, tecnología, performance, comportamiento)
+- Chain of Verification (Claims que requieren evidencia empírica)
+- Protocolo [EVIDENCE] vs [PROPOSAL]
+- Context Pinning (fuentes de verdad y fuentes prohibidas)
+- Condiciones de éxito/fallo de la misión
+
+**Ejemplo de uso**:
+```markdown
+"Definir guardrails para implementación de endpoint POST /api/orders"
+"Establecer límites estrictos para migración de base de datos"
+"Crear marco de control para refactor crítico de sistema de pagos"
+```
+
+---
+
+### 21. Matriz de Criterios de Éxito - `template_21_success_criteria_matrix.md`
+
+**Cuándo usar**: Definir métricas y KPIs cuantificables para sprints/proyectos
+
+**Características**:
+- 4 dimensiones con ponderación:
+  - **Completitud** (30%): Tareas, requisitos, documentación, artefactos
+  - **Calidad** (30%): Cobertura tests, bugs, vulnerabilidades, linter
+  - **Impacto** (25%): Latencia, conversión, satisfacción, carga
+  - **Sostenibilidad** (15%): Mantenibilidad, complejidad, pipeline, runbook
+- Metodología de scoring (baseline → target → actual)
+- Método de medición específico para cada KPI
+- Cálculo de score global final con gate de aprobación
+
+**Ejemplo de uso**:
+```markdown
+"Definir criterios de éxito para sprint de optimización de performance"
+"Matriz de KPIs para proyecto de migración a React 18"
+"Métricas de evaluación para release de versión 2.0"
+```
+
+---
+
+### 22. Briefing de Misión para Agente - `template_22_agent_mission_briefing.md`
+
+**Cuándo usar**: Asignar tareas formalmente a agentes (humanos o IA) con directiva clara
+
+**Características**:
+- Prime Directive (objetivo imperativo e inmutable)
+- Parámetros de la misión (duración, recursos, documentos de referencia)
+- Capacidades requeridas (accesos, herramientas, conocimiento)
+- Protocolos operativos (comunicación, escalada, handoff)
+- Rules of Engagement (autonomía, colaboración, modo sigiloso)
+- Criterios de éxito de la misión con verificación
+
+**Ejemplo de uso**:
+```markdown
+"Briefing para agente de refactor de módulo LegacyUserService"
+"Misión formal para implementación de sistema de caché distribuido"
+"Asignación de tarea de migración de autenticación a OAuth 2.0"
+```
+
+---
+
+### 23. Registro de Conocimiento - `template_23_knowledge_index_record.md`
+
+**Cuándo usar**: Capturar aprendizajes y conocimiento después de completar misiones
+
+**Características**:
+- Resumen ejecutivo del conocimiento adquirido
+- Patrones de código identificados/implementados (contexto, implementación, ubicación)
+- Anti-patrones a evitar descubiertos
+- Decisiones de arquitectura (ADRs) tomadas o propuestas
+- Actualizaciones sugeridas para documentación y runbooks
+- Métricas y datos clave para la memoria
+- Nivel de memoria: L1 (Táctico) / L2 (Operacional) / L3 (Estratégico)
+
+**Ejemplo de uso**:
+```markdown
+"Documentar aprendizajes de migración a Node.js v20"
+"Registrar patrones descubiertos en implementación de WebSockets"
+"Capturar conocimiento de resolución de issue crítico de memoria"
+```
+
+---
+
+### 24. Análisis de Trade-offs - `template_24_trade_off_analysis.md`
+
+**Cuándo usar**: Comparar alternativas técnicas usando criterios ponderados
+
+**Características**:
+- Definición de problema y contexto
+- Criterios de decisión con ponderación (suma 100%)
+- Análisis y scoring de cada alternativa (escala 1-5)
+- Tabla comparativa con justificación de puntuaciones
+- Cálculo de score ponderado automático
+- Decisión final con justificación basada en datos
+
+**Ejemplo de uso**:
+```markdown
+"Comparar frameworks de CSS (Tailwind vs Styled Components vs actual)"
+"Evaluar alternativas de base de datos (PostgreSQL vs MongoDB vs DynamoDB)"
+"Análisis de opciones de deployment (Vercel vs AWS vs Railway)"
+```
+
+---
+
 ## 🔄 Flujo de Trabajo Recomendado
 
 ### Para Implementaciones Grandes
@@ -451,9 +559,10 @@ Estos templates se integran con los perfiles de agente existentes en `dev-docs/a
 
 | Agent Profile | Templates Recomendados |
 |---------------|------------------------|
-| **EJECUTOR** | Templates 1-5, 12-19 (implementación, investigación, planificación, testing) |
-| **VALIDADOR** | Templates 6, 8-11 (auditorías general y especializadas) |
-| **HANDOFF** | Template 7 (traspaso) |
+| **EJECUTOR** | Templates 1-5, 12-19, 24 (implementación, investigación, planificación, testing, análisis) |
+| **VALIDADOR** | Templates 6, 8-11, 21 (auditorías general y especializadas, métricas de éxito) |
+| **HANDOFF** | Template 7, 23 (traspaso, registro de conocimiento) |
+| **PLANIFICADOR/LÍDER** | Templates 20, 21, 22 (guardrails, métricas, briefings de misión) |
 
 **Auditorías Especializadas (Templates 6, 8-11):**
 - **Template 6**: Auditoría General (4 dimensiones: completitud, calidad, impacto, sostenibilidad)
@@ -473,6 +582,13 @@ Estos templates se integran con los perfiles de agente existentes en `dev-docs/a
 - **Template 17**: Plan de Pruebas de Integración (módulos, servicios, capas)
 - **Template 18**: Plan de Pruebas E2E (flujos de usuario completos)
 - **Template 19**: Estrategia TDD/BDD (desarrollo guiado por pruebas)
+
+**Meta-Organización y Control de Calidad (Templates 20-24):**
+- **Template 20**: Guardrails Anti-Drift (límites estrictos, evidencia vs propuesta, context pinning)
+- **Template 21**: Matriz de Criterios de Éxito (KPIs en 4 dimensiones, scoring ponderado)
+- **Template 22**: Briefing de Misión para Agente (directiva, capacidades, protocolos operativos)
+- **Template 23**: Registro de Conocimiento (patrones, anti-patrones, ADRs, métricas)
+- **Template 24**: Análisis de Trade-offs (comparación ponderada de alternativas)
 
 Ver: [`dev-docs/agent-profiles/README.md`](../agent-profiles/README.md)
 
