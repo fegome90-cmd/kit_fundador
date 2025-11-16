@@ -60,6 +60,16 @@
   - [ ] Contract tests pasando
   - [ ] E2E test funcional
 
+### [TASK-006] Documentar responsabilidades del consumidor del starkit
+- **Prioridad**: Alta
+- **Estimación**: 1 hora
+- **Dependencias**: Auditoría commit 7f0912b revisada
+- **Descripción**: Añadir en README/dev-docs un checklist post-clonado que destaque entrypoints, importaciones y servicios que debe proveer el equipo que adopte el kit.
+- **Criterios de Aceptación**:
+  - [ ] README actualizado con sección "Post-clone checklist"
+  - [ ] dev-docs incluye recordatorio de importaciones (ej. `crypto`) y hashing
+  - [ ] Referencia explícita a que las clases actuales son ejemplos ilustrativos
+
 ### [TASK-007] Ajustar guías de tooling y scripts
 - **Prioridad**: Media
 - **Estimación**: 1 hora
