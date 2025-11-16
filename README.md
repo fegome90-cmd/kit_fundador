@@ -138,6 +138,16 @@ lenguajes.
 - `tests/unit/python/` contiene ejemplos de Pytest para el value object `Email`. Son ilustrativos y no forman parte del comando
   `npm test`; habilítalos creando un script propio (`npm run test:py`) o desde tu `Makefile` si tu stack final usa Python.
 
+## 🧱 Plantillas de dominio y eventos
+
+- Los value objects (`Email`, `Password`) usan constantes exportadas (regex, dominios bloqueados, longitud mínima) para que
+  puedas sustituir reglas desde un único punto sin tocar la lógica interna.
+- El aggregate `User` sólo modela operaciones básicas y acumula eventos en memoria; la responsabilidad de despacharlos recae en
+  tu capa de aplicación a través de un `DomainEventDispatcher` propio.
+- Sigue el patrón `save → publish → clear` para evitar publicar eventos que no llegaron a persistirse.
+
+> 📄 Consulta `dev-docs/domain/domain-integration-points.md` para detalles y un checklist de implementación.
+
 ## 🛠️ Comandos Principales
 
 ```bash

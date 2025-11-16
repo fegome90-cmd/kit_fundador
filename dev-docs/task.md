@@ -60,17 +60,6 @@
   - [ ] Contract tests pasando
   - [ ] E2E test funcional
 
-
-### [TASK-008] Afinar plantillas de dominio y eventos
-- **Prioridad**: Media
-- **Estimación**: 1.5 horas
-- **Dependencias**: TASK-006
-- **Descripción**: Extraer constantes fuera de los value objects y añadir comentarios que indiquen dónde conectar servicios reales (hashing, event bus).
-- **Criterios de Aceptación**:
-  - [ ] Regex/listas compartidas definidas como constantes reutilizables
-  - [ ] Comentarios explican integración con servicios externos
-  - [ ] No se introduce dependencia concreta
-
 ### [TASK-009] Simplificar suites de prueba
 - **Prioridad**: Media
 - **Estimación**: 1 hora
@@ -115,6 +104,15 @@
   - [x] Scripts apuntan a `<project-entrypoint>`
   - [x] lint-staged documentado para múltiples lenguajes
   - [x] Tests Bash/Python documentados como opcionales
+
+### [TASK-008] Afinar plantillas de dominio y eventos
+- **Completado**: 2025-01-15
+- **Duración real**: 50 min
+- **Notas**: Value objects usan constantes compartidas, se documentó `DomainEventDispatcher` y se añadió guía de integración en `dev-docs/domain/domain-integration-points.md`.
+- **Criterios de Aceptación**:
+  - [x] Regex/listas compartidas definidas como constantes reutilizables
+  - [x] Comentarios explican integración con servicios externos
+  - [x] No se introduce dependencia concreta
 
 ## Backlog 💭
 

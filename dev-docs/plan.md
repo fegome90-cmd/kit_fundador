@@ -54,11 +54,14 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 2. ✅ Proveer instrucciones para conectar linting/formatting y `lint-staged` a los lenguajes que el usuario habilite. → ver `dev-docs/tooling-guide.md` y `README.md#🧰-personaliza-scripts-y-linters`.
 3. ✅ Decidir si los tests Bash/Python permanecen como ejemplo y documentar cómo activarlos. → ver `dev-docs/tooling-guide.md#3-suites-de-pruebas-opcionales` y `README.md#🧪-suites-opcionales-multi-lenguaje`.
 
-### Fase 3 – Plantillas de dominio y eventos
+### Fase 3 – Plantillas de dominio y eventos ✅
 
-1. Extraer constantes (regex, listas) fuera de los value objects para mostrar buenas prácticas sin agregar dependencias.
-2. Documentar dónde se espera integrar un dispatcher de eventos o servicios de infraestructura reales.
-3. Mantener los ejemplos simples, aclarando que el agregado no cubre todos los casos productivos.
+1. ✅ Extraer constantes (regex, listas) fuera de los value objects para mostrar buenas prácticas sin agregar dependencias. →
+   ver `src/domain/value-objects/Email.ts` y `Password.ts`.
+2. ✅ Documentar dónde se espera integrar un dispatcher de eventos o servicios de infraestructura reales. → ver
+   `src/domain/domain-events/DomainEventDispatcher.ts` y `dev-docs/domain/domain-integration-points.md`.
+3. ✅ Mantener los ejemplos simples, aclarando que el agregado no cubre todos los casos productivos. → ver sección
+   `README.md#🧱-plantillas-de-dominio-y-eventos`.
 
 ### Fase 4 – Pruebas orientativas
 
