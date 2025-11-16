@@ -457,7 +457,7 @@ Los prompts anteriores activan **roles de agente** (EJECUTOR, VALIDADOR). Para *
 
 | Rol de Agente | Templates Recomendados | Cuándo Usar |
 |---------------|------------------------|-------------|
-| **EJECUTOR** | Templates 1-5 | Para planificar e implementar tareas |
+| **EJECUTOR** | Templates 1-5, 12-15 | Para planificar e implementar tareas, investigar, documentar decisiones |
 | **VALIDADOR** | Templates 6, 8-11 | Para auditar y evaluar calidad (general y especializada) |
 | **HANDOFF** | Template 7 | Para traspasar contexto entre agentes/equipos |
 
@@ -527,6 +527,10 @@ Ver guía completa: [`dev-docs/prompt_example/QUICK_REFERENCE.md`](../prompt_exa
 - Auditoría de performance → Template 9
 - Auditoría de calidad de código → Template 10
 - Auditoría de UI/UX (WCAG) → Template 11
+- Investigación técnica/comparativa → Template 12
+- Planificación de infraestructura → Template 13
+- Arquitectura Decision Record (ADR) → Template 14
+- Plan de pruebas (Testing) → Template 15
 
 ### Workflow Recomendado
 
@@ -703,6 +707,104 @@ Verificaciones:
 - Testing con lectores de pantalla
 
 Generar plan de remediación con prioridades.
+
+Comenzar.
+```
+
+#### Para Investigación y Planificación
+
+##### Investigación Técnica
+```markdown
+Modo EJECUTOR.
+
+Template: template_12_technical_research.md
+Investigación: [RESEARCH-XXX]
+
+Objetivos SMART:
+- O1: Analizar alternativas [A, B, C]
+- O2: Crear PoC de la opción más prometedora
+- O3: Producir informe de recomendación
+
+Metodología:
+1. Recopilación de datos (documentación, benchmarks)
+2. Análisis comparativo con tabla de criterios
+3. Desarrollo de Proof of Concept
+4. Síntesis y recomendación final
+
+Criterios de evaluación: [Performance, ecosistema, curva de aprendizaje, bundle size, etc.]
+
+Comenzar.
+```
+
+##### Planificación de Infraestructura
+```markdown
+Modo EJECUTOR.
+
+Template: template_13_infrastructure_plan.md
+Plan: [INFRA-XXX]
+
+Objetivo: [ej: "Configurar pipeline de CI/CD para servicio X"]
+
+Componentes:
+- Proveedor Cloud: [AWS/GCP/Azure]
+- CI/CD: [GitHub Actions/Jenkins/GitLab CI]
+- IaC: [Terraform/CloudFormation/Pulumi]
+- Contenedores: [Docker/ECS/Kubernetes]
+- Monitoreo: [Datadog/Prometheus/CloudWatch]
+
+Fases:
+1. Configuración del entorno base (IaC)
+2. Creación del pipeline de CI/CD
+3. Seguridad y monitoreo
+
+Incluir: Diagrama de arquitectura, estrategia de rollback, criterios de aceptación.
+
+Comenzar.
+```
+
+##### Architecture Decision Record (ADR)
+```markdown
+Modo EJECUTOR.
+
+Template: template_14_architecture_decision_record.md
+ADR: [ADR-XXX]
+
+Decisión: [ej: "Adoptar WebSockets en lugar de polling"]
+
+Estructura:
+1. Contexto: ¿Qué problema resuelve esta decisión?
+2. Decisión: Declaración clara de lo que se decidió
+3. Justificación: Por qué esta opción sobre las alternativas
+4. Consecuencias: Impactos positivos y negativos
+5. Alternativas Consideradas: Opciones rechazadas y por qué
+
+Status: [Propuesto/Aceptado/Rechazado/Deprecado]
+
+Comenzar.
+```
+
+##### Plan de Pruebas (Testing)
+```markdown
+Modo EJECUTOR.
+
+Template: template_15_testing_plan.md
+Plan de Pruebas: [TEST-XXX]
+
+Funcionalidad: [ej: "Sistema de exportación a PDF"]
+
+Estrategia:
+- TDD/BDD: Definir comportamientos Given-When-Then
+- Pruebas Unitarias: Funciones y componentes aislados
+- Pruebas de Integración: Colaboración entre módulos
+- Pruebas E2E: Flujos completos de usuario
+
+Herramientas:
+- Unitarias: [Jest/Vitest]
+- Integración: [React Testing Library/Supertest]
+- E2E: [Cypress/Playwright]
+
+Criterios de Entrada: Código desplegado en Staging, tests unitarios pasando
+Criterios de Salida: 100% casos críticos ejecutados, cobertura ≥[XX]%, 0 bugs bloqueantes
 
 Comenzar.
 ```
