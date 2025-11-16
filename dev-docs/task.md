@@ -60,12 +60,60 @@
   - [ ] Contract tests pasando
   - [ ] E2E test funcional
 
+
+
+### [TASK-010] Añadir checklist de validación posterior
+- **Prioridad**: Baja
+- **Estimación**: 0.5 horas
+- **Dependencias**: TASK-006, TASK-007, TASK-008
+- **Descripción**: Crear sección en la documentación con pasos para validar que las personalizaciones del starkit están completas (lint, test, hooks, servicios).
+- **Criterios de Aceptación**:
+  - [ ] Sección "Post-adaptation validation" publicada
+  - [ ] Lista incluye lint/test/validate
+  - [ ] Preguntas guía sobre importaciones, hooks y servicios
+
 ## Completadas ✅
 
 ### [TASK-000] Inicializar proyecto con Kit Fundador
 - **Completado**: 2025-01-15
 - **Duración real**: 30 min
 - **Notas**: Estructura base creada exitosamente
+
+### [TASK-006] Documentar responsabilidades del consumidor del starkit
+- **Completado**: 2025-01-15
+- **Duración real**: 40 min
+- **Notas**: README y `dev-docs/consumer-checklist.md` documentan la responsabilidad del equipo que adopta el kit.
+- **Criterios de Aceptación**:
+  - [x] README actualizado con sección "Post-clone checklist"
+  - [x] dev-docs incluye recordatorio de importaciones (ej. `crypto`) y hashing
+  - [x] Referencia explícita a que las clases actuales son ejemplos ilustrativos
+
+### [TASK-007] Ajustar guías de tooling y scripts
+- **Completado**: 2025-01-15
+- **Duración real**: 45 min
+- **Notas**: `package.json` usa placeholders, `dev-docs/tooling-guide.md` explica cómo alinear linters multi-lenguaje y README documenta suites opcionales.
+- **Criterios de Aceptación**:
+  - [x] Scripts apuntan a `<project-entrypoint>`
+  - [x] lint-staged documentado para múltiples lenguajes
+  - [x] Tests Bash/Python documentados como opcionales
+
+### [TASK-008] Afinar plantillas de dominio y eventos
+- **Completado**: 2025-01-15
+- **Duración real**: 50 min
+- **Notas**: Value objects usan constantes compartidas, se documentó `DomainEventDispatcher` y se añadió guía de integración en `dev-docs/domain/domain-integration-points.md`.
+- **Criterios de Aceptación**:
+  - [x] Regex/listas compartidas definidas como constantes reutilizables
+  - [x] Comentarios explican integración con servicios externos
+  - [x] No se introduce dependencia concreta
+
+### [TASK-009] Simplificar suites de prueba
+- **Completado**: 2025-01-16
+- **Duración real**: 35 min
+- **Notas**: Se parametrizó `tests/unit/Email.test.ts`, se corrigió el ejemplo de `changePassword` y se añadió guía explícita para Pytest en el README.
+- **Criterios de Aceptación**:
+  - [x] `tests/unit/Email.test.ts` usa tabla de casos
+  - [x] Ejemplo de Jest asíncrono garantiza que el runner espere la promesa
+  - [x] README/dev-docs explican cómo habilitar/deshabilitar pruebas en otros lenguajes
 
 ## Backlog 💭
 
