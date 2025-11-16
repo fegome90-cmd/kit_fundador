@@ -93,32 +93,9 @@ export class Email {
     }
   }
 
-    const [localPart, domainPart] = this._value.split('@');
-    if (!localPart || !domainPart) {
-      throw new Error('Invalid email format');
-    }
-
-    if (localPart.startsWith('.') || localPart.endsWith('.')) {
-      throw new Error('Invalid email format');
-    }
-
-    if (domainPart.startsWith('-') || domainPart.endsWith('-')) {
-      throw new Error('Invalid email format');
-    }
-
-    const domainLabels = domainPart.split('.');
-    const hasInvalidLabel = domainLabels.some(
-      (label) => !label || label.startsWith('-') || label.endsWith('-')
-    );
-
-    if (hasInvalidLabel) {
-      throw new Error('Invalid email format');
-    }
-
-    // Example: Block certain domains
-    const domain = domainPart;
-    if (BLOCKED_DOMAINS.includes(domain)) {
-      throw new Error(`Email domain not allowed: ${domain}`);
+  private ensureDomainNotBlocked(domainPart: string): void {
+    if (BLOCKED_DOMAINS.includes(domainPart)) {
+      throw new Error(`Domain ${domainPart} is not allowed`);
     }
   }
 
