@@ -57,7 +57,9 @@ class TestUserEntity:
         assert events[0].__class__.__name__ == 'UserCreatedEvent'
 
     def test_create_defaults_to_user_role(self):
-        """Should default to user role if not specified."""
+        """
+        Default to the USER role when a User is created without an explicit role.
+        """
         # Arrange
         email = Email.create('test@example.com')
         password_hash = 'hashed_password_123'
@@ -88,7 +90,11 @@ class TestUserEntity:
         assert user.email_verified is True
 
     def test_verify_email_throws_if_already_verified(self):
-        """Should throw if email already verified."""
+        """
+        Raise ValueError when attempting to verify an already-verified email.
+        
+        Asserts that calling `verify_email` on a user whose email is already verified raises a `ValueError` with message 'Email already verified'.
+        """
         # Arrange
         user = User.create(
             email=Email.create('test@example.com'),
@@ -130,7 +136,9 @@ class TestUserEntity:
             user.change_name('')
 
     def test_is_admin_returns_true_for_admin_users(self):
-        """Should return true for admin users."""
+        """
+        Verify that is_admin() identifies users with the admin role.
+        """
         # Arrange & Act
         user = User.create(
             email=Email.create('admin@example.com'),
@@ -143,7 +151,9 @@ class TestUserEntity:
         assert user.is_admin() is True
 
     def test_is_admin_returns_false_for_regular_users(self):
-        """Should return false for regular users."""
+        """
+        Verify that is_admin() reports non-admin for a user assigned the USER role.
+        """
         # Arrange & Act
         user = User.create(
             email=Email.create('user@example.com'),
