@@ -57,20 +57,21 @@ class User:
         created_at: datetime,
         updated_at: datetime,
     ) -> None:
-        """Initialize User entity.
-
-        Args:
-            id: Unique user identifier
-            email: Email value object
-            name: User name
-            password_hash: Hashed password (never store plain text)
-            role: User role
-            email_verified: Whether email is verified
-            created_at: Creation timestamp
-            updated_at: Last update timestamp
-
+        """
+        Construct a User entity from explicit state and enforce domain invariants.
+        
+        Parameters:
+            id (str): Unique user identifier.
+            email (Email): Email value object for the user.
+            name (str): User's display name.
+            password_hash (str): Stored password hash (must not be plain text).
+            role (UserRole): Assigned user role.
+            email_verified (bool): Whether the user's email has been verified.
+            created_at (datetime): Creation timestamp.
+            updated_at (datetime): Last update timestamp.
+        
         Raises:
-            ValueError: If invariants are violated
+            ValueError: If any domain invariant (e.g., name constraints) is violated.
         """
         self._id = id
         self._email = email
@@ -92,19 +93,20 @@ class User:
         password_hash: str,
         role: UserRole = UserRole.USER,
     ) -> User:
-        """Factory method - preferred way to create entities.
-
-        Args:
-            email: Email value object
-            name: User name
-            password_hash: Hashed password
-            role: User role (defaults to USER)
-
+        """
+        Create a new User with a generated id and timestamps, and record a UserCreatedEvent.
+        
+        Parameters:
+            email (Email): Email value object for the new user.
+            name (str): User's display name.
+            password_hash (str): Hashed password to store.
+            role (UserRole): User role; defaults to UserRole.USER.
+        
         Returns:
-            New User instance
-
+            User: The newly created User instance.
+        
         Raises:
-            ValueError: If validation fails
+            ValueError: If user invariants (for example, name validation) are violated during construction.
         """
         now = datetime.utcnow()
         user_id = str(uuid.uuid4())
@@ -137,20 +139,21 @@ class User:
         created_at: datetime,
         updated_at: datetime,
     ) -> User:
-        """Reconstitute from persistence.
-
+        """
+        Reconstructs a User from persisted data without emitting domain events.
+        
         Args:
-            id: User ID
-            email: Email value object
-            name: User name
-            password_hash: Hashed password
-            role: User role
-            email_verified: Email verification status
-            created_at: Creation timestamp
-            updated_at: Last update timestamp
-
+            id: User identifier.
+            email: Email value object.
+            name: User name.
+            password_hash: Stored password hash.
+            role: UserRole for the user.
+            email_verified: Whether the user's email was verified.
+            created_at: Timestamp when the user was created.
+            updated_at: Timestamp of the last update.
+        
         Returns:
-            User instance
+            User instance reconstructed from the provided persisted fields.
         """
         return cls(
             id=id,
@@ -164,10 +167,13 @@ class User:
         )
 
     def _validate(self) -> None:
-        """Validate entity invariants.
-
+        """
+        Ensure the user's name satisfies domain invariants.
+        
+        Checks that the name is not empty or only whitespace and that its length does not exceed 255 characters.
+        
         Raises:
-            ValueError: If invariants are violated
+            ValueError: If the name is empty or contains only whitespace, or if its length is greater than 255.
         """
         if not self._name or not self._name.strip():
             raise ValueError('User name cannot be empty')
@@ -178,10 +184,11 @@ class User:
     # Business methods (not just getters/setters)
 
     def verify_email(self) -> None:
-        """Verify user email.
-
+        """
+        Mark the user's email as verified and update the updated_at timestamp.
+        
         Raises:
-            ValueError: If email is already verified
+            ValueError: If the user's email is already verified.
         """
         if self._email_verified:
             raise ValueError('Email already verified')
@@ -193,13 +200,17 @@ class User:
         # self._add_domain_event(EmailVerifiedEvent(...))
 
     def change_name(self, new_name: str) -> None:
-        """Change user name.
-
+        """
+        Change the user's name and update the modification timestamp.
+        
         Args:
-            new_name: New name
-
+            new_name (str): The new non-empty name for the user.
+        
         Raises:
-            ValueError: If name is empty
+            ValueError: If new_name is empty or contains only whitespace.
+        
+        Notes:
+            This method sets the user's name and updates `updated_at` to the current UTC time.
         """
         if not new_name or not new_name.strip():
             raise ValueError('Name cannot be empty')
@@ -208,19 +219,21 @@ class User:
         self._updated_at = datetime.utcnow()
 
     def change_password(self, new_password_hash: str) -> None:
-        """Change user password.
-
-        Args:
-            new_password_hash: New hashed password
+        """
+        Set the user's password hash and update the last-modified timestamp.
+        
+        Parameters:
+            new_password_hash: The new password hash to store for the user.
         """
         self._password_hash = new_password_hash
         self._updated_at = datetime.utcnow()
 
     def is_admin(self) -> bool:
-        """Check if user is admin.
-
+        """
+        Determine whether the user's role is ADMIN.
+        
         Returns:
-            True if user is admin
+            `true` if the user's role is `UserRole.ADMIN`, `false` otherwise.
         """
         return self._role == UserRole.ADMIN
 
@@ -228,54 +241,91 @@ class User:
 
     @property
     def id(self) -> str:
-        """Get user ID."""
+        """
+        Get the user's unique identifier.
+        
+        Returns:
+            str: The user's unique identifier.
+        """
         return self._id
 
     @property
     def email(self) -> Email:
-        """Get email value object."""
+        """
+        The user's Email value object.
+        
+        Returns:
+            Email: The Email value object representing the user's email address.
+        """
         return self._email
 
     @property
     def name(self) -> str:
-        """Get user name."""
+        """
+        User's display name.
+        
+        Returns:
+            name (str): The user's name.
+        """
         return self._name
 
     @property
     def role(self) -> UserRole:
-        """Get user role."""
+        """
+        Return the user's role within the system.
+        
+        Returns:
+            UserRole: The user's assigned role (e.g., UserRole.ADMIN, UserRole.USER, UserRole.GUEST).
+        """
         return self._role
 
     @property
     def email_verified(self) -> bool:
-        """Get email verification status."""
+        """
+        Indicates whether the user's email address has been verified.
+        
+        Returns:
+            True if the user's email is verified, False otherwise.
+        """
         return self._email_verified
 
     @property
     def created_at(self) -> datetime:
-        """Get creation timestamp."""
+        """
+        The timestamp when the user was created.
+        
+        Returns:
+            The creation timestamp as a `datetime` object.
+        """
         return self._created_at
 
     @property
     def updated_at(self) -> datetime:
-        """Get last update timestamp."""
+        """
+        Returns the timestamp when the user was last updated.
+        
+        Returns:
+            datetime: The user's last update timestamp.
+        """
         return self._updated_at
 
     # Domain events management
 
     def _add_domain_event(self, event: DomainEvent) -> None:
-        """Add domain event.
-
-        Args:
-            event: Domain event to add
+        """
+        Add a domain event to this user's accumulated domain events.
+        
+        Parameters:
+            event (DomainEvent): The domain event to append.
         """
         self._domain_events.append(event)
 
     def get_domain_events(self) -> list[DomainEvent]:
-        """Get copy of domain events.
-
+        """
+        Return a shallow copy of the user's accumulated domain events.
+        
         Returns:
-            List of domain events
+            list[DomainEvent]: A shallow copy of the domain events list.
         """
         return self._domain_events.copy()
 
@@ -286,10 +336,19 @@ class User:
     # For persistence
 
     def to_dict(self) -> dict:
-        """Convert to dictionary for persistence.
-
+        """
+        Serialize the user's persistent state to a dictionary suitable for storage.
+        
         Returns:
-            Dictionary representation (without password)
+            dict: Mapping with keys:
+                - `id` (str)
+                - `email` (str)
+                - `name` (str)
+                - `role` (str)
+                - `email_verified` (bool)
+                - `created_at` (str, ISO 8601)
+                - `updated_at` (str, ISO 8601)
+            The password is intentionally omitted.
         """
         return {
             'id': self._id,
@@ -303,18 +362,24 @@ class User:
         }
 
     def __eq__(self, other: object) -> bool:
-        """Entities are compared by ID.
-
-        Args:
-            other: Object to compare
-
+        """
+        Compare this User with another object by identifier.
+        
+        Parameters:
+            other (object): The object to compare against; only User instances are considered equal.
+        
         Returns:
-            True if same entity (same ID)
+            `true` if `other` is a `User` instance with the same id, `false` otherwise.
         """
         if not isinstance(other, User):
             return False
         return self._id == other._id
 
     def __hash__(self) -> int:
-        """Hash for use in collections."""
+        """
+        Return a hash value derived from the user's id for use in hashed collections.
+        
+        Returns:
+            int: Hash of the user's id.
+        """
         return hash(self._id)
