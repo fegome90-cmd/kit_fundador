@@ -138,7 +138,7 @@ antes de que un equipo adopte el script interactivo. Para mantener la trazabilid
 
 ## 📝 Workflow con Templates de Prompts
 
-El proyecto incluye **19 templates estructurados** para diferentes tipos de tareas en [`dev-docs/prompt_example/`](./prompt_example/). Estos templates ayudan a mantener consistencia y calidad al trabajar con agentes IA o al documentar tareas manuales.
+El proyecto incluye **24 templates estructurados** para diferentes tipos de tareas en [`dev-docs/prompt_example/`](./prompt_example/). Estos templates ayudan a mantener consistencia y calidad al trabajar con agentes IA o al documentar tareas manuales.
 
 ### Catálogo de Templates
 
@@ -186,13 +186,24 @@ El proyecto incluye **19 templates estructurados** para diferentes tipos de tare
 | **18. Plan de Pruebas E2E** | `template_18_e2e_testing_plan.md` | Flujos completos de usuario en entorno integrado | 1-3 días |
 | **19. Estrategia TDD/BDD** | `template_19_tdd_bdd_strategy.md` | Desarrollo guiado por pruebas | Variable |
 
+#### Templates de Meta-Organización y Control (20-24)
+
+| Template | Archivo | Uso Recomendado | Duración Típica |
+|----------|---------|-----------------|-----------------|
+| **20. Guardrails Anti-Drift** | `template_20_anti_drift_guardrails.md` | Definir límites estrictos y mecanismos anti-desviación | Variable |
+| **21. Matriz de Criterios de Éxito** | `template_21_success_criteria_matrix.md` | Definir métricas y KPIs cuantificables (4 dimensiones) | Variable |
+| **22. Briefing de Misión para Agente** | `template_22_agent_mission_briefing.md` | Asignar tareas formalmente a agentes con directiva clara | Variable |
+| **23. Registro de Conocimiento** | `template_23_knowledge_index_record.md` | Capturar aprendizajes y conocimiento post-misión | < 1 día |
+| **24. Análisis de Trade-offs** | `template_24_trade_off_analysis.md` | Comparar alternativas técnicas con criterios ponderados | 1-2 días |
+
 ### Integración con Agent Profiles
 
 Los templates se integran con los perfiles de agente documentados en [`dev-docs/agent-profiles/`](./agent-profiles/):
 
-- **EJECUTOR** → Usa templates 1-5, 12-19 para planificar, implementar, investigar, documentar y testing
-- **VALIDADOR** → Usa templates 6, 8-11 para auditorías (general y especializadas)
-- **HANDOFF** → Usa template 7 para traspasos de contexto
+- **EJECUTOR** → Usa templates 1-5, 12-19, 24 para planificar, implementar, investigar, documentar, testing y análisis
+- **VALIDADOR** → Usa templates 6, 8-11, 21 para auditorías (general y especializadas) y métricas de éxito
+- **HANDOFF** → Usa templates 7, 23 para traspasos de contexto y registro de conocimiento
+- **PLANIFICADOR/LÍDER** → Usa templates 20, 21, 22 para guardrails, métricas y briefings de misión
 
 Ver guía completa de integración en: [`dev-docs/agent-profiles/PROMPTS.md`](./agent-profiles/PROMPTS.md#-integración-con-templates-de-prompts-estructurados)
 
@@ -225,6 +236,13 @@ Ver guía completa de integración en: [`dev-docs/agent-profiles/PROMPTS.md`](./
 - Pruebas de integración (módulos/servicios) → **Template 17**
 - Pruebas E2E (flujos de usuario) → **Template 18**
 - Estrategia TDD/BDD (desarrollo guiado por tests) → **Template 19**
+
+**Meta-Organización y Control:**
+- Definir guardrails anti-drift → **Template 20**
+- Matriz de criterios de éxito (KPIs) → **Template 21**
+- Briefing de misión para agente → **Template 22**
+- Registrar conocimiento post-misión → **Template 23**
+- Análisis de trade-offs (alternativas) → **Template 24**
 
 **Handoff:**
 - Traspaso de contexto → **Template 7**
