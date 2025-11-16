@@ -1,24 +1,91 @@
 {
   "version": "2.0.0",
-  "last_updated": "2025-01-15T00:00:00Z",
+  "last_updated": "2025-01-16T13:30:00Z",
   "project_metadata": {
     "name": "nombre-proyecto",
     "domain": "dominio-negocio",
     "stage": "foundation",
-    "tech_stack_hash": ""
+    "tech_stack_hash": "typescript-node20-express-jest-esbuild"
   },
   "current_state": {
-    "active_bounded_contexts": [],
-    "implemented_aggregates": [],
+    "active_bounded_contexts": [
+      {
+        "name": "Identity & Access",
+        "description": "Gestión de cuentas de usuario, credenciales y verificación de email",
+        "status": "documented",
+        "artifacts": [
+          "dev-docs/domain/ubiquitous-language.md#bounded-context-identity--access",
+          "dev-docs/domain/invariants.md"
+        ]
+      }
+    ],
+    "implemented_aggregates": [
+      {
+        "name": "IdentityAccess.UserAccount",
+        "status": "template",
+        "code": "src/domain/entities/User.ts",
+        "tests": [
+          "tests/unit/User.test.ts",
+          "tests/unit/Email.test.ts"
+        ]
+      }
+    ],
     "pending_migrations": [],
     "active_feature_flags": {},
-    "technical_debt_items": []
+    "technical_debt_items": [
+      {
+        "id": "TD-SETUP-001",
+        "summary": "`scripts/setup.sh` tiene hallazgos críticos documentados en AUDITORIA_SETUP_SH.md",
+        "status": "in_progress",
+        "remediation_plan": "dev-docs/setup/setup-sh-remediation-plan.md",
+        "tasks": [
+          "TASK-015"
+        ],
+        "notes": "Fases A y B completadas; C3.1 (harness) y C3.3 (utc_timestamp + warning docker-compose) ya están en main. La única mejora abierta es la observabilidad opcional (C3.2/TASK-015)."
+      }
+    ]
   },
   "ai_context": {
-    "last_session_summary": "Proyecto inicializado con Kit Fundador v2.0",
-    "next_recommended_tasks": [],
-    "areas_needing_attention": [],
-    "recent_decisions": []
+    "last_session_summary": "El setup interactivo ahora incluye el harness Bash oficial, `utc_timestamp` con fallback y la advertencia cuando falta docker-compose.dev.yml; solo la observabilidad (--verbose/--no-color) quedó como mejora opt-in (TASK-015).",
+    "next_recommended_tasks": [
+      "TASK-015",
+      "TASK-003",
+      "TASK-004"
+    ],
+    "areas_needing_attention": [
+      "Decidir si se implementa la observabilidad opcional del setup (TASK-015)",
+      "Documentar el cierre de la remediación",
+      "Retomar base de datos y primer use case"
+    ],
+    "recent_decisions": [
+      {
+        "id": "DEC-2025-01-16-STACK",
+        "summary": "Se fija TypeScript + Express como perfil predeterminado del starkit y se documenta en dev-docs/tech-stack-decisions.md.",
+        "references": [
+          "config/tech-stack.json",
+          "dev-docs/tech-stack-decisions.md"
+        ]
+      },
+      {
+        "id": "DEC-2025-01-16-SETUP-PLAN",
+        "summary": "La auditoría AUDITORIA_SETUP_SH.md se adopta y se crea un plan de remediación en dev-docs/setup/setup-sh-remediation-plan.md.",
+        "references": [
+          "document/informes_CC/AUDITORIA_SETUP_SH.md",
+          "dev-docs/setup/setup-sh-remediation-plan.md",
+          "dev-docs/plan.md"
+        ]
+      },
+      {
+        "id": "DEC-2025-01-16-SETUP-PHASE-C",
+        "summary": "Se completaron C3.1/C3.3 del setup.sh (harness + utc_timestamp/warnings) y se documentó que C3.2 queda como opt-in.",
+        "references": [
+          "scripts/setup.sh",
+          "tests/setup/setup_script.test.sh",
+          "dev-docs/setup/setup-sh-remediation-plan.md",
+          "dev-docs/setup/setup-sh-remediation-report.md"
+        ]
+      }
+    ]
   },
   "metrics": {
     "test_coverage": 0,

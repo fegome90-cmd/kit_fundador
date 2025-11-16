@@ -1,0 +1,58 @@
+{
+  "version": "1.0.0",
+  "decisions": [
+    {
+      "id": "DEC-2025-01-16-STACK",
+      "title": "Stack base TypeScript + Express",
+      "date": "2025-01-16",
+      "context": "Necesitamos fijar un perfil predeterminado para que los agentes sepan qué dependencias ejemplificar en el starkit.",
+      "decision": "Mantener TypeScript (Node.js 20) con Express mínimo, Jest/Playwright/Pact/k6 para testing, ESLint + Prettier para lint/format y esbuild como build tool.",
+      "consequences": [
+        "Facilita reemplazo rápido por otros frameworks al no introducir dependencias complejas",
+        "Documentación actualizada en README, dev-docs/context.md y dev-docs/tech-stack-decisions.md",
+        "Los consumidores deben actualizar el config si eligen otro stack"
+      ],
+      "references": [
+        "config/tech-stack.json",
+        "dev-docs/tech-stack-decisions.md",
+        "dev-docs/context.md"
+      ]
+    },
+    {
+      "id": "DEC-2025-01-16-SETUP-PHASE-B",
+      "title": "Aplicar Fase B del plan de remediación del setup",
+      "date": "2025-01-16",
+      "context": "El auditor reportó riesgos de pérdida de datos y prerequisitos no verificados en `scripts/setup.sh`.",
+      "decision": "Agregar validación temprana de prerequisitos, confirmaciones de sobrescritura con soporte `--force` y un prompt para conservar/mover/eliminar `templates/`.",
+      "consequences": [
+        "Los usuarios ven errores claros antes de que el script copie archivos si falta git/npm/python3/pip/docker-compose",
+        "Los repos existentes no se sobrescriben sin confirmación explícita",
+        "Se documenta cómo automatizar el flujo desde README y dev-docs/tooling-guide.md"
+      ],
+      "references": [
+        "scripts/setup.sh",
+        "README.md#🚀-quick-start",
+        "dev-docs/setup/setup-sh-remediation-plan.md",
+        "dev-docs/tooling-guide.md#5-script-interactivo-scriptssetupsh"
+      ]
+    },
+    {
+      "id": "DEC-2025-01-16-SETUP-PHASE-C",
+      "title": "Completar C3.1/C3.3 del setup y diferir C3.2",
+      "date": "2025-01-16",
+      "context": "La auditoría pedía test harness, integridad de contextos y observabilidad; se priorizaron los dos primeros para mantener el starkit simple.",
+      "decision": "Agregar harness Bash + helper utc_timestamp/warning docker-compose y documentar que las banderas --verbose/--no-color quedan como mejora opt-in (TASK-015).",
+      "consequences": [
+        "scripts/setup.sh se valida automáticamente y produce JSON consistente",
+        "README/tooling guide/post-adaptation checklist documentan npm run test:setup y SETUP_SH_SKIP_INSTALLS",
+        "Observabilidad se traslada al backlog opcional (TASK-015)"
+      ],
+      "references": [
+        "scripts/setup.sh",
+        "tests/setup/setup_script.test.sh",
+        "dev-docs/setup/setup-sh-remediation-plan.md",
+        "dev-docs/setup/setup-sh-remediation-report.md"
+      ]
+    }
+  ]
+}
