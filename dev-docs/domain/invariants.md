@@ -12,6 +12,91 @@ Un invariante es una condición que debe ser verdadera en TODO momento para que 
 - ✅ "Email debe ser único por usuario"
 - ❌ "Los usuarios prefieren el color azul" (preferencia, no invariante)
 
+## Bounded Context: Identity & Access
+
+### User Aggregate
+
+#### Invariant: Display name is never empty
+
+```
+User.name.trim().length > 0 && User.name.length <= 255
+```
+
+- **Enforced by**: `User.validate()` y `User.changeName()`.
+- **Exception thrown**: `Error('User name cannot be empty')` o `Error('User name too long')`.
+- **Tests**: `tests/unit/User.test.ts` → "should throw if name is empty".
+- **Business rule**: BR-IA-002 (ver `dev-docs/domain/ubiquitous-language.md`).
+
+#### Invariant: Email verification is monotonic
+
+```
+User.emailVerified === true => User.verifyEmail() throws
+```
+
+- **Enforced by**: `User.verifyEmail()` (lanza si ya estaba verificado).
+- **Exception thrown**: `Error('Email already verified')`.
+- **Tests**: `tests/unit/User.test.ts` → "should throw if email already verified".
+- **Business rule**: BR-IA-003.
+
+#### Invariant: Password rotation updates audit trail
+
+```
+User.changePassword(newPassword) => User.updatedAt > previousUpdatedAt
+```
+
+- **Enforced by**: `User.changePassword()` actualiza `updatedAt` inmediatamente.
+- **Exception thrown**: _N/A_ (invariante positiva, falla detectada vía tests si no se actualiza).
+- **Tests**: `tests/unit/User.test.ts` → "should update updatedAt timestamp".
+- **Business rule**: BR-IA-004.
+
+### Email Value Object
+
+#### Invariant: Emails must obey the canonical format
+
+```
+EMAIL_REGEX.test(value) && value.length <= MAX_EMAIL_LENGTH
+```
+
+- **Enforced by**: `Email.validate()`.
+- **Exception thrown**: `Error('Invalid email format')` o `Error('Email too long')`.
+- **Tests**: `tests/unit/Email.test.ts` (casos parametrizados de éxito y error).
+- **Business rule**: BR-IA-001.
+
+#### Invariant: Blocked domains are rejected
+
+```
+domain(value) ∉ BLOCKED_DOMAINS
+```
+
+- **Enforced by**: `Email.validate()` al comparar contra `BLOCKED_DOMAINS`.
+- **Exception thrown**: `Error('Email domain not allowed: <domain>')`.
+- **Tests**: `tests/unit/Email.test.ts` → caso "blocked domain".
+- **Business rule**: BR-IA-001.
+
+### Password Value Object
+
+#### Invariant: Passwords are pre-hashed and meet the minimum length
+
+```
+plainPassword.trim().length >= MIN_PASSWORD_LENGTH
+```
+
+- **Enforced by**: `Password.create()` antes de construir el hash.
+- **Exception thrown**: `Error('Password must be at least ...')`.
+- **Tests**: Agrega casos en `tests/unit/User.test.ts` o crea `tests/unit/Password.test.ts` cuando conectes un hasher real.
+- **Business rule**: BR-IA-004.
+
+#### Invariant: Stored hashes carry the configured prefix
+
+```
+Password.hashedValue.startsWith(HASH_PLACEHOLDER_PREFIX)
+```
+
+- **Enforced by**: `Password.validate()`.
+- **Exception thrown**: `Error('Password must be hashed using the configured hashing service')`.
+- **Tests**: Añade pruebas enfocadas al valor objeto cuando se sustituya el hasher ficticio.
+- **Nota**: En producción reemplaza `HASH_PLACEHOLDER_PREFIX` por el prefijo que retorne tu servicio de hashing.
+
 ## Bounded Context: [Nombre]
 
 ### [Aggregate Name]
