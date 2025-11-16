@@ -1,15 +1,18 @@
 # Context
 
 ## Propósito del Proyecto
-[Descripción clara del problema que resuelve este proyecto]
+Proveer un **starkit de Identity & Access** que incluya ejemplos autocontenidos de entidades (`User`), value objects (`Email`, `Password`) y eventos de dominio para que cualquier equipo arranque un proyecto desde cero sin depender de infraestructura real.
 
 ## Alcance
 ### En Scope
-- [Funcionalidad 1]
-- [Funcionalidad 2]
+- Documentar bounded contexts iniciales y sus invariantes (ver `dev-docs/domain/ubiquitous-language.md`).
+- Exponer ejemplos de entidades, value objects y eventos sin dependencias de frameworks.
+- Definir checklists y planes para que los equipos consumidores reemplacen los placeholders por implementaciones reales.
 
 ### Out of Scope
-- [Lo que NO se incluye]
+- Implementaciones completas de infraestructura (DB, colas, proveedores de identidad externos).
+- Casos de uso y endpoints listos para producción.
+- Configuración real de CI/CD o despliegues a ambientes compartidos.
 
 ## Stack Tecnológico
 - Lenguaje base: **TypeScript (Node.js 20)**.

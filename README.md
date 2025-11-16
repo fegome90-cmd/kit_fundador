@@ -164,6 +164,8 @@ lenguajes.
 - El aggregate `User` sólo modela operaciones básicas y acumula eventos en memoria; la responsabilidad de despacharlos recae en
   tu capa de aplicación a través de un `DomainEventDispatcher` propio.
 - Sigue el patrón `save → publish → clear` para evitar publicar eventos que no llegaron a persistirse.
+- El bounded context **Identity & Access** ya está descrito en [`dev-docs/domain/ubiquitous-language.md`](dev-docs/domain/ubiquitous-language.md);
+  úsalo como blueprint y duplica la plantilla incluida al añadir nuevos contextos.
 
 > 📄 Consulta `dev-docs/domain/domain-integration-points.md` para detalles y un checklist de implementación.
 

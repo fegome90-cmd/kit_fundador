@@ -11,11 +11,11 @@
 - [x] Development environment (Docker)
 
 ### Fase 1: Core Domain
-- [ ] Definir bounded contexts
-- [ ] Identificar aggregates principales
-- [ ] Implementar entidades core
-- [ ] Definir domain events
-- [ ] Tests de domain layer (100% coverage)
+- [x] Definir bounded contexts → `dev-docs/domain/ubiquitous-language.md#bounded-context-identity--access`.
+- [x] Identificar aggregates principales → `Identity & Access` documenta `UserAccount` como aggregate raíz.
+- [x] Implementar entidades core → `src/domain/entities/User.ts` + value objects asociados descritos en la guía.
+- [x] Definir domain events → `UserCreatedEvent` detallado y eventos futuros listados en el glosario.
+- [ ] Tests de domain layer (100% coverage) → pendiente de expandir cuando se añadan nuevos aggregates.
 
 ### Fase 2: Application Layer
 - [ ] Implementar use cases

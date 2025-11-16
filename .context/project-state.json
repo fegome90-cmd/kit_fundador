@@ -8,16 +8,36 @@
     "tech_stack_hash": "typescript-node20-express-jest-esbuild"
   },
   "current_state": {
-    "active_bounded_contexts": [],
-    "implemented_aggregates": [],
+    "active_bounded_contexts": [
+      {
+        "name": "Identity & Access",
+        "description": "Gestión de cuentas de usuario, credenciales y verificación de email",
+        "status": "documented",
+        "artifacts": [
+          "dev-docs/domain/ubiquitous-language.md#bounded-context-identity--access",
+          "dev-docs/domain/invariants.md"
+        ]
+      }
+    ],
+    "implemented_aggregates": [
+      {
+        "name": "IdentityAccess.UserAccount",
+        "status": "template",
+        "code": "src/domain/entities/User.ts",
+        "tests": [
+          "tests/unit/User.test.ts",
+          "tests/unit/Email.test.ts"
+        ]
+      }
+    ],
     "pending_migrations": [],
     "active_feature_flags": {},
     "technical_debt_items": []
   },
   "ai_context": {
-    "last_session_summary": "Stack base documentado: TypeScript + Node.js 20 con Express, Jest, ESLint/Prettier y esbuild quedaron registrados en config/tech-stack.json, README y dev-docs.",
-    "next_recommended_tasks": ["TASK-002", "TASK-003"],
-    "areas_needing_attention": ["Definir bounded contexts en dev-docs/plan.md", "Implementar primera entidad de dominio"],
+    "last_session_summary": "Se documentó el bounded context Identity & Access, se catalogaron los invariantes del aggregate User y se enlazaron los artefactos con las pruebas del dominio.",
+    "next_recommended_tasks": ["TASK-003", "TASK-004"],
+    "areas_needing_attention": ["Configurar base de datos y migraciones (TASK-003)", "Diseñar el primer use case/endpoints (TASK-004/TASK-005)"],
     "recent_decisions": [
       {
         "id": "DEC-2025-01-16-STACK",

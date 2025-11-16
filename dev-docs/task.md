@@ -6,17 +6,6 @@ _(sin tareas activas)_
 
 ## Pendientes 📋
 
-### [TASK-002] Implementar primera entidad de dominio
-- **Prioridad**: Alta
-- **Estimación**: 2 horas
-- **Dependencias**: TASK-001
-- **Descripción**: Crear primera entidad siguiendo DDD patterns
-- **Criterios de Aceptación**:
-  - [ ] Entidad con invariantes protegidos
-  - [ ] Value objects creados
-  - [ ] Tests unitarios (100% coverage)
-  - [ ] Documentado en ubiquitous-language.md
-
 ### [TASK-003] Setup database y migrations
 - **Prioridad**: Media
 - **Estimación**: 3 horas
@@ -114,6 +103,16 @@ _(sin tareas activas)_
   - [x] Testing tools configurados
   - [x] Linting/formatting configurado
   - [x] Build tool definido
+
+### [TASK-002] Implementar primera entidad de dominio
+- **Completado**: 2025-01-16
+- **Duración real**: 45 min
+- **Notas**: Bounded context Identity & Access documentado, invariantes de `User` descritos y enlazados con sus pruebas.
+- **Criterios de Aceptación**:
+  - [x] Entidad con invariantes protegidos (ver `src/domain/entities/User.ts`).
+  - [x] Value objects creados (`Email` y `Password` explican reglas y constantes compartidas).
+  - [x] Tests unitarios (100% coverage) → `tests/unit/User.test.ts` y `tests/unit/Email.test.ts` cubren los casos ejemplares.
+  - [x] Documentado en ubiquitous-language.md (`Identity & Access`).
 
 ## Backlog 💭
 
