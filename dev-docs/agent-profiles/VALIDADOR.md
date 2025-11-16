@@ -52,6 +52,310 @@ npm run validate:architecture
 
 **Si cualquiera falla** → ❌ REJECT inmediatamente con mensaje claro.
 
+---
+
+## 🔍 DEEP REVIEW - ERROR CATEGORIES (RESEARCH-BASED)
+
+**Basado en**: Chen et al 2024 - "A Deep Dive Into LLM Code Generation Mistakes"
+
+**Objetivo**: Revisar sistemáticamente las 7 categorías de errores más comunes en código generado por LLMs
+
+**Tiempo**: 20-25 minutos (crítico para 98% precision según Tornhill et al 2024)
+
+---
+
+### ⚠️ CATEGORÍA 1: Conditional Errors (35% de bugs) - **CRÍTICO**
+
+**Problema**: Errores en condicionales - condiciones omitidas, mal interpretadas, o lógica defectuosa
+
+**Checklist**:
+
+- [ ] **Cada `if/else` tiene test de boundary**
+  ```typescript
+  // if (count > threshold) → Requiere tests:
+  // - count = threshold (false)
+  // - count = threshold + 1 (true)
+  // - count = threshold - 1 (false)
+  ```
+
+- [ ] **No hay coerción implícita de booleanos**
+  ```typescript
+  // ❌ BAD: if (value)
+  // ✅ GOOD: if (value !== null && value !== undefined)
+  ```
+
+- [ ] **Profundidad de nesting ≤ 3**
+  - Si >3 → Solicitar refactor a funciones auxiliares
+
+- [ ] **Condiciones complejas tienen variable explicativa**
+  ```typescript
+  // ❌ BAD: if (user.age > 18 && user.verified && !user.banned)
+  // ✅ GOOD: const canAccess = user.age > 18 && user.verified && !user.banned;
+  //          if (canAccess)
+  ```
+
+**Acción si falla**: REQUEST_REVISION con tests específicos faltantes
+
+---
+
+### 🎯 CATEGORÍA 2: Edge Case Oversight (20% de bugs) - **CRÍTICO**
+
+**Problema**: No considerar corner cases en el input
+
+**Checklist - TODOS deben estar cubiertos**:
+
+- [ ] **Empty inputs testeados**
+  - [ ] Empty array: `[]`
+  - [ ] Empty string: `""`
+  - [ ] `null`
+  - [ ] `undefined`
+
+- [ ] **Single element testeado**
+  - [ ] Array de 1 elemento
+  - [ ] String de 1 carácter
+
+- [ ] **Boundary values testeados**
+  - [ ] `0` (cero)
+  - [ ] `-1` (negativo)
+  - [ ] `MAX_INT` / `MIN_INT`
+  - [ ] `Infinity` / `-Infinity`
+
+- [ ] **Type mismatches considerados**
+  - [ ] String cuando se espera number
+  - [ ] Number cuando se espera string
+
+- [ ] **Invalid inputs manejados**
+  - [ ] Negative cuando debe ser positive
+  - [ ] Out of range values
+
+**Mínimo requerido**: 5+ edge case tests
+
+**Acción si falla**: REJECT si <3 edge cases, REQUEST_REVISION si 3-4
+
+---
+
+### 📐 CATEGORÍA 3: Math/Logic Errors (10-15% de bugs) - **ALTO**
+
+**Problema**: Fórmulas matemáticas incorrectas u operaciones lógicas defectuosas
+
+**Checklist**:
+
+- [ ] **Fórmula documentada en comentario**
+  ```typescript
+  // ✅ GOOD
+  // Formula: average = (a + b) / 2
+  const avg = (a + b) / 2;
+
+  // ❌ BAD - no documented
+  const avg = (a + b) / 2;
+  ```
+
+- [ ] **No hay off-by-one en fórmulas**
+  ```typescript
+  // ❌ Common LLM mistake: (n + m + 1) / 2
+  // ✅ Correct: (n + m) / 2
+  ```
+
+- [ ] **Property-based test existe** (recomendado)
+  ```typescript
+  // Property: avg(a, b) must be between min(a,b) and max(a,b)
+  // Property: avg(n, n) must equal n
+  ```
+
+**Acción si falla**: REQUEST_REVISION para documentar fórmula
+
+---
+
+### 🔍 CATEGORÍA 4: Index Off Mistakes (5-7% pero ALTO IMPACTO) - **ALTO**
+
+**Problema**: Cálculo incorrecto de índices en arrays
+
+**Checklist - TODOS requeridos para código con arrays**:
+
+- [ ] **Test de empty array** (`length = 0`)
+- [ ] **Test de single element** (`length = 1`)
+- [ ] **Test de first element** (`index = 0`)
+- [ ] **Test de last element** (`index = length - 1`)
+- [ ] **No off-by-one en slicing**
+
+**Red flags comunes**:
+```typescript
+// ❌ array[i-1:i-4:-1] probablemente debería ser array[0:i]
+// ❌ loop que empieza en 1 cuando debería ser 0
+// ❌ usar length en vez de length-1 para último elemento
+```
+
+**Acción si falla**: REJECT si falta test de boundary crítico
+
+---
+
+### 🔧 CATEGORÍA 5: API Misuse (8-12% de bugs) - **MEDIO**
+
+**Problema**: Uso incorrecto de APIs por confusión cross-language
+
+**Checklist**:
+
+- [ ] **API usada correctamente según docs oficiales**
+- [ ] **Parámetros correctos y tipos correctos**
+- [ ] **Return type esperado**
+- [ ] **Side effects documentados** (si existen)
+
+**Watch for cross-language confusion**:
+```typescript
+// ❌ Python: text.split('.?!')  NO acepta regex
+// ✅ Python: re.split(r'[.?!]', text)
+
+// ❌ Confundir round() behavior entre lenguajes
+```
+
+**Acción si falla**: REQUEST_REVISION para verificar docs
+
+---
+
+### 📤 CATEGORÍA 6: Output Format Errors (15-20% de bugs) - **MEDIO**
+
+**Problema**: Output se desvía del formato requerido
+
+**Checklist**:
+
+- [ ] **Return type exacto match con spec**
+  - [ ] `string` vs `string[]`
+  - [ ] `number` vs `string`
+  - [ ] `Date` vs `string`
+
+- [ ] **Formato preciso**
+  - [ ] No extra/missing slashes (`"/test"` vs `"test"`)
+  - [ ] No extra/missing quotes
+  - [ ] Date/time format exacto
+
+- [ ] **Test explícito de formato existe**
+  ```typescript
+  test('returns exact format', () => {
+    expect(result).toBe("test");  // NOT "/test"
+  });
+  ```
+
+**Acción si falla**: REQUEST_REVISION con spec de formato exacto
+
+---
+
+### 🗑️ CATEGORÍA 7: Garbage Code (25-30% de bugs) - **CRÍTICO**
+
+**Problema**: Código completamente desconectado del approach correcto
+
+**Checklist**:
+
+- [ ] **Algoritmo tiene sentido para el problema**
+  ```typescript
+  // Spec: "Perform XOR operation"
+  // ❌ GARBAGE: return a + b;  // Suma, NO XOR!
+  // ✅ CORRECT: return a ^ b;
+  ```
+
+- [ ] **Estructuras de datos correctas**
+  - ¿Usa array cuando debería ser Set?
+  - ¿Usa objeto cuando debería ser Map?
+
+- [ ] **No confusión obvia entre operaciones**
+  - `+` vs `^` (suma vs XOR)
+  - `&&` vs `&` (logical AND vs bitwise AND)
+  - `concat` vs `push` vs `splice`
+
+**Acción si falla**: **REJECT completamente** - No intentar refinar, código debe reescribirse
+
+---
+
+## 🚦 DECISION MATRIX
+
+Basado en categorías de errores, decidir acción:
+
+### ⛔ REJECT Inmediatamente si:
+
+- ❌ Tests no pasan (automated check failed)
+- ❌ **Garbage code detectado** (approach completamente erróneo)
+- ❌ Tests fueron removidos
+- ❌ Arquitectura violada (domain imports infra)
+- ❌ <3 edge cases testeados
+- ❌ Condicionales sin tests de boundary
+
+### ⚠️ REQUEST_REVISION si:
+
+- 🟡 3-4 edge cases (mínimo es 5)
+- 🟡 Fórmulas sin documentación
+- 🟡 API usage sin verificar docs
+- 🟡 Output format impreciso
+- 🟡 Off-by-one suspicious en arrays
+
+### ✅ APPROVE si:
+
+- ✅ Todas las categorías pasan review
+- ✅ Mínimo 5+ edge cases cubiertos
+- ✅ Todos los condicionales tienen boundary tests
+- ✅ No garbage code
+- ✅ Confidence >= 90%
+
+---
+
+## 📊 EJEMPLO DE REVIEW COMPLETO
+
+```markdown
+## Validation Report
+
+**Código**: src/domain/utils/average.ts
+
+### Automated Checks
+- [x] Tests pass
+- [x] Lint pass
+- [x] Type check pass
+- [x] Build pass
+
+### Error Categories Review
+
+#### 1. Conditional Errors
+- [x] No condicionales en este código
+- Status: ✅ N/A
+
+#### 2. Edge Cases
+- [x] Empty array: ✅ Testeado
+- [x] Single element: ✅ Testeado
+- [x] Large array: ❌ MISSING
+- Status: ⚠️ REQUEST_REVISION
+
+#### 3. Math/Logic
+- [ ] Formula NOT documented
+- [x] No off-by-one
+- [ ] Property test MISSING
+- Status: ⚠️ REQUEST_REVISION
+
+#### 4. Index Operations
+- [x] Array boundary tests: ✅ Complete
+- Status: ✅ PASS
+
+#### 5. API Misuse
+- [x] Only uses standard operators
+- Status: ✅ N/A
+
+#### 6. Output Format
+- [x] Return type correct (number)
+- [x] Format test exists
+- Status: ✅ PASS
+
+#### 7. Garbage Code
+- [x] Algorithm correct for averaging
+- Status: ✅ PASS
+
+### Decision: REQUEST_REVISION
+
+**Issues to fix**:
+1. Add test for large array (10,000+ elements)
+2. Document formula: `// Formula: sum(arr) / arr.length`
+3. (Optional but recommended) Add property test: `avg(arr) between min(arr) and max(arr)`
+
+**Estimated time to fix**: 10 minutes
+```
+
+---
+
 ### Nivel 2: Code Review (15-30 min)
 
 #### A. Arquitectura
