@@ -65,6 +65,8 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 
 ## Fase B – Usabilidad y seguridad operativa (P2)
 
+**Estado:** ✅ Completada el 2025-01-16. `scripts/setup.sh` valida prerequisitos por modo, solicita confirmación antes de sobrescribir y ofrece opciones guiadas para manejar `templates/`.
+
 ### B2.1 – Protección ante sobrescritura
 **Objetivo.** Evitar la pérdida accidental de código cuando el script se ejecuta sobre un repositorio existente.
 
@@ -81,6 +83,12 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 - Crear archivos dummy, ejecutar `./scripts/setup.sh` y elegir “No”: el script debe salir sin modificaciones.
 - Repetir con “Sí” y confirmar que los archivos se reemplazan según lo esperado.
 
+**Implementado en:** `scripts/setup.sh` (`confirm_overwrite` + flag `--force`), README (`Quick Start`), `dev-docs/tooling-guide.md` (tabla de prerequisitos) y `dev-docs/task.md` (cierre de TASK-012).
+
+**Testing:**
+- Simulaciones manuales creando archivos dummy y respondiendo `n`/`y` para verificar que el script se detiene o continúa según la selección.
+- Ejecución del script con `--force` para asegurar que omite la confirmación y deja un mensaje de advertencia.
+
 ### B2.2 – Hooks de prerequisitos
 **Objetivo.** Fallar temprano si faltan herramientas básicas.
 
@@ -96,6 +104,12 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 **Testing.**
 - Simular ausencia de una herramienta (`PATH="" ./scripts/setup.sh"`) y verificar que el mensaje sea claro y el script termine.
 - Ejecutar normalmente para asegurar que los mensajes de éxito siguen apareciendo.
+
+**Implementado en:** `scripts/setup.sh` (`validate_prerequisites` + helper `has_compose`) y `dev-docs/tooling-guide.md#5-script-interactivo-scriptssetupsh`.
+
+**Testing:**
+- Ejecución de `./scripts/setup.sh` en un entorno con herramientas instaladas para comprobar que continúa sin alertas.
+- Simulaciones locales removiendo `npm`/`python3` del `PATH` para observar la cancelación temprana y el mensaje instructivo (documentado para reproducir en entornos reales, no se altera el repo durante las pruebas guiadas).
 
 ### B2.3 – Limpieza/retención de templates
 **Objetivo.** Dar control al usuario sobre el directorio `templates/` después de la copia.
@@ -195,3 +209,7 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 1. Socializar este plan con los equipos que consumen el starkit y priorizar Fase A.
 2. Una vez aplicadas las correcciones críticas, ejecutar nuevamente la auditoría para verificar que la opción Python sea utilizable.
 3. Planificar ventanas cortas para Fase B y C, o permitir que cada consumidor las ejecute antes de su primera release.
+**Implementado en:** función `cleanup_templates` del script.
+
+**Testing:**
+- Recorridos manuales seleccionando cada opción del prompt para validar que se conservan, mueven o eliminan los directorios como se espera.

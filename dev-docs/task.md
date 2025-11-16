@@ -39,16 +39,6 @@ _(sin tareas activas)_
   - [ ] Contract tests pasando
   - [ ] E2E test funcional
 
-### [TASK-012] Mejorar usabilidad y protecciones
-- **Prioridad**: Media
-- **Estimación**: 2 horas
-- **Dependencias**: TASK-011
-- **Descripción**: Fase B del plan: confirmaciones de sobrescritura, validación de prerequisitos y opciones de limpieza para `templates/`.
-- **Criterios de Aceptación**:
-  - [ ] Script solicita confirmación o `--force` al detectar archivos existentes.
-  - [ ] Falta de `npm`, `python3` o `docker-compose` detiene la opción correspondiente con mensaje claro.
-  - [ ] README explica cómo conservar o eliminar `templates/` tras la ejecución.
-
 ### [TASK-013] Hardening y automatización del setup
 - **Prioridad**: Media
 - **Estimación**: 5 horas
@@ -155,6 +145,15 @@ _(sin tareas activas)_
   - [x] Value objects creados (`Email` y `Password` explican reglas y constantes compartidas).
   - [x] Tests unitarios (100% coverage) → `tests/unit/User.test.ts` y `tests/unit/Email.test.ts` cubren los casos ejemplares.
   - [x] Documentado en ubiquitous-language.md (`Identity & Access`).
+
+### [TASK-012] Mejorar usabilidad y protecciones
+- **Completado**: 2025-01-16
+- **Duración real**: 1 h
+- **Notas**: `scripts/setup.sh` ahora aborta cuando faltan prerequisitos (git/npm/python3/pip/docker-compose), pide confirmación antes de sobrescribir, soporta `--force` y permite conservar/mover/eliminar `templates/`. README y la guía de tooling documentan el nuevo flujo.
+- **Criterios de Aceptación**:
+  - [x] Script solicita confirmación o `--force` al detectar archivos existentes.
+  - [x] Falta de `npm`, `python3` o `docker-compose` detiene la opción correspondiente con mensaje claro.
+  - [x] README explica cómo conservar o eliminar `templates/` tras la ejecución.
 
 ## Backlog 💭
 

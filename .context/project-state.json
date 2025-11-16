@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "last_updated": "2025-01-16T12:30:00Z",
+  "last_updated": "2025-01-16T13:30:00Z",
   "project_metadata": {
     "name": "nombre-proyecto",
     "domain": "dominio-negocio",
@@ -39,25 +39,21 @@
         "status": "in_progress",
         "remediation_plan": "dev-docs/setup/setup-sh-remediation-plan.md",
         "tasks": [
-          "TASK-011",
-          "TASK-012",
           "TASK-013",
           "TASK-014"
         ],
-        "notes": "Fase A completada; pendientes fases B y C del plan."
+        "notes": "Fases A y B completadas; resta aplicar la Fase C (hardening/automatización)."
       }
     ]
   },
   "ai_context": {
-    "last_session_summary": "Fase A del plan de remediación de setup.sh quedó aplicada (deps Python/TypeScript actualizadas y pip aborta en error); los siguientes pasos son las fases B/C y las tareas del roadmap.",
+    "last_session_summary": "La Fase B del plan de remediación de setup.sh quedó aplicada (prerequisitos obligatorios, confirmaciones de sobrescritura, prompt para templates y flag --force).",
     "next_recommended_tasks": [
-      "TASK-012",
       "TASK-013",
       "TASK-014",
       "TASK-003"
     ],
     "areas_needing_attention": [
-      "Completar la Fase B (usabilidad) del setup",
       "Implementar la Fase C (hardening/flags/tests) del setup",
       "Documentar el cierre de la remediación",
       "Retomar base de datos y primer use case"

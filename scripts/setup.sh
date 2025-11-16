@@ -11,6 +11,161 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+FORCE_MODE=false
+
+usage() {
+    cat <<USAGE
+Uso: ./scripts/setup.sh [opciones]
+
+Opciones:
+  --force       Omite confirmaciones de sobrescritura y validaciones de prerequisitos.
+  -h, --help    Muestra esta ayuda y termina.
+USAGE
+}
+
+parse_args() {
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --force)
+                FORCE_MODE=true
+                shift
+                ;;
+            -h|--help)
+                usage
+                exit 0
+                ;;
+            *)
+                echo -e "${RED}Flag no reconocida: $1${NC}"
+                usage
+                exit 1
+                ;;
+        esac
+    done
+}
+
+parse_args "$@"
+
+has_compose() {
+    if command -v docker-compose &> /dev/null; then
+        return 0
+    fi
+
+    if command -v docker &> /dev/null; then
+        if docker compose version &> /dev/null; then
+            return 0
+        fi
+    fi
+
+    return 1
+}
+
+validate_prerequisites() {
+    local mode=$1
+    local -a missing
+
+    if ! command -v git &> /dev/null; then
+        missing+=("git")
+    fi
+
+    case $mode in
+        typescript)
+            if ! command -v npm &> /dev/null; then
+                missing+=("npm")
+            fi
+            if ! has_compose; then
+                missing+=("docker-compose")
+            fi
+            ;;
+        python)
+            local has_python=false
+            local has_pip=false
+
+            if command -v python3 &> /dev/null; then
+                has_python=true
+            fi
+
+            if command -v pip &> /dev/null; then
+                has_pip=true
+            elif [[ $has_python == true ]] && python3 -m pip --version &> /dev/null; then
+                has_pip=true
+            fi
+
+            if [[ $has_python == false ]]; then
+                missing+=("python3")
+            fi
+
+            if [[ $has_pip == false ]]; then
+                missing+=("pip")
+            fi
+
+            if ! has_compose; then
+                missing+=("docker-compose")
+            fi
+            ;;
+        generic)
+            # No prerequisitos adicionales
+            ;;
+    esac
+
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo -e "${RED}❌ Prerequisitos faltantes para la opción $mode:${NC}"
+        for bin in "${missing[@]}"; do
+            echo "  - $bin"
+        done
+
+        if [[ "$FORCE_MODE" == true ]]; then
+            echo -e "${YELLOW}⚠ Ejecutando con --force: continúa bajo tu propio riesgo.${NC}"
+        else
+            echo -e "${YELLOW}Instala las herramientas indicadas o ejecuta con --force si realmente deseas continuar.${NC}"
+            exit 1
+        fi
+    fi
+}
+
+confirm_overwrite() {
+    local mode=$1
+    local -a targets=("src" "tests" "config/tech-stack.json" ".context/project-state.json")
+
+    case $mode in
+        typescript)
+            targets+=("package.json" "tsconfig.json" "jest.config.js" ".eslintrc.json" ".prettierrc")
+            ;;
+        python)
+            targets+=("pyproject.toml" "requirements.txt" "venv")
+            ;;
+        generic)
+            targets+=("src/domain/entities/.gitkeep" "src/domain/value_objects/.gitkeep")
+            ;;
+    esac
+
+    local -a existing
+    for path in "${targets[@]}"; do
+        if [[ -e $path ]]; then
+            existing+=("$path")
+        fi
+    done
+
+    if [[ ${#existing[@]} -eq 0 ]]; then
+        return
+    fi
+
+    echo -e "${YELLOW}⚠ Se encontraron archivos existentes que serían sobrescritos:${NC}"
+    for path in "${existing[@]}"; do
+        echo "  - $path"
+    done
+
+    if [[ "$FORCE_MODE" == true ]]; then
+        echo -e "${YELLOW}--force activado → sobrescribiendo sin confirmación adicional.${NC}"
+        return
+    fi
+
+    read -r -p "¿Deseas continuar y sobrescribir estos archivos? (y/N): " confirm
+    if [[ ! $confirm =~ ^[Yy]$ ]]; then
+        echo -e "${RED}Setup cancelado para evitar pérdida de datos.${NC}"
+        exit 0
+    fi
+}
+
 echo -e "${BLUE}"
 cat << "EOF"
 ╔═══════════════════════════════════════════════════════╗
@@ -37,6 +192,8 @@ show_menu() {
 
 # setup_typescript sets up a TypeScript + Node.js project by copying template files into the workspace, writing config/tech-stack.json describing the stack, and installing npm dependencies if npm is available.
 setup_typescript() {
+    validate_prerequisites "typescript"
+    confirm_overwrite "typescript"
     echo -e "${GREEN}Configurando proyecto TypeScript...${NC}"
 
     # Copy TypeScript template files
@@ -96,6 +253,8 @@ JSON_END
 
 # setup_python configures a Python (FastAPI) project by copying template files, writing config/tech-stack.json, creating a virtual environment and installing dependencies if python3 is available, and printing next-step instructions.
 setup_python() {
+    validate_prerequisites "python"
+    confirm_overwrite "python"
     echo -e "${GREEN}Configurando proyecto Python...${NC}"
 
     # Copy Python template files
@@ -166,6 +325,8 @@ JSON_END
 
 # setup_json creates a minimal JSON/config-only project structure with placeholder `.gitkeep` files, writes a default `config/tech-stack.json`, and prints next-step guidance.
 setup_json() {
+    validate_prerequisites "generic"
+    confirm_overwrite "generic"
     echo -e "${GREEN}Configurando proyecto con solo JSON/Config...${NC}"
 
     # Create minimal structure
@@ -218,12 +379,30 @@ JSON_END
 
 # cleanup_templates prints a notice that template files are being cleaned from the project, reminds the user that the templates/ directory is kept for reference, and shows the command to remove it (rm -rf templates/).
 cleanup_templates() {
-    echo -e "${YELLOW}Limpiando templates...${NC}"
+    if [[ ! -d templates ]]; then
+        return
+    fi
 
-    # Keep templates directory for reference but remove from main project
-    # You can delete templates/ directory if you want
-    echo -e "${BLUE}ℹ Los templates están en templates/ por si necesitas referencia${NC}"
-    echo -e "${BLUE}  Puedes eliminar templates/ cuando quieras: rm -rf templates/${NC}"
+    echo -e "${YELLOW}Opciones para templates/${NC}"
+    echo "  1) Conservarlos para referencia (opción por defecto)"
+    echo "  2) Moverlos a .templates/ (ocultar del árbol principal)"
+    echo "  3) Eliminarlos (${RED}acción irreversible${NC})"
+
+    read -r -p "Selecciona una opción [1/2/3]: " template_choice
+    case $template_choice in
+        2)
+            rm -rf .templates
+            mv templates .templates
+            echo -e "${GREEN}✓ Templates movidos a .templates/${NC}"
+            ;;
+        3)
+            rm -rf templates
+            echo -e "${GREEN}✓ Templates eliminados${NC}"
+            ;;
+        *)
+            echo -e "${BLUE}ℹ Templates conservados en templates/${NC}"
+            ;;
+    esac
 }
 
 # update_context writes .context/project-state.json recording initialization timestamp, selected language, phase, and a default last_session with suggested next steps.

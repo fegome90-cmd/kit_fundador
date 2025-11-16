@@ -67,3 +67,14 @@ muévelas a `templates/` para evitar confusiones.
 
 Siguiendo estas pautas, el starkit mantiene su naturaleza agnóstica y aún así te guía para aterrizar un tooling coherente con tu
 stack.
+
+## 5. Script interactivo `scripts/setup.sh`
+
+| Opción | Prerequisitos obligatorios | Acción al faltar prereqs |
+|--------|----------------------------|---------------------------|
+| TypeScript | `git`, `npm`, `docker-compose` (o `docker compose`) | El script se detiene antes de copiar archivos y explica qué instalar. |
+| Python | `git`, `python3`, `pip`, `docker-compose` | Se aborta el setup antes de crear `venv/` o copiar plantillas. |
+| JSON/config | `git` | Solo valida la presencia de git. |
+
+- Usa `./scripts/setup.sh --force` únicamente en pipelines automatizados o cuando estés seguro de que quieres sobrescribir archivos sin confirmación y continuar a pesar de prerequisitos faltantes.
+- Al finalizar, el script pregunta si deseas conservar `templates/`, moverlos a `.templates/` o eliminarlos. Documenta tu elección en `dev-docs/context.md` si cambias el flujo estándar.

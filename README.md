@@ -72,14 +72,16 @@ cd mi-proyecto
 
 # Ejecutar setup
 chmod +x scripts/setup.sh
-./scripts/setup.sh
+./scripts/setup.sh [--force]
 
-# Seleccionar tech stack cuando se solicite
+# Selecciona el stack cuando se solicite
 # Opciones disponibles:
 #   1) TypeScript + Node.js (Express, Jest, Prisma)
 #   2) Python (FastAPI, Pytest, SQLAlchemy)
 #   3) JSON/Config only (para usar con cualquier lenguaje)
 ```
+
+> 💡 El script valida prerequisitos (`git`, `npm`, `python3`, `docker-compose`) antes de copiar archivos y te pedirá confirmación si detecta contenido existente. Usa `--force` solo cuando estés seguro de sobrescribir y omitir las validaciones.
 
 ### 2. Configurar Proyecto
 
@@ -123,7 +125,9 @@ en un proyecto real, sigue el [plan de ejecución](dev-docs/setup/setup-sh-remed
 2. **Mejoras de usabilidad** (confirmación de sobrescritura, validación de prerequisitos y limpieza de templates).
 3. **Hardening opcional** (tests del script, flags verbosos y guardas para `docker-compose`).
 
-> **Estado actual**: ✅ **Fase A completada**. `templates/python/requirements.txt` usa versiones verificadas de OpenTelemetry, la plantilla TypeScript apunta a `eslint@^9`, `@typescript-eslint@^8`, `redis@^5` y el bloque de instalación de `pip` aborta con error si falla. Pendientes: fases B y C para endurecer la UX y la automatización.
+> **Estado actual**: ✅ **Fases A y B completadas**. Además de las dependencias auditadas, `setup.sh` ahora valida prerequisitos obligatorios, solicita confirmación (o `--force`) antes de sobrescribir y permite conservar/mover/eliminar `templates/` tras cada ejecución. Pendiente: **Fase C** (suite bash, flags verbosos, guardas adicionales).
+
+> 📦 Después de cada ejecución, decide qué hacer con `templates/` directamente desde el prompt final; si prefieres evitar preguntas en entornos automatizados, invoca el script con `--force`.
 
 Documenta qué fases aplicaste en `dev-docs/task.md` antes de continuar con las tareas principales del roadmap.
 

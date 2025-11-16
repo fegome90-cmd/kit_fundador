@@ -6,19 +6,19 @@
 ## Current Session
 
 **Started**: 2025-01-16T00:00:00Z
-**Last Updated**: 2025-01-16T12:00:00Z
+**Last Updated**: 2025-01-16T13:30:00Z
 **Agent**: gpt-5-codex
 
 ## Active Tasks
 
 - _(sin tareas activas)_
-- Próximo foco sugerido: [TASK-012]-[TASK-014] para completar las fases B y C del setup, y, una vez endurecido el script, retomar [TASK-003]/[TASK-004].
+- Próximo foco sugerido: [TASK-013]-[TASK-014] para completar la Fase C del setup, y, una vez endurecido el script, retomar [TASK-003]/[TASK-004].
 
 ## Recent Changes
 
-- Se completó la Fase A del plan de remediación (`templates/python/requirements.txt`, plantilla TypeScript y manejo de errores de `pip`).
-- README, `dev-docs/plan.md` y `dev-docs/setup/setup-sh-remediation-plan.md` documentan el nuevo estado (Fase A ✅, Fases B/C pendientes).
-- `dev-docs/task.md` mueve TASK-011 a Completadas y deja TASK-012 → TASK-014 como próximos pasos.
+- Se completó la Fase B del plan de remediación (prerequisitos obligatorios, confirmación/`--force`, prompt para `templates/`).
+- README, `dev-docs/plan.md`, `dev-docs/tooling-guide.md` y `dev-docs/setup/setup-sh-remediation-plan.md` documentan el nuevo estado (Fases A/B ✅, Fase C pendiente).
+- `dev-docs/task.md` mueve TASK-012 a Completadas y deja TASK-013 → TASK-014 como próximos pasos.
 
 ### Last 5 Commits
 ```
