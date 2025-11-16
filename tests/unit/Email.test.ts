@@ -8,7 +8,11 @@
  * - Value object behavior: immutability, equality, serialization
  */
 
-import { Email } from '@domain/value-objects/Email';
+import {
+  Email,
+  BLOCKED_DOMAINS,
+  MAX_EMAIL_LENGTH,
+} from '@domain/value-objects/Email';
 
 describe('Email Value Object', () => {
   describe('create', () => {
@@ -305,17 +309,17 @@ describe('Email Value Object', () => {
 
   describe('business rules', () => {
     it('should enforce maximum length constraint', () => {
-      const email255 = 'a'.repeat(240) + '@example.com'; // exactly 255
-      const email256 = 'a'.repeat(241) + '@example.com'; // 256
-      
+      const domainSuffix = '@example.com';
+      const allowedLocalLength = MAX_EMAIL_LENGTH - domainSuffix.length;
+      const email255 = 'a'.repeat(allowedLocalLength) + domainSuffix;
+      const email256 = 'a'.repeat(allowedLocalLength + 1) + domainSuffix;
+
       expect(() => Email.create(email255)).not.toThrow();
       expect(() => Email.create(email256)).toThrow('Email too long');
     });
 
     it('should block all configured blocked domains', () => {
-      const blockedDomains = ['tempmail.com', 'throwaway.email'];
-      
-      blockedDomains.forEach(domain => {
+      BLOCKED_DOMAINS.forEach((domain) => {
         expect(() => Email.create(`user@${domain}`)).toThrow(`Email domain not allowed: ${domain}`);
       });
     });
