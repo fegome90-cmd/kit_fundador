@@ -94,8 +94,8 @@ export class Email {
   }
 
   private ensureDomainNotBlocked(domainPart: string): void {
-    if (BLOCKED_DOMAINS.includes(domainPart)) {
-      throw new Error(`Domain ${domainPart} is not allowed`);
+    if (BLOCKED_DOMAINS.some((d) => domainPart.toLowerCase() === d.toLowerCase())) {
+      throw new Error(`Email domain not allowed: ${domainPart}`);
     }
   }
 
