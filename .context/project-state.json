@@ -1,11 +1,11 @@
 {
   "version": "2.0.0",
-  "last_updated": "2025-01-15T00:00:00Z",
+  "last_updated": "2025-01-16T00:00:00Z",
   "project_metadata": {
     "name": "nombre-proyecto",
     "domain": "dominio-negocio",
     "stage": "foundation",
-    "tech_stack_hash": ""
+    "tech_stack_hash": "typescript-node20-express-jest-esbuild"
   },
   "current_state": {
     "active_bounded_contexts": [],
@@ -15,10 +15,16 @@
     "technical_debt_items": []
   },
   "ai_context": {
-    "last_session_summary": "Proyecto inicializado con Kit Fundador v2.0",
-    "next_recommended_tasks": [],
-    "areas_needing_attention": [],
-    "recent_decisions": []
+    "last_session_summary": "Stack base documentado: TypeScript + Node.js 20 con Express, Jest, ESLint/Prettier y esbuild quedaron registrados en config/tech-stack.json, README y dev-docs.",
+    "next_recommended_tasks": ["TASK-002", "TASK-003"],
+    "areas_needing_attention": ["Definir bounded contexts en dev-docs/plan.md", "Implementar primera entidad de dominio"],
+    "recent_decisions": [
+      {
+        "id": "DEC-2025-01-16-STACK",
+        "summary": "Se fija TypeScript + Express como perfil predeterminado del starkit y se documenta en dev-docs/tech-stack-decisions.md.",
+        "references": ["config/tech-stack.json", "dev-docs/tech-stack-decisions.md"]
+      }
+    ]
   },
   "metrics": {
     "test_coverage": 0,
