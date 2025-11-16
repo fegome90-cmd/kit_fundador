@@ -27,26 +27,31 @@ class Email:
 
     @classmethod
     def create(cls, email: str) -> Email:
-        """Factory method to create Email instance with validation.
-
-        Args:
-            email: Email address string
-
+        """
+        Create and validate an Email value object from a raw email string.
+        
+        Parameters:
+            email (str): The email address to encapsulate and validate.
+        
         Returns:
-            Email instance
-
+            Email: A validated Email instance.
+        
         Raises:
-            ValueError: If email is invalid
+            ValueError: If the provided email fails validation.
         """
         email_obj = cls(_value=email)
         email_obj._validate()
         return email_obj
 
     def _validate(self) -> None:
-        """Validate email format and business rules.
-
+        """
+        Validate the stored email value against format and business rules.
+        
         Raises:
-            ValueError: If email is invalid
+            ValueError: If the email is empty.
+            ValueError: If the email does not match the required format.
+            ValueError: If the email length exceeds MAX_LENGTH.
+            ValueError: If the email's domain is in BLOCKED_DOMAINS.
         """
         if not self._value:
             raise ValueError('Email cannot be empty')
@@ -67,26 +72,44 @@ class Email:
 
     @property
     def value(self) -> str:
-        """Get email value."""
+        """
+        Retrieve the underlying email address.
+        
+        Returns:
+            The stored email address string.
+        """
         return self._value
 
     def __str__(self) -> str:
-        """String representation."""
+        """
+        Return the email's string value.
+        
+        Returns:
+            The underlying email string.
+        """
         return self._value
 
     def __eq__(self, other: object) -> bool:
-        """Value objects are compared by value (case-insensitive for emails).
-
-        Args:
-            other: Object to compare
-
+        """
+        Compare this Email with another object for value equality using a case-insensitive comparison.
+        
+        If the other object is not an Email, the comparison yields `false`.
+        
+        Parameters:
+            other: Object to compare against this Email.
+        
         Returns:
-            True if emails are equal (case-insensitive)
+            `true` if the other object is an Email with the same address ignoring case, `false` otherwise.
         """
         if not isinstance(other, Email):
             return False
         return self._value.lower() == other._value.lower()
 
     def __hash__(self) -> int:
-        """Hash for use in collections (Set, Dict)."""
+        """
+        Return a hash suitable for use in hash-based collections that matches case-insensitive equality.
+        
+        Returns:
+            int: Hash of the email value converted to lowercase.
+        """
         return hash(self._value.lower())

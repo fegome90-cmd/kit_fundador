@@ -449,5 +449,505 @@ Agrega tus propios prompts específicos aquí:
 
 ---
 
-Última actualización: 2025-01-16  
+## 📝 Integración con Templates de Prompts Estructurados
+
+Los prompts anteriores activan **roles de agente** (EJECUTOR, VALIDADOR). Para **tareas específicas**, usa los **templates estructurados** disponibles en [`dev-docs/prompt_example/`](../prompt_example/).
+
+### Relación entre Roles y Templates
+
+| Rol de Agente | Templates Recomendados | Cuándo Usar |
+|---------------|------------------------|-------------|
+| **EJECUTOR** | Templates 1-5, 12-19 | Para planificar e implementar tareas, investigar, documentar decisiones, testing |
+| **VALIDADOR** | Templates 6, 8-11 | Para auditar y evaluar calidad (general y especializada) |
+| **HANDOFF** | Template 7 | Para traspasar contexto entre agentes/equipos |
+
+**Tipos de Auditoría Disponibles (Templates 6, 8-11):**
+- Template 6: Auditoría General (4 dimensiones, gate de calidad)
+- Template 8: Auditoría de Seguridad (OWASP, dependencias, secretos)
+- Template 9: Auditoría de Performance (latencia, carga, optimización)
+- Template 10: Auditoría de Calidad de Código (deuda técnica, code smells)
+- Template 11: Auditoría de UI/UX (accesibilidad WCAG, usabilidad)
+
+**Testing Especializado (Templates 15-19):**
+- Template 15: Plan de Pruebas General (estrategia completa TDD/BDD, cobertura)
+- Template 16: Plan de Pruebas Unitarias (funciones, métodos, componentes)
+- Template 17: Plan de Pruebas de Integración (módulos, servicios, capas)
+- Template 18: Plan de Pruebas E2E (flujos de usuario completos)
+- Template 19: Estrategia TDD/BDD (desarrollo guiado por pruebas)
+
+### Flujo Completo: Rol + Template
+
+#### Ejemplo: Implementación de Feature Mediana
+
+```markdown
+# Paso 1: Activar EJECUTOR con Template 2
+"Modo EJECUTOR. Trabajar en TASK-123.
+
+Usar template de planificación: dev-docs/prompt_example/prompt_template_2_medium_feature.md
+
+Feature: Sistema de exportación de usuarios a CSV
+Duración estimada: 3 días
+
+[Rellenar template completo con objetivos SMART, plan de implementación, etc.]
+
+Comenzar con TDD."
+
+# Paso 2: Desarrollo
+[Ejecutor implementa siguiendo el plan del template]
+
+# Paso 3: Activar VALIDADOR con Template 6
+"Modo VALIDADOR. Auditar TASK-123.
+
+Usar template de auditoría: dev-docs/prompt_example/template_6_general_audit.md
+
+Evaluar en 4 dimensiones:
+- Completitud (30%)
+- Calidad (30%)
+- Impacto (25%)
+- Sostenibilidad (15%)
+
+Generar score y decisión de gate."
+
+# Paso 4: Handoff (si es necesario)
+"Preparar handoff con template: dev-docs/prompt_example/template_7_general_handoff.md
+
+Documentar:
+- Tareas completadas
+- Artefactos generados
+- Issues pendientes
+- Decisiones de arquitectura (ADRs)"
+```
+
+### Decisión Rápida: ¿Qué Template Usar?
+
+Ver guía completa: [`dev-docs/prompt_example/QUICK_REFERENCE.md`](../prompt_example/QUICK_REFERENCE.md)
+
+**Atajos**:
+- Nueva feature grande (> 5 días) → Template 1
+- Nueva feature mediana (2-5 días) → Template 2
+- Bug fix → Template 3
+- Refactorización → Template 4
+- Tarea rápida (< 2 horas) → Template 5
+- Auditoría general/Gate → Template 6
+- Traspaso de contexto → Template 7
+- Auditoría de seguridad (OWASP) → Template 8
+- Auditoría de performance → Template 9
+- Auditoría de calidad de código → Template 10
+- Auditoría de UI/UX (WCAG) → Template 11
+- Investigación técnica/comparativa → Template 12
+- Planificación de infraestructura → Template 13
+- Arquitectura Decision Record (ADR) → Template 14
+- Plan de pruebas general (Testing) → Template 15
+- Plan de pruebas unitarias → Template 16
+- Plan de pruebas de integración → Template 17
+- Plan de pruebas E2E → Template 18
+- Estrategia TDD/BDD → Template 19
+
+### Workflow Recomendado
+
+```
+┌─────────────────────────────────────────────────┐
+│ 1. Seleccionar Template según tarea             │
+│    (ver QUICK_REFERENCE.md)                     │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ 2. Activar EJECUTOR + Rellenar Template         │
+│    "Modo EJECUTOR. Usar template X para..."    │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ 3. Implementar siguiendo plan del template      │
+│    (TDD, commits frecuentes, etc.)              │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ 4. Activar VALIDADOR + Usar Template 6          │
+│    "Modo VALIDADOR. Auditar con template 6..."  │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ 5. ¿Gate PASS? → Usar Template 7 para handoff   │
+│    Si NO → Volver a EJECUTOR para fixes         │
+└─────────────────────────────────────────────────┘
+```
+
+### Templates Especializados por Tipo de Tarea
+
+#### Para Implementaciones Grandes (Sprints)
+```markdown
+Modo EJECUTOR.
+
+Template: prompt_template_1_large_implementation.md
+Task: [TASK-XXX]
+
+IMPORTANTE:
+- Incluir metadata YAML completa
+- Definir ≥10 Boundary Markers (anti-drift)
+- Objetivos SMART con métricas cuantificables
+- Timeline por fases con validaciones
+- Target de code coverage ≥[XX]%
+
+Comenzar.
+```
+
+#### Para Bugs
+```markdown
+Modo EJECUTOR.
+
+Template: prompt_template_3_bug_fix.md
+Bug: [BUG-XXX]
+Severidad: [CRITICAL/HIGH/MEDIUM/LOW]
+
+Proceso:
+1. Reproducir bug siguiendo pasos
+2. Root Cause Analysis (RCA)
+3. Proponer solución con impacto
+4. Implementar con tests anti-regresión
+5. Verificar que comportamiento esperado ocurre
+
+Comenzar.
+```
+
+#### Para Refactorización
+```markdown
+Modo EJECUTOR.
+
+Template: prompt_template_4_refactoring.md
+Refactor: [REFACTOR-XXX]
+
+CRÍTICO:
+- NO cambiar comportamiento externo
+- Todos los tests existentes deben seguir pasando
+- Añadir tests de integración para garantizar no-regresión
+- Documentar métricas antes/después (complejidad, LOC, etc.)
+
+Comenzar.
+```
+
+#### Para Auditorías
+
+##### Auditoría General (Gate de Calidad)
+```markdown
+Modo VALIDADOR.
+
+Template: template_6_general_audit.md
+Auditar: [TASK/SPRINT-XXX]
+
+Metodología de 4 Dimensiones:
+1. Completitud (30%): Tareas, requisitos, deliverables
+2. Calidad (30%): Linter, coherencia, documentación
+3. Impacto (25%): Anti-drift, usabilidad, valor
+4. Sostenibilidad (15%): Versionado, extensibilidad, escalabilidad
+
+Gate threshold: ≥[XX]/100
+Generar decisión: ✅ APROBADO / ❌ RECHAZADO
+
+Comenzar.
+```
+
+##### Auditoría de Seguridad (OWASP)
+```markdown
+Modo VALIDADOR.
+
+Template: template_8_security_audit.md
+Auditar: [Módulo/API a auditar]
+
+Scope:
+- Análisis de dependencias (npm audit, Snyk)
+- Revisión SAST (análisis estático)
+- Checklist OWASP Top 10
+- Autenticación y Autorización
+- Manejo de secretos y configuración
+
+Generar plan de remediación por severidad (Crítica/Alta/Media).
+
+Comenzar.
+```
+
+##### Auditoría de Performance
+```markdown
+Modo VALIDADOR.
+
+Template: template_9_performance_audit.md
+Auditar: [Flujo/API a auditar]
+
+KPIs Target:
+- Latencia p95: < [XX]ms
+- Throughput: > [YY] RPS
+- LCP: < [Z.Z]s
+
+Proceso:
+1. Ejecutar pruebas de carga (k6/JMeter)
+2. Identificar bottlenecks con profiling
+3. Recomendar optimizaciones priorizadas
+
+Comenzar.
+```
+
+##### Auditoría de Calidad de Código
+```markdown
+Modo VALIDADOR.
+
+Template: template_10_code_quality_audit.md
+Auditar: [Repositorio/Módulo a auditar]
+
+Métricas:
+- Complejidad ciclomática
+- Duplicación de código
+- Cobertura de tests
+- Code smells (God Object, métodos largos)
+
+Estimar deuda técnica en días-persona.
+Priorizar plan de refactorización.
+
+Comenzar.
+```
+
+##### Auditoría de UI/UX y Accesibilidad
+```markdown
+Modo VALIDADOR.
+
+Template: template_11_ui_ux_audit.md
+Auditar: [Flujo/Interfaz a auditar]
+
+Verificaciones:
+- Heurísticas de Nielsen (10 heurísticas)
+- WCAG 2.1 AA compliance (Lighthouse, axe)
+- Consistencia de UI (Design System)
+- Testing con lectores de pantalla
+
+Generar plan de remediación con prioridades.
+
+Comenzar.
+```
+
+#### Para Investigación y Planificación
+
+##### Investigación Técnica
+```markdown
+Modo EJECUTOR.
+
+Template: template_12_technical_research.md
+Investigación: [RESEARCH-XXX]
+
+Objetivos SMART:
+- O1: Analizar alternativas [A, B, C]
+- O2: Crear PoC de la opción más prometedora
+- O3: Producir informe de recomendación
+
+Metodología:
+1. Recopilación de datos (documentación, benchmarks)
+2. Análisis comparativo con tabla de criterios
+3. Desarrollo de Proof of Concept
+4. Síntesis y recomendación final
+
+Criterios de evaluación: [Performance, ecosistema, curva de aprendizaje, bundle size, etc.]
+
+Comenzar.
+```
+
+##### Planificación de Infraestructura
+```markdown
+Modo EJECUTOR.
+
+Template: template_13_infrastructure_plan.md
+Plan: [INFRA-XXX]
+
+Objetivo: [ej: "Configurar pipeline de CI/CD para servicio X"]
+
+Componentes:
+- Proveedor Cloud: [AWS/GCP/Azure]
+- CI/CD: [GitHub Actions/Jenkins/GitLab CI]
+- IaC: [Terraform/CloudFormation/Pulumi]
+- Contenedores: [Docker/ECS/Kubernetes]
+- Monitoreo: [Datadog/Prometheus/CloudWatch]
+
+Fases:
+1. Configuración del entorno base (IaC)
+2. Creación del pipeline de CI/CD
+3. Seguridad y monitoreo
+
+Incluir: Diagrama de arquitectura, estrategia de rollback, criterios de aceptación.
+
+Comenzar.
+```
+
+##### Architecture Decision Record (ADR)
+```markdown
+Modo EJECUTOR.
+
+Template: template_14_architecture_decision_record.md
+ADR: [ADR-XXX]
+
+Decisión: [ej: "Adoptar WebSockets en lugar de polling"]
+
+Estructura:
+1. Contexto: ¿Qué problema resuelve esta decisión?
+2. Decisión: Declaración clara de lo que se decidió
+3. Justificación: Por qué esta opción sobre las alternativas
+4. Consecuencias: Impactos positivos y negativos
+5. Alternativas Consideradas: Opciones rechazadas y por qué
+
+Status: [Propuesto/Aceptado/Rechazado/Deprecado]
+
+Comenzar.
+```
+
+##### Plan de Pruebas (Testing)
+```markdown
+Modo EJECUTOR.
+
+Template: template_15_testing_plan.md
+Plan de Pruebas: [TEST-XXX]
+
+Funcionalidad: [ej: "Sistema de exportación a PDF"]
+
+Estrategia:
+- TDD/BDD: Definir comportamientos Given-When-Then
+- Pruebas Unitarias: Funciones y componentes aislados
+- Pruebas de Integración: Colaboración entre módulos
+- Pruebas E2E: Flujos completos de usuario
+
+Herramientas:
+- Unitarias: [Jest/Vitest]
+- Integración: [React Testing Library/Supertest]
+- E2E: [Cypress/Playwright]
+
+Criterios de Entrada: Código desplegado en Staging, tests unitarios pasando
+Criterios de Salida: 100% casos críticos ejecutados, cobertura ≥[XX]%, 0 bugs bloqueantes
+
+Comenzar.
+```
+
+#### Testing Especializado
+
+##### Plan de Pruebas Unitarias
+```markdown
+Modo EJECUTOR.
+
+Template: template_16_unit_testing_plan.md
+Plan: [UNIT-YYYYMMDD-MODULE_NAME]
+
+Módulo/Componente: [ej: "UserValidation module"]
+
+Unidades a Probar:
+- Función: `validateEmail(email)`
+- Función: `validatePassword(password)`
+- Componente: `<UserForm />`
+
+Casos de Prueba:
+- Happy paths (inputs válidos)
+- Casos borde (vacíos, muy grandes, límites)
+- Casos de error (null, undefined, tipos incorrectos)
+- Componentes UI (renderizado, interacciones, accesibilidad)
+
+Criterios de Aceptación:
+- Cobertura ≥90%
+- Tests se ejecutan en <2 minutos
+- Todos pasan en CI
+
+Comenzar.
+```
+
+##### Plan de Pruebas de Integración
+```markdown
+Modo EJECUTOR.
+
+Template: template_17_integration_testing_plan.md
+Plan: [INT-YYYYMMDD-FEATURE_NAME]
+
+Funcionalidad: [ej: "Creación de usuarios"]
+
+Puntos de Integración:
+1. UI (Formulario de registro) ↔ API (/api/users)
+2. API ↔ Base de Datos (PostgreSQL)
+3. API ↔ Servicio de Email (notificaciones)
+
+Componentes Reales:
+- Servidor API (real)
+- Base de datos de prueba (Docker container)
+
+Componentes Mockeados:
+- Servicio de email (mock)
+- APIs de terceros (mock)
+
+Escenarios:
+- Flujo completo exitoso (UI → API → DB → Email)
+- Manejo de errores de DB
+- Validación de contratos entre servicios
+
+Comenzar.
+```
+
+##### Plan de Pruebas E2E
+```markdown
+Modo EJECUTOR.
+
+Template: template_18_e2e_testing_plan.md
+Plan: [E2E-YYYYMMDD-APP_NAME]
+
+Aplicación: [ej: "E-commerce Platform"]
+Entorno: https://staging.[app].com
+
+Flujos Críticos:
+1. Registro y onboarding de nuevo usuario
+2. Búsqueda → Añadir al carrito → Checkout → Pago
+3. Creación/edición/eliminación de producto (admin)
+
+Navegadores/Dispositivos:
+- Chrome Desktop
+- Firefox Desktop
+- Safari Desktop
+- Vista Móvil (emulada)
+
+Herramientas:
+- Framework: Cypress / Playwright
+- Gestión de datos: Seeds scripts, usuarios de prueba
+- Reportes: Screenshots y videos de fallos
+
+Comenzar.
+```
+
+##### Estrategia TDD/BDD
+```markdown
+Modo EJECUTOR.
+
+Template: template_19_tdd_bdd_strategy.md
+Estrategia: [TDD-YYYYMMDD-FEATURE_NAME]
+
+Funcionalidad: [ej: "Carrito de compras"]
+
+Escenarios BDD (Given-When-Then):
+
+Escenario 1: Añadir primer artículo al carrito
+- Given: Usuario autenticado con carrito vacío
+- When: Usuario hace clic en "Añadir al Carrito" en producto X
+- Then: Carrito contiene 1 unidad de producto X
+- And: Subtotal = precio de X
+
+Escenario 2: Añadir artículo existente
+- Given: Carrito ya contiene 1 unidad de producto X
+- When: Usuario añade producto X nuevamente
+- Then: Carrito contiene 2 unidades de producto X
+
+Plan de Implementación (Red-Green-Refactor):
+1. Escribir test que falla para Escenario 1
+2. Implementar código mínimo para pasar test 1
+3. Refactorizar
+4. Repetir para Escenario 2
+5. ...continuar iterativamente
+
+Comenzar.
+```
+
+### Ver Documentación Completa
+
+- **README de Templates**: [`dev-docs/prompt_example/README.md`](../prompt_example/README.md)
+- **Guía de Decisión Rápida**: [`dev-docs/prompt_example/QUICK_REFERENCE.md`](../prompt_example/QUICK_REFERENCE.md)
+- **Templates Individuales**: [`dev-docs/prompt_example/`](../prompt_example/)
+
+---
+
+Última actualización: 2025-01-16
 Autor: Kit Fundador v2.0

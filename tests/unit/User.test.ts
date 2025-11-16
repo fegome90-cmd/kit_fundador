@@ -11,12 +11,14 @@ import { User } from '@domain/entities/User';
 import { Email } from '@domain/value-objects/Email';
 import { Password } from '@domain/value-objects/Password';
 
+const STRONG_PASSWORD = 'SecurePass123!';
+
 describe('User Entity', () => {
   describe('create', () => {
     it('should create a valid user', () => {
       // Arrange
       const email = Email.create('test@example.com');
-      const password = Password.create('SecurePass123!');
+      const password = Password.create(STRONG_PASSWORD);
       
       // Act
       const user = User.create({
@@ -38,7 +40,7 @@ describe('User Entity', () => {
     it('should raise UserCreated domain event', () => {
       // Arrange
       const email = Email.create('test@example.com');
-      const password = Password.create('SecurePass123!');
+      const password = Password.create(STRONG_PASSWORD);
       
       // Act
       const user = User.create({
@@ -55,7 +57,7 @@ describe('User Entity', () => {
 
     it('should default to user role if not specified', () => {
       const email = Email.create('test@example.com');
-      const password = Password.create('SecurePass123!');
+      const password = Password.create(STRONG_PASSWORD);
       
       const user = User.create({
         email,
@@ -73,7 +75,7 @@ describe('User Entity', () => {
       const user = User.create({
         email: Email.create('test@example.com'),
         name: 'Test User',
-        password: Password.create('SecurePass123!'),
+        password: Password.create(STRONG_PASSWORD),
       });
       
       // Act
@@ -88,7 +90,7 @@ describe('User Entity', () => {
       const user = User.create({
         email: Email.create('test@example.com'),
         name: 'Test User',
-        password: Password.create('SecurePass123!'),
+        password: Password.create(STRONG_PASSWORD),
       });
       user.verifyEmail();
       
@@ -102,7 +104,7 @@ describe('User Entity', () => {
       const user = User.create({
         email: Email.create('test@example.com'),
         name: 'Old Name',
-        password: Password.create('SecurePass123!'),
+        password: Password.create(STRONG_PASSWORD),
       });
       
       user.changeName('New Name');
@@ -114,7 +116,7 @@ describe('User Entity', () => {
       const user = User.create({
         email: Email.create('test@example.com'),
         name: 'Test User',
-        password: Password.create('SecurePass123!'),
+        password: Password.create(STRONG_PASSWORD),
       });
       
       expect(() => user.changeName('')).toThrow('Name cannot be empty');
@@ -142,6 +144,94 @@ describe('User Entity', () => {
       });
       
       expect(user.isAdmin()).toBe(false);
+    });
+  });
+
+  describe('changePassword', () => {
+    it('should change password successfully', () => {
+      const user = User.create({
+        email: Email.create('test@example.com'),
+        name: 'Test User',
+        password: Password.create('OldPass1234!'),
+      });
+
+      const newPassword = Password.create('NewPass4567!');
+      user.changePassword(newPassword);
+      
+      expect(user.updatedAt).toBeDefined();
+    });
+
+    it('should update updatedAt timestamp', () => {
+      const user = User.create({
+        email: Email.create('test@example.com'),
+        name: 'Test User',
+        password: Password.create(STRONG_PASSWORD),
+      });
+
+      const oldUpdatedAt = user.updatedAt;
+
+      user.changePassword(Password.create('NewSecurePass123!'));
+
+      expect(user.updatedAt).not.toBe(oldUpdatedAt);
+      expect(user.updatedAt.getTime()).toBeGreaterThanOrEqual(oldUpdatedAt.getTime());
+    });
+  });
+
+  describe('fromPersistence', () => {
+    it('should reconstitute user from persistence', () => {
+      const email = Email.create('persisted@example.com');
+      const password = Password.create(STRONG_PASSWORD);
+      const now = new Date();
+      
+      const user = User.fromPersistence({
+        id: 'test-id-123',
+        email,
+        name: 'Persisted User',
+        password,
+        role: 'admin',
+        emailVerified: true,
+        createdAt: now,
+        updatedAt: now,
+      });
+      
+      expect(user.id).toBe('test-id-123');
+      expect(user.emailVerified).toBe(true);
+      expect(user.role).toBe('admin');
+    });
+  });
+
+  describe('toJSON', () => {
+    it('should serialize to JSON without password', () => {
+      const user = User.create({
+        email: Email.create('json@example.com'),
+        name: 'JSON User',
+        password: Password.create(STRONG_PASSWORD),
+        role: 'user',
+      });
+      
+      const json = user.toJSON();
+      
+      expect(json).toHaveProperty('id');
+      expect(json).toHaveProperty('email', 'json@example.com');
+      expect(json).toHaveProperty('name', 'JSON User');
+      expect(json).toHaveProperty('role', 'user');
+      expect(json).not.toHaveProperty('password');
+    });
+  });
+
+  describe('domain events', () => {
+    it('should clear domain events', () => {
+      const user = User.create({
+        email: Email.create('test@example.com'),
+        name: 'Test User',
+        password: Password.create(STRONG_PASSWORD),
+      });
+      
+      expect(user.getDomainEvents().length).toBeGreaterThan(0);
+      
+      user.clearDomainEvents();
+      
+      expect(user.getDomainEvents()).toHaveLength(0);
     });
   });
 });

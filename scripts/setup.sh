@@ -4,12 +4,191 @@
 
 set -e
 
+SKIP_INSTALLS=${SETUP_SH_SKIP_INSTALLS:-false}
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
+FORCE_MODE=false
+
+usage() {
+    cat <<USAGE
+Uso: ./scripts/setup.sh [opciones]
+
+Opciones:
+  --force       Omite confirmaciones de sobrescritura y validaciones de prerequisitos.
+  -h, --help    Muestra esta ayuda y termina.
+
+Variables de entorno:
+  SETUP_SH_SKIP_INSTALLS=true  Omite `npm install`/`pip install` (útil en CI o en el harness de tests).
+USAGE
+}
+
+parse_args() {
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --force)
+                FORCE_MODE=true
+                shift
+                ;;
+            -h|--help)
+                usage
+                exit 0
+                ;;
+            *)
+                echo -e "${RED}Flag no reconocida: $1${NC}"
+                usage
+                exit 1
+                ;;
+        esac
+    done
+}
+
+parse_args "$@"
+
+utc_timestamp() {
+    if command -v date &> /dev/null; then
+        if ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2> /dev/null); then
+            echo "$ts"
+            return 0
+        fi
+    fi
+
+    if command -v python3 &> /dev/null; then
+        python3 - <<'PY'
+import datetime
+print(datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z")
+PY
+        return 0
+    fi
+
+    echo "1970-01-01T00:00:00Z"
+}
+
+has_compose() {
+    if command -v docker-compose &> /dev/null; then
+        return 0
+    fi
+
+    if command -v docker &> /dev/null; then
+        if docker compose version &> /dev/null; then
+            return 0
+        fi
+    fi
+
+    return 1
+}
+
+validate_prerequisites() {
+    local mode=$1
+    local -a missing
+
+    if ! command -v git &> /dev/null; then
+        missing+=("git")
+    fi
+
+    case $mode in
+        typescript)
+            if ! command -v npm &> /dev/null; then
+                missing+=("npm")
+            fi
+            if ! has_compose; then
+                missing+=("docker-compose")
+            fi
+            ;;
+        python)
+            local has_python=false
+            local has_pip=false
+
+            if command -v python3 &> /dev/null; then
+                has_python=true
+            fi
+
+            if command -v pip &> /dev/null; then
+                has_pip=true
+            elif [[ $has_python == true ]] && python3 -m pip --version &> /dev/null; then
+                has_pip=true
+            fi
+
+            if [[ $has_python == false ]]; then
+                missing+=("python3")
+            fi
+
+            if [[ $has_pip == false ]]; then
+                missing+=("pip")
+            fi
+
+            if ! has_compose; then
+                missing+=("docker-compose")
+            fi
+            ;;
+        generic)
+            # No prerequisitos adicionales
+            ;;
+    esac
+
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo -e "${RED}❌ Prerequisitos faltantes para la opción $mode:${NC}"
+        for bin in "${missing[@]}"; do
+            echo "  - $bin"
+        done
+
+        if [[ "$FORCE_MODE" == true ]]; then
+            echo -e "${YELLOW}⚠ Ejecutando con --force: continúa bajo tu propio riesgo.${NC}"
+        else
+            echo -e "${YELLOW}Instala las herramientas indicadas o ejecuta con --force si realmente deseas continuar.${NC}"
+            exit 1
+        fi
+    fi
+}
+
+confirm_overwrite() {
+    local mode=$1
+    local -a targets=("src" "tests" "config/tech-stack.json" ".context/project-state.json")
+
+    case $mode in
+        typescript)
+            targets+=("package.json" "tsconfig.json" "jest.config.js" ".eslintrc.json" ".prettierrc")
+            ;;
+        python)
+            targets+=("pyproject.toml" "requirements.txt" "venv")
+            ;;
+        generic)
+            targets+=("src/domain/entities/.gitkeep" "src/domain/value_objects/.gitkeep")
+            ;;
+    esac
+
+    local -a existing
+    for path in "${targets[@]}"; do
+        if [[ -e $path ]]; then
+            existing+=("$path")
+        fi
+    done
+
+    if [[ ${#existing[@]} -eq 0 ]]; then
+        return
+    fi
+
+    echo -e "${YELLOW}⚠ Se encontraron archivos existentes que serían sobrescritos:${NC}"
+    for path in "${existing[@]}"; do
+        echo "  - $path"
+    done
+
+    if [[ "$FORCE_MODE" == true ]]; then
+        echo -e "${YELLOW}--force activado → sobrescribiendo sin confirmación adicional.${NC}"
+        return
+    fi
+
+    read -r -p "¿Deseas continuar y sobrescribir estos archivos? (y/N): " confirm
+    if [[ ! $confirm =~ ^[Yy]$ ]]; then
+        echo -e "${RED}Setup cancelado para evitar pérdida de datos.${NC}"
+        exit 0
+    fi
+}
 
 echo -e "${BLUE}"
 cat << "EOF"
@@ -24,7 +203,7 @@ cat << "EOF"
 EOF
 echo -e "${NC}"
 
-# Function to display menu
+# show_menu displays the technology stack selection menu and a cancel option.
 show_menu() {
     echo -e "${YELLOW}Selecciona tu stack tecnológico:${NC}\n"
     echo "  1) TypeScript + Node.js (Express, Jest, Prisma)"
@@ -35,8 +214,10 @@ show_menu() {
     echo ""
 }
 
-# Function to setup TypeScript
+# setup_typescript sets up a TypeScript + Node.js project by copying template files into the workspace, writing config/tech-stack.json describing the stack, and installing npm dependencies if npm is available.
 setup_typescript() {
+    validate_prerequisites "typescript"
+    confirm_overwrite "typescript"
     echo -e "${GREEN}Configurando proyecto TypeScript...${NC}"
 
     # Copy TypeScript template files
@@ -79,7 +260,9 @@ JSON_END
     echo -e "${GREEN}✓ Archivos TypeScript copiados${NC}"
 
     # Install dependencies
-    if command -v npm &> /dev/null; then
+    if [[ "$SKIP_INSTALLS" == true ]]; then
+        echo -e "${BLUE}ℹ SETUP_SH_SKIP_INSTALLS=true → omitiendo npm install.${NC}"
+    elif command -v npm &> /dev/null; then
         echo -e "${YELLOW}Instalando dependencias...${NC}"
         npm install
         echo -e "${GREEN}✓ Dependencias instaladas${NC}"
@@ -94,8 +277,10 @@ JSON_END
     echo "  make dev                 # Con Docker Compose"
 }
 
-# Function to setup Python
+# setup_python configures a Python (FastAPI) project by copying template files, writing config/tech-stack.json, creating a virtual environment and installing dependencies if python3 is available, and printing next-step instructions.
 setup_python() {
+    validate_prerequisites "python"
+    confirm_overwrite "python"
     echo -e "${GREEN}Configurando proyecto Python...${NC}"
 
     # Copy Python template files
@@ -141,9 +326,17 @@ JSON_END
         echo -e "${GREEN}✓ Entorno virtual creado${NC}"
 
         echo -e "${YELLOW}Instalando dependencias...${NC}"
+        # shellcheck disable=SC1091
         source venv/bin/activate
-        pip install -r requirements.txt
-        echo -e "${GREEN}✓ Dependencias instaladas${NC}"
+        if [[ "$SKIP_INSTALLS" == true ]]; then
+            echo -e "${BLUE}ℹ SETUP_SH_SKIP_INSTALLS=true → omitiendo pip install.${NC}"
+        elif pip install -r requirements.txt; then
+            echo -e "${GREEN}✓ Dependencias instaladas${NC}"
+        else
+            echo -e "${RED}❌ Error al instalar dependencias${NC}"
+            echo -e "${YELLOW}Revisa templates/python/requirements.txt o tu conexión antes de reintentar.${NC}"
+            return 1
+        fi
     else
         echo -e "${YELLOW}⚠ python3 no encontrado. Instala Python 3.11+ y ejecuta:${NC}"
         echo "  python3 -m venv venv"
@@ -158,8 +351,10 @@ JSON_END
     echo "  make dev                  # Con Docker Compose"
 }
 
-# Function to setup JSON only
+# setup_json creates a minimal JSON/config-only project structure with placeholder `.gitkeep` files, writes a default `config/tech-stack.json`, and prints next-step guidance.
 setup_json() {
+    validate_prerequisites "generic"
+    confirm_overwrite "generic"
     echo -e "${GREEN}Configurando proyecto con solo JSON/Config...${NC}"
 
     # Create minimal structure
@@ -210,34 +405,97 @@ JSON_END
     echo "  3. Revisa dev-docs/ para guías de arquitectura"
 }
 
-# Function to cleanup
+# cleanup_templates prints a notice that template files are being cleaned from the project, reminds the user that the templates/ directory is kept for reference, and shows the command to remove it (rm -rf templates/).
 cleanup_templates() {
-    echo -e "${YELLOW}Limpiando templates...${NC}"
+    if [[ ! -d templates ]]; then
+        return
+    fi
 
-    # Keep templates directory for reference but remove from main project
-    # You can delete templates/ directory if you want
-    echo -e "${BLUE}ℹ Los templates están en templates/ por si necesitas referencia${NC}"
-    echo -e "${BLUE}  Puedes eliminar templates/ cuando quieras: rm -rf templates/${NC}"
+    echo -e "${YELLOW}Opciones para templates/${NC}"
+    echo "  1) Conservarlos para referencia (opción por defecto)"
+    echo "  2) Moverlos a .templates/ (ocultar del árbol principal)"
+    echo "  3) Eliminarlos (${RED}acción irreversible${NC})"
+
+    read -r -p "Selecciona una opción [1/2/3]: " template_choice
+    case $template_choice in
+        2)
+            rm -rf .templates
+            mv templates .templates
+            echo -e "${GREEN}✓ Templates movidos a .templates/${NC}"
+            ;;
+        3)
+            rm -rf templates
+            echo -e "${GREEN}✓ Templates eliminados${NC}"
+            ;;
+        *)
+            echo -e "${BLUE}ℹ Templates conservados en templates/${NC}"
+            ;;
+    esac
 }
 
-# Function to update context
+warn_missing_compose_file() {
+    if [[ -f docker-compose.dev.yml ]]; then
+        return
+    fi
+
+    echo -e "${YELLOW}⚠ docker-compose.dev.yml no encontrado.${NC}"
+    echo -e "${BLUE}  Los comandos del Makefile que invocan Docker Compose (make dev/test/seed) fallarán hasta que crees uno.${NC}"
+    echo -e "${BLUE}  Copia el ejemplo desde templates/ o ajusta el Makefile a tus propios servicios antes de usarlo.${NC}"
+}
+
+# update_context writes .context/project-state.json recording initialization timestamp, selected language, phase, and a default last_session with suggested next steps.
+# Accepts a single argument `lang` that is stored as the project's language identifier (e.g., "typescript", "python", "generic").
 update_context() {
     local lang=$1
+    local timestamp=${2:-$(utc_timestamp)}
 
     echo -e "${YELLOW}Actualizando contexto del proyecto...${NC}"
 
-    # Update project-state.json
-    cat > .context/project-state.json << JSON_END
+    local summary="Project initialized with $lang stack"
+
+    if command -v python3 &> /dev/null; then
+        python3 - "$lang" "$timestamp" "$summary" <<'PY' > .context/project-state.json
+import json
+import sys
+
+lang = sys.argv[1]
+timestamp = sys.argv[2]
+summary = sys.argv[3]
+
+payload = {
+    "version": "1.0.0",
+    "initialized": timestamp,
+    "language": lang,
+    "phase": "setup",
+    "aggregates_implemented": [],
+    "bounded_contexts": [],
+    "last_session": {
+        "date": timestamp,
+        "summary": summary,
+        "next_steps": [
+            "Review dev-docs/context.md",
+            "Define domain model in dev-docs/domain/ubiquitous-language.md",
+            "Start implementing domain entities",
+            "Write tests following TDD"
+        ]
+    }
+}
+
+json.dump(payload, sys.stdout, indent=2)
+sys.stdout.write("\n")
+PY
+    else
+        cat > .context/project-state.json <<JSON_END
 {
   "version": "1.0.0",
-  "initialized": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+  "initialized": "$timestamp",
   "language": "$lang",
   "phase": "setup",
   "aggregates_implemented": [],
   "bounded_contexts": [],
   "last_session": {
-    "date": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
-    "summary": "Project initialized with $lang stack",
+    "date": "$timestamp",
+    "summary": "$summary",
     "next_steps": [
       "Review dev-docs/context.md",
       "Define domain model in dev-docs/domain/ubiquitous-language.md",
@@ -247,6 +505,7 @@ update_context() {
   }
 }
 JSON_END
+    fi
 
     echo -e "${GREEN}✓ Contexto actualizado${NC}"
 }
@@ -261,18 +520,21 @@ while true; do
             setup_typescript
             update_context "typescript"
             cleanup_templates
+            warn_missing_compose_file
             break
             ;;
         2)
             setup_python
             update_context "python"
             cleanup_templates
+            warn_missing_compose_file
             break
             ;;
         3)
             setup_json
             update_context "generic"
             cleanup_templates
+            warn_missing_compose_file
             break
             ;;
         q|Q)
