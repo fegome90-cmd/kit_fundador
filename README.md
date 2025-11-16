@@ -107,6 +107,22 @@ make test
 make validate
 ```
 
+## 🧭 Post-clone Checklist
+
+Este repositorio es un **starkit agnóstico**: incluye ejemplos, no una aplicación completa. Después de clonar, sigue estos pasos
+para dejarlo operativo en tu contexto:
+
+1. **Entry point real** → crea el archivo de arranque de tu servicio (`src/index.ts`, `main.py`, etc.) y actualiza los scripts
+   (`package.json`, `Makefile`, `docker-compose`) para apuntar a él.
+2. **Dependencias implícitas** → importa manualmente módulos como `crypto` y reemplaza los helpers ficticios (`hashed_${plainPassword}`,
+   event dispatcher en memoria) por servicios reales.
+3. **Tooling** → decide tu stack de lint/test (ESLint, Pytest, Go test, etc.) y actualiza `lint-staged`, hooks y pipelines según
+   corresponda.
+4. **Documentación viva** → completa `dev-docs/context.md`, `dev-docs/plan.md` y `dev-docs/task.md` con las decisiones de tu
+   producto.
+
+> 📄 Consulta `dev-docs/consumer-checklist.md` para una lista detallada y marcable de responsabilidades.
+
 ## 🛠️ Comandos Principales
 
 ```bash
@@ -149,6 +165,7 @@ make reset            # Reset completo (clean + up + migrate + seed)
 - **[dev-docs/context.md](dev-docs/context.md)**: Visión general del proyecto
 - **[dev-docs/plan.md](dev-docs/plan.md)**: Roadmap y milestones
 - **[dev-docs/domain/ubiquitous-language.md](dev-docs/domain/ubiquitous-language.md)**: Glosario del dominio
+- **[dev-docs/consumer-checklist.md](dev-docs/consumer-checklist.md)**: Checklist post-clonado para equipos que adopten el kit
 
 ## 🏗️ Arquitectura
 

@@ -44,9 +44,9 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 
 ### Fase 1 – Fundamentos del esqueleto
 
-1. Documentar en README/dev-docs qué responsabilidades recaen en el consumidor (entrypoint, importación de `crypto`, implementación real de hashing, etc.).
-2. Añadir checklist post-clonado que recuerde revisar dependencias implícitas y definir servicios concretos.
-3. Señalar explícitamente que las clases actuales son ejemplos ilustrativos y deben ser extendidas o reemplazadas.
+1. ✅ Documentar en README/dev-docs qué responsabilidades recaen en el consumidor (entrypoint, importación de `crypto`, implementación real de hashing, etc.). → ver `README.md#🧭-post-clone-checklist` y `dev-docs/consumer-checklist.md`.
+2. ✅ Añadir checklist post-clonado que recuerde revisar dependencias implícitas y definir servicios concretos. → `dev-docs/consumer-checklist.md` sirve como lista marcable.
+3. ✅ Señalar explícitamente que las clases actuales son ejemplos ilustrativos y deben ser extendidas o reemplazadas. → se advierte en el README y en la checklist.
 
 ### Fase 2 – Tooling mínimo y scripts
 

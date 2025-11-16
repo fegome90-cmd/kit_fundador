@@ -117,6 +117,15 @@
 - **Duración real**: 30 min
 - **Notas**: Estructura base creada exitosamente
 
+### [TASK-006] Documentar responsabilidades del consumidor del starkit
+- **Completado**: 2025-01-15
+- **Duración real**: 40 min
+- **Notas**: README y `dev-docs/consumer-checklist.md` documentan la responsabilidad del equipo que adopta el kit.
+- **Criterios de Aceptación**:
+  - [x] README actualizado con sección "Post-clone checklist"
+  - [x] dev-docs incluye recordatorio de importaciones (ej. `crypto`) y hashing
+  - [x] Referencia explícita a que las clases actuales son ejemplos ilustrativos
+
 ## Backlog 💭
 
 - Implementar autenticación/autorización
