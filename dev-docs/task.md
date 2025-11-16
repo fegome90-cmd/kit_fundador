@@ -60,7 +60,6 @@
   - [ ] Contract tests pasando
   - [ ] E2E test funcional
 
-
 ### [TASK-009] Simplificar suites de prueba
 - **Prioridad**: Media
 - **Estimación**: 1 hora
