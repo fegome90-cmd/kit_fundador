@@ -11,6 +11,7 @@ _(sin tareas activas)_
 - **Estimación**: 3 horas
 - **Dependencias**: TASK-001
 - **Descripción**: Configurar base de datos y sistema de migraciones
+- **Blueprint**: `dev-docs/infrastructure/database-blueprint.md`
 - **Criterios de Aceptación**:
   - [ ] Docker compose con DB
   - [ ] Migration framework configurado

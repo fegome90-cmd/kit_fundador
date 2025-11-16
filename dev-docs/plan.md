@@ -31,6 +31,9 @@
 - [ ] Authentication/Authorization
 - [ ] Observability (logs, metrics, traces)
 
+> 🔎 Consulta [`dev-docs/infrastructure/database-blueprint.md`](infrastructure/database-blueprint.md) antes de abordar TASK-003.
+> El documento desgrana minitareas, revisiones de código y pruebas para adaptar el starkit sin introducir dependencias nuevas.
+
 ### Fase 4: Production Ready
 - [ ] Performance testing
 - [ ] Security audit

@@ -44,10 +44,13 @@ export class Email {
       throw new Error('Invalid email format');
     }
 
+    // Basic email validation
+    // In production, use a proper library or more comprehensive regex
     if (!EMAIL_REGEX.test(this._value)) {
       throw new Error(`Invalid email format: ${this._value}`);
     }
 
+    // Additional business rules
     if (this._value.length > MAX_EMAIL_LENGTH) {
       throw new Error('Email too long');
     }
@@ -78,9 +81,32 @@ export class Email {
     }
   }
 
-  private validateBlockedDomains(domainPart: string): void {
-    if (BLOCKED_DOMAINS.includes(domainPart)) {
-      throw new Error(`Email domain not allowed: ${domainPart}`);
+    const [localPart, domainPart] = this._value.split('@');
+    if (!localPart || !domainPart) {
+      throw new Error('Invalid email format');
+    }
+
+    if (localPart.startsWith('.') || localPart.endsWith('.')) {
+      throw new Error('Invalid email format');
+    }
+
+    if (domainPart.startsWith('-') || domainPart.endsWith('-')) {
+      throw new Error('Invalid email format');
+    }
+
+    const domainLabels = domainPart.split('.');
+    const hasInvalidLabel = domainLabels.some(
+      (label) => !label || label.startsWith('-') || label.endsWith('-')
+    );
+
+    if (hasInvalidLabel) {
+      throw new Error('Invalid email format');
+    }
+
+    // Example: Block certain domains
+    const domain = domainPart;
+    if (BLOCKED_DOMAINS.includes(domain)) {
+      throw new Error(`Email domain not allowed: ${domain}`);
     }
   }
 

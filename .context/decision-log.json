@@ -53,6 +53,24 @@
         "dev-docs/setup/setup-sh-remediation-plan.md",
         "dev-docs/setup/setup-sh-remediation-report.md"
       ]
+    },
+    {
+      "id": "DEC-2025-01-16-DB-BLUEPRINT",
+      "title": "Blueprint agnóstico para TASK-003",
+      "date": "2025-01-16",
+      "context": "El roadmap exige documentar cómo implementar base de datos y migraciones sin comprometer el carácter de starkit.",
+      "decision": "Publicar `dev-docs/infrastructure/database-blueprint.md`, enlazarlo desde README/plan/backlog y mantener TASK-003 pendiente hasta que un consumidor adopte el plan.",
+      "consequences": [
+        "Los equipos tienen una guía paso a paso sin que el repo arrastre dependencias de DB",
+        "TASK-003 referencia explícita al blueprint y puede moverse a 'En progreso' apenas se seleccione proveedor real",
+        "El estado global refleja la deuda de infraestructura como TD-DB-001 para facilitar seguimiento"
+      ],
+      "references": [
+        "dev-docs/infrastructure/database-blueprint.md",
+        "README.md#🗄️-blueprint-de-base-de-datos-y-migraciones",
+        "dev-docs/task.md#task-003-setup-database-y-migrations",
+        "dev-docs/plan.md#fase-3-infrastructure"
+      ]
     }
   ]
 }

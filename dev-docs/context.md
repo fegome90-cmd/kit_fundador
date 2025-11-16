@@ -29,6 +29,13 @@ Proveer un **starkit de Identity & Access** que incluya ejemplos autocontenidos 
 - La observabilidad mínima (C3.2) quedó registrada como opt-in en `TASK-015`; sólo se implementará si el consumidor lo solicita.
 - Usa `SETUP_SH_SKIP_INSTALLS=true` en CI o en el harness cuando quieras validar el flujo sin acceder a npm/PyPI.
 
+## Estado de infraestructura (TASK-003)
+- No se incluye base de datos real en el starkit; se publicó [`dev-docs/infrastructure/database-blueprint.md`](infrastructure/database-blueprint.md)
+  como guía agnóstica.
+- El blueprint cubre docker-compose, migraciones, seeds y pruebas de smoke para que cada consumidor adapte el kit sin
+  arrastrar dependencias.
+- TASK-003 permanece pendiente hasta que el equipo defina proveedor y herramienta de migraciones en su fork.
+
 ## Arquitectura
 
 ```
