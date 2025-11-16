@@ -2,17 +2,7 @@
 
 ## En Progreso 🔄
 
-### [TASK-001] Definir Tech Stack
-- **Asignado**: Agente IA / Tech Lead
-- **Prioridad**: Alta
-- **Estimación**: 1 hora
-- **Descripción**: Completar config/tech-stack.json con decisiones de tecnología
-- **Criterios de Aceptación**:
-  - [ ] Lenguaje principal definido
-  - [ ] Framework seleccionado
-  - [ ] Testing tools configurados
-  - [ ] Linting/formatting configurado
-  - [ ] Build tool definido
+_(sin tareas activas)_
 
 ## Pendientes 📋
 
@@ -113,6 +103,17 @@
   - [x] Sección "Post-adaptation validation" publicada
   - [x] Lista incluye lint/test/validate
   - [x] Preguntas guía sobre importaciones, hooks y servicios
+
+### [TASK-001] Definir Tech Stack
+- **Completado**: 2025-01-16
+- **Duración real**: 30 min
+- **Notas**: `config/tech-stack.json` incluye el perfil TypeScript + Node.js 20, README señala el doc de decisiones y `dev-docs/context.md`/`dev-docs/tech-stack-decisions.md` detallan las elecciones.
+- **Criterios de Aceptación**:
+  - [x] Lenguaje principal definido
+  - [x] Framework seleccionado
+  - [x] Testing tools configurados
+  - [x] Linting/formatting configurado
+  - [x] Build tool definido
 
 ## Backlog 💭
 

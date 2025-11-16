@@ -8,6 +8,12 @@
 - ✅ **Python** (FastAPI + Pytest + SQLAlchemy)
 - ✅ **JSON/Config** (para cualquier otro lenguaje)
 
+## 🧩 Decisiones del stack base
+
+- El perfil predeterminado del starkit usa **TypeScript + Node.js 20** con Express mínimo para exponer ejemplos de handlers.
+- Los comandos de lint, build y testing se alinean con **ESLint + Prettier + Jest + esbuild**; tómalos como referencia y reemplázalos en cuanto cierres tu propio stack.
+- Consulta [`dev-docs/tech-stack-decisions.md`](dev-docs/tech-stack-decisions.md) y [`config/tech-stack.json`](config/tech-stack.json) antes de proponer dependencias nuevas o sugerir frameworks alternativos.
+
 ## 🎯 Propósito
 
 Este kit proporciona la infraestructura completa para que un agente IA (como Claude) pueda iniciar y mantener un proyecto de software de calidad profesional, con énfasis en:

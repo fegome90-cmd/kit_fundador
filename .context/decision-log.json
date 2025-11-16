@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "decisions": [
+    {
+      "id": "DEC-2025-01-16-STACK",
+      "title": "Stack base TypeScript + Express",
+      "date": "2025-01-16",
+      "context": "Necesitamos fijar un perfil predeterminado para que los agentes sepan qué dependencias ejemplificar en el starkit.",
+      "decision": "Mantener TypeScript (Node.js 20) con Express mínimo, Jest/Playwright/Pact/k6 para testing, ESLint + Prettier para lint/format y esbuild como build tool.",
+      "consequences": [
+        "Facilita reemplazo rápido por otros frameworks al no introducir dependencias complejas",
+        "Documentación actualizada en README, dev-docs/context.md y dev-docs/tech-stack-decisions.md",
+        "Los consumidores deben actualizar el config si eligen otro stack"
+      ],
+      "references": [
+        "config/tech-stack.json",
+        "dev-docs/tech-stack-decisions.md",
+        "dev-docs/context.md"
+      ]
+    }
+  ]
+}
