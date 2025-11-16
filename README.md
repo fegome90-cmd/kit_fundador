@@ -124,6 +124,16 @@ para dejarlo operativo en tu contexto:
 
 > 📄 Consulta `dev-docs/consumer-checklist.md` para una lista detallada y marcable de responsabilidades.
 
+## ✅ Validación post-adaptación
+
+Cuando todos los placeholders hayan sido reemplazados, ejecuta una última pasada de calidad:
+
+1. Corre lint, tests y type-check con los comandos reales de tu stack (no dejes los ejemplos sin verificar).
+2. Confirma que los servicios ficticios (hasher, dispatcher, entrypoint) fueron sustituidos y documentados en `dev-docs/context.md`.
+3. Sincroniza README, `dev-docs/plan.md` y `dev-docs/task.md` para que reflejen los comandos y responsables actuales.
+
+> 📄 Usa la [Guía de Validación Post-Adaptación](dev-docs/post-adaptation-validation.md) para seguir un checklist completo y registrar hallazgos.
+
 ## 🧰 Personaliza scripts y linters
 
 Los scripts incluidos en `package.json` contienen tokens (`<project-entrypoint>`, `<build-output>`, `<seed-script>`) que debes

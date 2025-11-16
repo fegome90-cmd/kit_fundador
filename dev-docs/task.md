@@ -62,16 +62,6 @@
 
 
 
-### [TASK-010] Añadir checklist de validación posterior
-- **Prioridad**: Baja
-- **Estimación**: 0.5 horas
-- **Dependencias**: TASK-006, TASK-007, TASK-008
-- **Descripción**: Crear sección en la documentación con pasos para validar que las personalizaciones del starkit están completas (lint, test, hooks, servicios).
-- **Criterios de Aceptación**:
-  - [ ] Sección "Post-adaptation validation" publicada
-  - [ ] Lista incluye lint/test/validate
-  - [ ] Preguntas guía sobre importaciones, hooks y servicios
-
 ## Completadas ✅
 
 ### [TASK-000] Inicializar proyecto con Kit Fundador
@@ -114,6 +104,15 @@
   - [x] `tests/unit/Email.test.ts` usa tabla de casos
   - [x] Ejemplo de Jest asíncrono garantiza que el runner espere la promesa
   - [x] README/dev-docs explican cómo habilitar/deshabilitar pruebas en otros lenguajes
+
+### [TASK-010] Añadir checklist de validación posterior
+- **Completado**: 2025-01-16
+- **Duración real**: 25 min
+- **Notas**: Se creó `dev-docs/post-adaptation-validation.md`, se añadió la sección "Validación post-adaptación" en el README y se referenció el checklist desde el plan.
+- **Criterios de Aceptación**:
+  - [x] Sección "Post-adaptation validation" publicada
+  - [x] Lista incluye lint/test/validate
+  - [x] Preguntas guía sobre importaciones, hooks y servicios
 
 ## Backlog 💭
 

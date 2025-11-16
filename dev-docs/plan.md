@@ -69,11 +69,11 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 2. ✅ Corregir ejemplos asíncronos para que Jest (u otros runners) demuestren buenas prácticas. → ver `tests/unit/User.test.ts`.
 3. ✅ Explicar cómo ejecutar o descartar la suite Python según el stack elegido. → ver `README.md#🧪-suites-opcionales-multi-lenguaje`.
 
-### Fase 5 – Validación posterior
+### Fase 5 – Validación posterior ✅
 
-1. Crear checklist para que, tras personalizar el starkit, se ejecuten `lint`, `test` y validaciones de arquitectura.
-2. Añadir preguntas guía para verificar que se cubrieron importaciones, servicios y hooks.
-3. Registrar en `dev-docs/task.md` los artefactos que cada usuario debe actualizar cuando aterriza el kit.
+1. ✅ Checklist publicada en `dev-docs/post-adaptation-validation.md` con lint/test/type-check y validaciones de arquitectura.
+2. ✅ Preguntas guía incluidas en la misma guía para cubrir importaciones, servicios y hooks.
+3. ✅ `dev-docs/task.md` actualizado (TASK-010) para indicar qué artefactos deben tocar los consumidores tras aterrizar el kit.
 
 ## Hitos
 
