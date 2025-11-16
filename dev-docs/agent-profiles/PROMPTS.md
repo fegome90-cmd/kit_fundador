@@ -457,9 +457,10 @@ Los prompts anteriores activan **roles de agente** (EJECUTOR, VALIDADOR). Para *
 
 | Rol de Agente | Templates Recomendados | Cuándo Usar |
 |---------------|------------------------|-------------|
-| **EJECUTOR** | Templates 1-5, 12-19 | Para planificar e implementar tareas, investigar, documentar decisiones, testing |
-| **VALIDADOR** | Templates 6, 8-11 | Para auditar y evaluar calidad (general y especializada) |
-| **HANDOFF** | Template 7 | Para traspasar contexto entre agentes/equipos |
+| **EJECUTOR** | Templates 1-5, 12-19, 24 | Para planificar e implementar tareas, investigar, documentar decisiones, testing, análisis de alternativas |
+| **VALIDADOR** | Templates 6, 8-11, 21 | Para auditar y evaluar calidad (general y especializada), definir métricas de éxito |
+| **HANDOFF** | Template 7, 23 | Para traspasar contexto entre agentes/equipos, registrar conocimiento aprendido |
+| **PLANIFICADOR/LÍDER** | Templates 20, 21, 22 | Para definir guardrails anti-drift, métricas de éxito, briefings de misión |
 
 **Tipos de Auditoría Disponibles (Templates 6, 8-11):**
 - Template 6: Auditoría General (4 dimensiones, gate de calidad)
@@ -542,6 +543,11 @@ Ver guía completa: [`dev-docs/prompt_example/QUICK_REFERENCE.md`](../prompt_exa
 - Plan de pruebas de integración → Template 17
 - Plan de pruebas E2E → Template 18
 - Estrategia TDD/BDD → Template 19
+- Definir guardrails anti-drift → Template 20
+- Matriz de criterios de éxito → Template 21
+- Briefing de misión para agente → Template 22
+- Registrar conocimiento post-misión → Template 23
+- Análisis de trade-offs → Template 24
 
 ### Workflow Recomendado
 
