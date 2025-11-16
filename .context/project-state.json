@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "last_updated": "2025-01-16T00:00:00Z",
+  "last_updated": "2025-01-16T12:00:00Z",
   "project_metadata": {
     "name": "nombre-proyecto",
     "domain": "dominio-negocio",
@@ -32,17 +32,30 @@
     ],
     "pending_migrations": [],
     "active_feature_flags": {},
-    "technical_debt_items": []
+    "technical_debt_items": [
+      {
+        "id": "TD-SETUP-001",
+        "summary": "`scripts/setup.sh` tiene hallazgos críticos documentados en AUDITORIA_SETUP_SH.md",
+        "status": "planned",
+        "remediation_plan": "dev-docs/setup/setup-sh-remediation-plan.md",
+        "tasks": ["TASK-011", "TASK-012", "TASK-013", "TASK-014"]
+      }
+    ]
   },
   "ai_context": {
-    "last_session_summary": "Se documentó el bounded context Identity & Access, se catalogaron los invariantes del aggregate User y se enlazaron los artefactos con las pruebas del dominio.",
-    "next_recommended_tasks": ["TASK-003", "TASK-004"],
-    "areas_needing_attention": ["Configurar base de datos y migraciones (TASK-003)", "Diseñar el primer use case/endpoints (TASK-004/TASK-005)"],
+    "last_session_summary": "Se documentó el bounded context Identity & Access, se catalogaron los invariantes del aggregate User y ahora existe un plan detallado para remediar scripts/setup.sh basado en AUDITORIA_SETUP_SH.md.",
+    "next_recommended_tasks": ["TASK-011", "TASK-012", "TASK-013", "TASK-014"],
+    "areas_needing_attention": ["Ejecutar la Fase A del plan de setup", "Agregar validaciones de usabilidad al script", "Automatizar pruebas del setup", "Documentar el cierre de la remediación"],
     "recent_decisions": [
       {
         "id": "DEC-2025-01-16-STACK",
         "summary": "Se fija TypeScript + Express como perfil predeterminado del starkit y se documenta en dev-docs/tech-stack-decisions.md.",
         "references": ["config/tech-stack.json", "dev-docs/tech-stack-decisions.md"]
+      },
+      {
+        "id": "DEC-2025-01-16-SETUP-PLAN",
+        "summary": "La auditoría AUDITORIA_SETUP_SH.md se adopta y se crea un plan de remediación en dev-docs/setup/setup-sh-remediation-plan.md.",
+        "references": ["document/informes_CC/AUDITORIA_SETUP_SH.md", "dev-docs/setup/setup-sh-remediation-plan.md", "dev-docs/plan.md"]
       }
     ]
   },

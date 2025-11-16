@@ -6,20 +6,20 @@
 ## Current Session
 
 **Started**: 2025-01-16T00:00:00Z
-**Last Updated**: 2025-01-16T00:00:00Z
+**Last Updated**: 2025-01-16T12:00:00Z
 **Agent**: gpt-5-codex
-**Agent**: Claude Sonnet 4.5
 
 ## Active Tasks
 
 - _(sin tareas activas)_
-- Próximo foco sugerido: [TASK-003] database & migrations, seguido de [TASK-004] primer use case.
+- Próximo foco sugerido: [TASK-011] remediación crítica de `scripts/setup.sh`, luego [TASK-012]-[TASK-014] y, una vez listo el
+  script, retomar [TASK-003]/[TASK-004].
 
 ## Recent Changes
 
-- `dev-docs/domain/ubiquitous-language.md` ahora describe el bounded context **Identity & Access** y documenta `UserAccount`.
-- `dev-docs/domain/invariants.md` lista las reglas activas para `User`, `Email` y `Password`.
-- `dev-docs/plan.md`, `dev-docs/task.md`, `.context/project-state.json` y README referencian los nuevos artefactos.
+- Nuevo informe `document/informes_CC/AUDITORIA_SETUP_SH.md` consolidó los hallazgos del script interactivo.
+- `dev-docs/setup/setup-sh-remediation-plan.md` traduce la auditoría en fases accionables.
+- README, `dev-docs/plan.md` y `dev-docs/task.md` enlazan el plan y catalogan las nuevas TASK-011 → TASK-014.
 
 ### Last 5 Commits
 ```
@@ -43,9 +43,9 @@ chore: Initialize project with Kit Fundador v2.0
 ## Context for Next Session
 
 Stack base documentado (TypeScript + Express + Jest + ESLint/Prettier + esbuild). Próximos pasos sugeridos:
-1. Arrancar [TASK-003] enfocándose en documentación/plantillas de base de datos y migraciones.
-2. Preparar blueprint del primer use case ([TASK-004]) alineado con el aggregate `User`.
-3. Mantener `dev-docs/plan.md` y `.context/project-state.json` sincronizados tras cada fase.
+1. Evaluar y ejecutar la Fase A del plan de `setup.sh` (TASK-011).
+2. Continuar con las fases de usabilidad/hardening (TASK-012/TASK-013) y cerrar con la documentación (TASK-014).
+3. Una vez remediado el script, volver a las tareas estructurales del roadmap (TASK-003 y TASK-004).
 
 Archivos clave a revisar:
 - `config/rules/ai-guardrails.json` - Reglas del agente

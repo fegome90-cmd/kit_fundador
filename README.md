@@ -113,6 +113,18 @@ make test
 make validate
 ```
 
+## 🛡️ Remediación del setup interactivo
+
+El informe [`AUDITORIA_SETUP_SH.md`](document/informes_CC/AUDITORIA_SETUP_SH.md) detectó un bloqueo crítico en la opción Python,
+19 vulnerabilidades moderadas en la plantilla TypeScript y varios riesgos de usabilidad. Antes de reutilizar `scripts/setup.sh`
+en un proyecto real, sigue el [plan de ejecución](dev-docs/setup/setup-sh-remediation-plan.md) que prioriza:
+
+1. **Correcciones críticas** (dependencias Python/TypeScript y manejo de errores de `pip`).
+2. **Mejoras de usabilidad** (confirmación de sobrescritura, validación de prerequisitos y limpieza de templates).
+3. **Hardening opcional** (tests del script, flags verbosos y guardas para `docker-compose`).
+
+Documenta qué fases aplicaste en `dev-docs/task.md` antes de continuar con las tareas principales del roadmap.
+
 ## 🧭 Post-clone Checklist
 
 Este repositorio es un **starkit agnóstico**: incluye ejemplos, no una aplicación completa. Después de clonar, sigue estos pasos

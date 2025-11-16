@@ -75,6 +75,16 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 2. ✅ Preguntas guía incluidas en la misma guía para cubrir importaciones, servicios y hooks.
 3. ✅ `dev-docs/task.md` actualizado (TASK-010) para indicar qué artefactos deben tocar los consumidores tras aterrizar el kit.
 
+## Programa de remediación `scripts/setup.sh`
+
+La auditoría detallada en `document/informes_CC/AUDITORIA_SETUP_SH.md` expone nueve hallazgos (uno crítico) que deben resolverse
+antes de que un equipo adopte el script interactivo. Para mantener la trazabilidad:
+
+1. Consulta el [plan de ejecución](setup/setup-sh-remediation-plan.md) y decide qué fases aplicarás.
+2. Registra el avance en `dev-docs/task.md` usando las nuevas TASK-011 a TASK-014.
+3. Actualiza `.context/project-state.json` una vez que cierres cada fase para que futuros agentes conozcan el estado real del
+   setup.
+
 ## Hitos
 
 | Hito | Fecha Objetivo | Estado | Notas |

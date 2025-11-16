@@ -39,6 +39,49 @@ _(sin tareas activas)_
   - [ ] Contract tests pasando
   - [ ] E2E test funcional
 
+### [TASK-011] Remediar dependencias críticas de `setup.sh`
+- **Prioridad**: Alta
+- **Estimación**: 3 horas
+- **Dependencias**: Auditoría `AUDITORIA_SETUP_SH`
+- **Descripción**: Ejecutar la Fase A del plan (`dev-docs/setup/setup-sh-remediation-plan.md`): actualizar `templates/python/requirements.txt`, alinear el template TypeScript y garantizar que `pip install` falle de forma controlada.
+- **Criterios de Aceptación**:
+  - [ ] `pip install -r templates/python/requirements.txt` finaliza sin errores en un entorno limpio.
+  - [ ] `npm install && npm audit --production` dentro de la plantilla TS no reporta vulnerabilidades.
+  - [ ] `setup.sh` aborta y muestra error cuando `pip install` falla.
+  - [ ] README/plan hacen referencia a las versiones nuevas.
+
+### [TASK-012] Mejorar usabilidad y protecciones
+- **Prioridad**: Media
+- **Estimación**: 2 horas
+- **Dependencias**: TASK-011
+- **Descripción**: Fase B del plan: confirmaciones de sobrescritura, validación de prerequisitos y opciones de limpieza para `templates/`.
+- **Criterios de Aceptación**:
+  - [ ] Script solicita confirmación o `--force` al detectar archivos existentes.
+  - [ ] Falta de `npm`, `python3` o `docker-compose` detiene la opción correspondiente con mensaje claro.
+  - [ ] README explica cómo conservar o eliminar `templates/` tras la ejecución.
+
+### [TASK-013] Hardening y automatización del setup
+- **Prioridad**: Media
+- **Estimación**: 5 horas
+- **Dependencias**: TASK-012
+- **Descripción**: Implementar la Fase C: suite bash de pruebas, flags `--verbose/--no-color`, función para timestamps portables y alerta cuando falta `docker-compose.dev.yml`.
+- **Criterios de Aceptación**:
+  - [ ] Existe `tests/setup/setup_script.test.sh` y se documenta cómo ejecutarlo.
+  - [ ] Nuevas banderas documentadas y probadas.
+  - [ ] `update_context` usa helper portable para UTC.
+  - [ ] `setup.sh` advierte si no se encuentra `docker-compose.dev.yml`.
+
+### [TASK-014] Documentar y cerrar la remediación
+- **Prioridad**: Baja
+- **Estimación**: 1 hora
+- **Dependencias**: TASK-013
+- **Descripción**: Registrar en README, `dev-docs/plan.md`, `dev-docs/post-adaptation-validation.md` y `.context/` los resultados de la remediación y checklist post-fix.
+- **Criterios de Aceptación**:
+  - [ ] README enlaza la guía final y describe el estado del script.
+  - [ ] `dev-docs/task.md` y `plan.md` reflejan el cierre de cada fase.
+  - [ ] `.context/project-state.json` y `.context/active-context.md` incluyen el resumen.
+  - [ ] La checklist de validación añade pasos específicos para el setup.
+
 
 
 ## Completadas ✅
