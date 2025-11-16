@@ -1,0 +1,75 @@
+{
+  "version": "1.0.0",
+  "language": "typescript",
+  "runtime": "node",
+  "node_version": "20",
+  
+  "framework": {
+    "backend": "express",
+    "alternatives": ["fastify", "hono", "nestjs"]
+  },
+  
+  "testing": {
+    "framework": "jest",
+    "coverage": "nyc",
+    "mocking": "jest",
+    "e2e": "playwright",
+    "load_testing": "k6",
+    "contract_testing": "pact"
+  },
+  
+  "linting": {
+    "tool": "eslint",
+    "config": ".eslintrc.json",
+    "plugins": ["@typescript-eslint"]
+  },
+  
+  "formatting": {
+    "tool": "prettier",
+    "config": ".prettierrc"
+  },
+  
+  "build": {
+    "tool": "esbuild",
+    "output": "dist"
+  },
+  
+  "database": {
+    "primary": "postgresql",
+    "orm": "prisma",
+    "migrations": "prisma-migrate",
+    "version": "16"
+  },
+  
+  "cache": {
+    "tool": "redis",
+    "version": "7"
+  },
+  
+  "observability": {
+    "metrics": "prometheus",
+    "tracing": "jaeger",
+    "logging": "winston",
+    "apm": "opentelemetry"
+  },
+  
+  "ci_cd": {
+    "platform": "github_actions",
+    "pipeline": ".github/workflows"
+  },
+  
+  "deployment": {
+    "container": "docker",
+    "orchestration": "kubernetes",
+    "registry": "ghcr.io"
+  },
+  
+  "package_manager": "npm",
+  
+  "git_hooks": "husky",
+  
+  "documentation": {
+    "api": "openapi",
+    "site": "docusaurus"
+  }
+}

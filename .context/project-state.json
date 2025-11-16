@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "last_updated": "2025-01-15T00:00:00Z",
+  "project_metadata": {
+    "name": "nombre-proyecto",
+    "domain": "dominio-negocio",
+    "stage": "foundation",
+    "tech_stack_hash": ""
+  },
+  "current_state": {
+    "active_bounded_contexts": [],
+    "implemented_aggregates": [],
+    "pending_migrations": [],
+    "active_feature_flags": {},
+    "technical_debt_items": []
+  },
+  "ai_context": {
+    "last_session_summary": "Proyecto inicializado con Kit Fundador v2.0",
+    "next_recommended_tasks": [],
+    "areas_needing_attention": [],
+    "recent_decisions": []
+  },
+  "metrics": {
+    "test_coverage": 0,
+    "cyclomatic_complexity_avg": 0,
+    "dependency_count": 0,
+    "last_build_time_ms": 0
+  }
+}
