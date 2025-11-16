@@ -29,8 +29,24 @@
 │  └─► Template 4: Refactoring         │
 │                                      │
 ├─ AUDITAR trabajo completado          │
-│  └─► Template 6: Audit               │
-│                                      │
+│  │                                   │
+│  ├─ ¿Qué tipo de auditoría?          │
+│  │  │                                │
+│  │  ├─ General (gate de calidad)    │
+│  │  │  └─► Template 6: General Audit│
+│  │  │                                │
+│  │  ├─ Seguridad (OWASP, vulns)     │
+│  │  │  └─► Template 8: Security     │
+│  │  │                                │
+│  │  ├─ Performance (latencia, carga)│
+│  │  │  └─► Template 9: Performance  │
+│  │  │                                │
+│  │  ├─ Calidad de Código (deuda)    │
+│  │  │  └─► Template 10: Code Quality│
+│  │  │                                │
+│  │  └─ UI/UX (accesibilidad, WCAG)  │
+│  │     └─► Template 11: UI/UX       │
+│  │                                   │
 └─ TRASPASAR contexto a otro agente    │
    └─► Template 7: Handoff             │
 ```
@@ -46,8 +62,12 @@
 | **3: Bug Fix** | < 1 día | Baja-Media | Correcciones, hotfixes, RCA | No |
 | **4: Refactoring** | 1-3 días | Media | Reducción de deuda técnica, optimización | No |
 | **5: Daily Task** | < 2 horas | Baja | Cambios triviales, ajustes menores | No |
-| **6: Audit** | Variable | N/A | Evaluación de calidad, gates de aprobación | Sí (Gate) |
+| **6: General Audit** | Variable | N/A | Gate de calidad general (4 dimensiones) | Sí (Gate) |
 | **7: Handoff** | Variable | N/A | Cambio de contexto, fin de sprint, traspaso | No |
+| **8: Security Audit** | 1-3 días | N/A | Auditoría OWASP, vulnerabilidades, secretos | Sí (Riesgo) |
+| **9: Performance Audit** | 1-3 días | N/A | Latencia, carga, bottlenecks, optimización | Sí (KPIs) |
+| **10: Code Quality Audit** | 1-2 días | N/A | Deuda técnica, code smells, refactorización | Sí (Índice) |
+| **11: UI/UX Audit** | 1-2 días | N/A | Accesibilidad WCAG, usabilidad, consistencia | Sí (WCAG) |
 
 ---
 
@@ -75,12 +95,20 @@
 | "Refactorizar AuthService para reducir complejidad ciclomática de 25 a 10" | 4: Refactoring |
 | "Renombrar variable `usrData` a `userData`" | 5: Daily Task |
 
-### ✅ Evaluación
+### ✅ Evaluación y Auditorías
 
 | Descripción | Template |
 |-------------|----------|
-| "Auditar sprint de implementación antes de merge a main" | 6: Audit |
-| "Evaluar calidad de PR antes de aprobar" | 6: Audit (versión simplificada) |
+| "Auditar sprint de implementación antes de merge a main" | 6: General Audit |
+| "Evaluar calidad de PR antes de aprobar" | 6: General Audit |
+| "Auditar seguridad del módulo de autenticación contra OWASP Top 10" | 8: Security Audit |
+| "Analizar vulnerabilidades en dependencias antes de release" | 8: Security Audit |
+| "Evaluar performance del flujo de checkout bajo carga de 1000 usuarios" | 9: Performance Audit |
+| "Identificar cuellos de botella en API de búsqueda" | 9: Performance Audit |
+| "Auditar calidad de código y deuda técnica del módulo de billing" | 10: Code Quality Audit |
+| "Evaluar mantenibilidad y code smells del repositorio" | 10: Code Quality Audit |
+| "Auditar accesibilidad del flujo de registro para WCAG 2.1 AA" | 11: UI/UX Audit |
+| "Evaluar usabilidad del dashboard con heurísticas de Nielsen" | 11: UI/UX Audit |
 
 ### 🔄 Traspasos
 
@@ -229,22 +257,33 @@ Template 5 (Daily Task) → Cambio → Merge
 - Bug → 3
 - Refactor → 4
 - Tarea rápida → 5
-- Auditoría → 6
+- Auditoría general → 6
 - Traspaso → 7
+- Auditoría de seguridad → 8
+- Auditoría de performance → 9
+- Auditoría de calidad de código → 10
+- Auditoría de UI/UX → 11
 
 **"¿Cuánto tiempo?"**
 - < 2h → 5
 - 2h-1d → 3, 5
-- 1-5d → 2, 4
+- 1-5d → 2, 4, 8, 9, 10, 11
 - > 5d → 1
 
 **"¿Necesito gate?"**
-- Sí → 6 (auditoría)
-- No → 1, 2, 3, 4, 5
+- Sí → 6, 8, 9, 10, 11 (auditorías)
+- No → 1, 2, 3, 4, 5, 7
+
+**"¿Qué tipo de auditoría?"**
+- Gate general (4 dimensiones) → 6
+- Seguridad (OWASP, vulns) → 8
+- Performance (latencia, carga) → 9
+- Código (deuda técnica) → 10
+- UI/UX (WCAG, usabilidad) → 11
 
 **"¿Cambio de contexto?"**
 - Sí → 7 (handoff)
-- No → 1-6
+- No → 1-6, 8-11
 
 ---
 

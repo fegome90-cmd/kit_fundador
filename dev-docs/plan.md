@@ -136,9 +136,11 @@ antes de que un equipo adopte el script interactivo. Para mantener la trazabilid
 
 ## 📝 Workflow con Templates de Prompts
 
-El proyecto incluye **7 templates estructurados** para diferentes tipos de tareas en [`dev-docs/prompt_example/`](./prompt_example/). Estos templates ayudan a mantener consistencia y calidad al trabajar con agentes IA o al documentar tareas manuales.
+El proyecto incluye **11 templates estructurados** para diferentes tipos de tareas en [`dev-docs/prompt_example/`](./prompt_example/). Estos templates ayudan a mantener consistencia y calidad al trabajar con agentes IA o al documentar tareas manuales.
 
 ### Catálogo de Templates
+
+#### Templates de Implementación (1-5)
 
 | Template | Archivo | Uso Recomendado | Duración Típica |
 |----------|---------|-----------------|-----------------|
@@ -147,7 +149,21 @@ El proyecto incluye **7 templates estructurados** para diferentes tipos de tarea
 | **3. Bug Fix** | `prompt_template_3_bug_fix.md` | Corrección de bugs, RCA | < 1 día |
 | **4. Refactoring** | `prompt_template_4_refactoring.md` | Reducción de deuda técnica | 1-3 días |
 | **5. Daily Task** | `prompt_template_5_daily_task.md` | Tareas triviales y rápidas | < 2 horas |
-| **6. Audit** | `template_6_general_audit.md` | Auditorías de calidad, gates | Variable |
+
+#### Templates de Auditoría (6, 8-11)
+
+| Template | Archivo | Uso Recomendado | Duración Típica |
+|----------|---------|-----------------|-----------------|
+| **6. Auditoría General** | `template_6_general_audit.md` | Gate de calidad (4 dimensiones) | Variable |
+| **8. Auditoría de Seguridad** | `template_8_security_audit.md` | OWASP, vulnerabilidades, secretos | 1-3 días |
+| **9. Auditoría de Performance** | `template_9_performance_audit.md` | Latencia, carga, bottlenecks | 1-3 días |
+| **10. Auditoría de Calidad de Código** | `template_10_code_quality_audit.md` | Deuda técnica, code smells | 1-2 días |
+| **11. Auditoría de UI/UX** | `template_11_ui_ux_audit.md` | Accesibilidad WCAG, usabilidad | 1-2 días |
+
+#### Template de Handoff (7)
+
+| Template | Archivo | Uso Recomendado | Duración Típica |
+|----------|---------|-----------------|-----------------|
 | **7. Handoff** | `template_7_general_handoff.md` | Traspasos entre equipos/agentes | Variable |
 
 ### Integración con Agent Profiles
@@ -155,7 +171,7 @@ El proyecto incluye **7 templates estructurados** para diferentes tipos de tarea
 Los templates se integran con los perfiles de agente documentados en [`dev-docs/agent-profiles/`](./agent-profiles/):
 
 - **EJECUTOR** → Usa templates 1-5 para planificar e implementar
-- **VALIDADOR** → Usa template 6 para auditorías
+- **VALIDADOR** → Usa templates 6, 8-11 para auditorías (general y especializadas)
 - **HANDOFF** → Usa template 7 para traspasos de contexto
 
 Ver guía completa de integración en: [`dev-docs/agent-profiles/PROMPTS.md`](./agent-profiles/PROMPTS.md#-integración-con-templates-de-prompts-estructurados)
@@ -164,12 +180,21 @@ Ver guía completa de integración en: [`dev-docs/agent-profiles/PROMPTS.md`](./
 
 **¿Qué template usar?**
 
+**Implementación:**
 - Nueva feature grande (> 5 días) → **Template 1**
 - Nueva feature mediana (2-5 días) → **Template 2**
 - Bug fix → **Template 3**
 - Refactorización → **Template 4**
 - Tarea rápida (< 2 horas) → **Template 5**
-- Auditoría/Gate de calidad → **Template 6**
+
+**Auditoría:**
+- Gate de calidad general → **Template 6**
+- Seguridad (OWASP, vulnerabilidades) → **Template 8**
+- Performance (latencia, carga) → **Template 9**
+- Calidad de código (deuda técnica) → **Template 10**
+- UI/UX (accesibilidad WCAG) → **Template 11**
+
+**Handoff:**
 - Traspaso de contexto → **Template 7**
 
 Ver guía completa: [`dev-docs/prompt_example/QUICK_REFERENCE.md`](./prompt_example/QUICK_REFERENCE.md)

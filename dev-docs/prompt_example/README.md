@@ -1,6 +1,6 @@
 # 📝 Catálogo de Templates de Prompts
 
-Esta carpeta contiene **templates de prompts estructurados** para diferentes tipos de tareas de desarrollo. Estos templates ayudan a mantener consistencia, claridad y trazabilidad en el trabajo con agentes IA o en documentación de tareas.
+Esta carpeta contiene **11 templates de prompts estructurados** para diferentes tipos de tareas de desarrollo. Estos templates ayudan a mantener consistencia, claridad y trazabilidad en el trabajo con agentes IA o en documentación de tareas.
 
 ## 🎯 Propósito
 
@@ -150,6 +150,93 @@ Los templates sirven para:
 
 ---
 
+### 8. Auditoría de Seguridad - `template_8_security_audit.md`
+
+**Cuándo usar**: Evaluación de vulnerabilidades, compliance OWASP, análisis de dependencias
+
+**Características**:
+- Análisis de vulnerabilidades en dependencias (npm audit, Snyk)
+- Revisión de código fuente con SAST (análisis estático)
+- Checklist de Autenticación y Autorización
+- Auditoría de manejo de secretos y claves API
+- Configuración de infraestructura y red (headers, CORS, logging)
+- Plan de remediación categorizado por severidad (Crítica/Alta/Media)
+- Basado en OWASP Top 10
+
+**Ejemplo de uso**:
+```markdown
+"Auditar seguridad del módulo de autenticación antes de release"
+"Evaluar vulnerabilidades del API backend contra OWASP Top 10"
+"Revisar manejo de secretos y configuración de producción"
+```
+
+---
+
+### 9. Auditoría de Performance - `template_9_performance_audit.md`
+
+**Cuándo usar**: Optimización de rendimiento, análisis de cuellos de botella, pruebas de carga
+
+**Características**:
+- KPIs de performance (latencia p95, throughput, CPU, memoria, LCP)
+- Resultados de pruebas de carga (k6, JMeter, Gatling)
+- Análisis de bottlenecks con profiling (New Relic, Datadog APM)
+- Identificación de queries lentas, N+1 queries
+- Recomendaciones de optimización por prioridad
+- Plan de acción con esfuerzo estimado e impacto esperado
+
+**Ejemplo de uso**:
+```markdown
+"Auditar performance del flujo de checkout bajo carga de 1000 usuarios"
+"Analizar cuellos de botella en API de búsqueda"
+"Optimizar tiempos de carga del frontend (Core Web Vitals)"
+```
+
+---
+
+### 10. Auditoría de Calidad de Código - `template_10_code_quality_audit.md`
+
+**Cuándo usar**: Evaluación de deuda técnica, code smells, mantenibilidad del código
+
+**Características**:
+- Métricas cuantitativas (complejidad ciclomática, duplicación, LOC)
+- Análisis de code smells (God Object, métodos largos, duplicación)
+- Evaluación de cobertura y calidad de tests
+- Identificación de módulos problemáticos
+- Estimación de deuda técnica en días-persona
+- Plan de refactorización priorizado
+- Herramientas: SonarQube, CodeClimate, ESLint
+
+**Ejemplo de uso**:
+```markdown
+"Auditar calidad del módulo de billing para reducir deuda técnica"
+"Evaluar mantenibilidad del repositorio frontend-app"
+"Identificar code smells y priorizar refactorización"
+```
+
+---
+
+### 11. Auditoría de UI/UX y Accesibilidad - `template_11_ui_ux_audit.md`
+
+**Cuándo usar**: Evaluación de usabilidad, compliance WCAG, consistencia de diseño
+
+**Características**:
+- Evaluación heurística de usabilidad (10 heurísticas de Nielsen)
+- Auditoría de accesibilidad WCAG 2.1 AA (Lighthouse, axe DevTools)
+- Revisión de consistencia de UI (tipografía, colores, espaciado)
+- Verificación de contenido y claridad de mensajes
+- Identificación de issues críticos, mayores y menores
+- Plan de remediación con prioridades
+- Testing con lectores de pantalla (VoiceOver, NVDA)
+
+**Ejemplo de uso**:
+```markdown
+"Auditar accesibilidad del flujo de registro para WCAG 2.1 AA"
+"Evaluar usabilidad del dashboard principal con heurísticas de Nielsen"
+"Revisar consistencia de UI del Design System"
+```
+
+---
+
 ## 🔄 Flujo de Trabajo Recomendado
 
 ### Para Implementaciones Grandes
@@ -197,8 +284,15 @@ Estos templates se integran con los perfiles de agente existentes en `dev-docs/a
 | Agent Profile | Templates Recomendados |
 |---------------|------------------------|
 | **EJECUTOR** | Templates 1-5 (planificación e implementación) |
-| **VALIDADOR** | Template 6 (auditoría) |
+| **VALIDADOR** | Templates 6-11 (auditorías general y especializadas) |
 | **HANDOFF** | Template 7 (traspaso) |
+
+**Auditorías Especializadas por Tipo:**
+- **Template 6**: Auditoría General (4 dimensiones: completitud, calidad, impacto, sostenibilidad)
+- **Template 8**: Auditoría de Seguridad (OWASP, dependencias, secretos)
+- **Template 9**: Auditoría de Performance (latencia, carga, bottlenecks)
+- **Template 10**: Auditoría de Calidad de Código (deuda técnica, code smells)
+- **Template 11**: Auditoría de UI/UX (accesibilidad WCAG, usabilidad)
 
 Ver: [`dev-docs/agent-profiles/README.md`](../agent-profiles/README.md)
 
