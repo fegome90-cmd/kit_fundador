@@ -131,3 +131,94 @@ antes de que un equipo adopte el script interactivo. Para mantener la trazabilid
 - **Bien**: Setup automatizado funciona perfecto
 - **Mal**: [Pendiente]
 - **Mejoras**: [Pendiente]
+
+---
+
+## 📝 Workflow con Templates de Prompts
+
+El proyecto incluye **7 templates estructurados** para diferentes tipos de tareas en [`dev-docs/prompt_example/`](./prompt_example/). Estos templates ayudan a mantener consistencia y calidad al trabajar con agentes IA o al documentar tareas manuales.
+
+### Catálogo de Templates
+
+| Template | Archivo | Uso Recomendado | Duración Típica |
+|----------|---------|-----------------|-----------------|
+| **1. Implementación Grande** | `prompt_template_1_large_implementation.md` | Sprints completos, arquitecturas complejas | > 5 días |
+| **2. Feature Mediana** | `prompt_template_2_medium_feature.md` | Funcionalidades de tamaño medio | 2-5 días |
+| **3. Bug Fix** | `prompt_template_3_bug_fix.md` | Corrección de bugs, RCA | < 1 día |
+| **4. Refactoring** | `prompt_template_4_refactoring.md` | Reducción de deuda técnica | 1-3 días |
+| **5. Daily Task** | `prompt_template_5_daily_task.md` | Tareas triviales y rápidas | < 2 horas |
+| **6. Audit** | `template_6_general_audit.md` | Auditorías de calidad, gates | Variable |
+| **7. Handoff** | `template_7_general_handoff.md` | Traspasos entre equipos/agentes | Variable |
+
+### Integración con Agent Profiles
+
+Los templates se integran con los perfiles de agente documentados en [`dev-docs/agent-profiles/`](./agent-profiles/):
+
+- **EJECUTOR** → Usa templates 1-5 para planificar e implementar
+- **VALIDADOR** → Usa template 6 para auditorías
+- **HANDOFF** → Usa template 7 para traspasos de contexto
+
+Ver guía completa de integración en: [`dev-docs/agent-profiles/PROMPTS.md`](./agent-profiles/PROMPTS.md#-integración-con-templates-de-prompts-estructurados)
+
+### Guía de Decisión Rápida
+
+**¿Qué template usar?**
+
+- Nueva feature grande (> 5 días) → **Template 1**
+- Nueva feature mediana (2-5 días) → **Template 2**
+- Bug fix → **Template 3**
+- Refactorización → **Template 4**
+- Tarea rápida (< 2 horas) → **Template 5**
+- Auditoría/Gate de calidad → **Template 6**
+- Traspaso de contexto → **Template 7**
+
+Ver guía completa: [`dev-docs/prompt_example/QUICK_REFERENCE.md`](./prompt_example/QUICK_REFERENCE.md)
+
+### Workflow Recomendado para Tareas
+
+```
+1. Seleccionar template según tipo y duración de tarea
+                    ↓
+2. Activar agente EJECUTOR + Rellenar template
+                    ↓
+3. Implementar siguiendo plan (TDD, commits frecuentes)
+                    ↓
+4. Activar agente VALIDADOR + Usar template 6 (Audit)
+                    ↓
+5. ¿Gate PASS? → Template 7 (Handoff) → Siguiente tarea
+   ¿Gate FAIL? → Volver a EJECUTOR para remediar issues
+```
+
+### Ejemplo de Uso: Implementar Feature Mediana
+
+```markdown
+# Paso 1: Planificación con Template 2
+Modo EJECUTOR.
+Template: dev-docs/prompt_example/prompt_template_2_medium_feature.md
+Task: TASK-004 - Implementar primer use case
+
+[Rellenar template con objetivos SMART, plan día a día, criterios de aceptación]
+
+# Paso 2: Desarrollo
+[Seguir plan del template con TDD]
+
+# Paso 3: Auditoría con Template 6
+Modo VALIDADOR.
+Template: dev-docs/prompt_example/template_6_general_audit.md
+
+Evaluar en 4 dimensiones:
+- Completitud (30%)
+- Calidad (30%)
+- Impacto (25%)
+- Sostenibilidad (15%)
+
+# Paso 4: Handoff si aprueba
+Template: dev-docs/prompt_example/template_7_general_handoff.md
+[Documentar tareas completadas, artefactos, issues pendientes]
+```
+
+### Documentación Completa
+
+- **README de Templates**: [`dev-docs/prompt_example/README.md`](./prompt_example/README.md)
+- **Guía Rápida**: [`dev-docs/prompt_example/QUICK_REFERENCE.md`](./prompt_example/QUICK_REFERENCE.md)
+- **Integración con Agentes**: [`dev-docs/agent-profiles/PROMPTS.md`](./agent-profiles/PROMPTS.md)

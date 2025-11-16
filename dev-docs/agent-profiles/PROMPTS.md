@@ -449,5 +449,182 @@ Agrega tus propios prompts específicos aquí:
 
 ---
 
-Última actualización: 2025-01-16  
+## 📝 Integración con Templates de Prompts Estructurados
+
+Los prompts anteriores activan **roles de agente** (EJECUTOR, VALIDADOR). Para **tareas específicas**, usa los **templates estructurados** disponibles en [`dev-docs/prompt_example/`](../prompt_example/).
+
+### Relación entre Roles y Templates
+
+| Rol de Agente | Templates Recomendados | Cuándo Usar |
+|---------------|------------------------|-------------|
+| **EJECUTOR** | Templates 1-5 | Para planificar e implementar tareas |
+| **VALIDADOR** | Template 6 | Para auditar y evaluar calidad |
+| **HANDOFF** | Template 7 | Para traspasar contexto entre agentes/equipos |
+
+### Flujo Completo: Rol + Template
+
+#### Ejemplo: Implementación de Feature Mediana
+
+```markdown
+# Paso 1: Activar EJECUTOR con Template 2
+"Modo EJECUTOR. Trabajar en TASK-123.
+
+Usar template de planificación: dev-docs/prompt_example/prompt_template_2_medium_feature.md
+
+Feature: Sistema de exportación de usuarios a CSV
+Duración estimada: 3 días
+
+[Rellenar template completo con objetivos SMART, plan de implementación, etc.]
+
+Comenzar con TDD."
+
+# Paso 2: Desarrollo
+[Ejecutor implementa siguiendo el plan del template]
+
+# Paso 3: Activar VALIDADOR con Template 6
+"Modo VALIDADOR. Auditar TASK-123.
+
+Usar template de auditoría: dev-docs/prompt_example/template_6_general_audit.md
+
+Evaluar en 4 dimensiones:
+- Completitud (30%)
+- Calidad (30%)
+- Impacto (25%)
+- Sostenibilidad (15%)
+
+Generar score y decisión de gate."
+
+# Paso 4: Handoff (si es necesario)
+"Preparar handoff con template: dev-docs/prompt_example/template_7_general_handoff.md
+
+Documentar:
+- Tareas completadas
+- Artefactos generados
+- Issues pendientes
+- Decisiones de arquitectura (ADRs)"
+```
+
+### Decisión Rápida: ¿Qué Template Usar?
+
+Ver guía completa: [`dev-docs/prompt_example/QUICK_REFERENCE.md`](../prompt_example/QUICK_REFERENCE.md)
+
+**Atajos**:
+- Nueva feature grande (> 5 días) → Template 1
+- Nueva feature mediana (2-5 días) → Template 2
+- Bug fix → Template 3
+- Refactorización → Template 4
+- Tarea rápida (< 2 horas) → Template 5
+- Auditoría/Gate → Template 6
+- Traspaso de contexto → Template 7
+
+### Workflow Recomendado
+
+```
+┌─────────────────────────────────────────────────┐
+│ 1. Seleccionar Template según tarea             │
+│    (ver QUICK_REFERENCE.md)                     │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ 2. Activar EJECUTOR + Rellenar Template         │
+│    "Modo EJECUTOR. Usar template X para..."    │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ 3. Implementar siguiendo plan del template      │
+│    (TDD, commits frecuentes, etc.)              │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ 4. Activar VALIDADOR + Usar Template 6          │
+│    "Modo VALIDADOR. Auditar con template 6..."  │
+└─────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────┐
+│ 5. ¿Gate PASS? → Usar Template 7 para handoff   │
+│    Si NO → Volver a EJECUTOR para fixes         │
+└─────────────────────────────────────────────────┘
+```
+
+### Templates Especializados por Tipo de Tarea
+
+#### Para Implementaciones Grandes (Sprints)
+```markdown
+Modo EJECUTOR.
+
+Template: prompt_template_1_large_implementation.md
+Task: [TASK-XXX]
+
+IMPORTANTE:
+- Incluir metadata YAML completa
+- Definir ≥10 Boundary Markers (anti-drift)
+- Objetivos SMART con métricas cuantificables
+- Timeline por fases con validaciones
+- Target de code coverage ≥[XX]%
+
+Comenzar.
+```
+
+#### Para Bugs
+```markdown
+Modo EJECUTOR.
+
+Template: prompt_template_3_bug_fix.md
+Bug: [BUG-XXX]
+Severidad: [CRITICAL/HIGH/MEDIUM/LOW]
+
+Proceso:
+1. Reproducir bug siguiendo pasos
+2. Root Cause Analysis (RCA)
+3. Proponer solución con impacto
+4. Implementar con tests anti-regresión
+5. Verificar que comportamiento esperado ocurre
+
+Comenzar.
+```
+
+#### Para Refactorización
+```markdown
+Modo EJECUTOR.
+
+Template: prompt_template_4_refactoring.md
+Refactor: [REFACTOR-XXX]
+
+CRÍTICO:
+- NO cambiar comportamiento externo
+- Todos los tests existentes deben seguir pasando
+- Añadir tests de integración para garantizar no-regresión
+- Documentar métricas antes/después (complejidad, LOC, etc.)
+
+Comenzar.
+```
+
+#### Para Auditorías
+```markdown
+Modo VALIDADOR.
+
+Template: template_6_general_audit.md
+Auditar: [TASK/SPRINT-XXX]
+
+Metodología de 4 Dimensiones:
+1. Completitud (30%): Tareas, requisitos, deliverables
+2. Calidad (30%): Linter, coherencia, documentación
+3. Impacto (25%): Anti-drift, usabilidad, valor
+4. Sostenibilidad (15%): Versionado, extensibilidad, escalabilidad
+
+Gate threshold: ≥[XX]/100
+Generar decisión: ✅ APROBADO / ❌ RECHAZADO
+
+Comenzar.
+```
+
+### Ver Documentación Completa
+
+- **README de Templates**: [`dev-docs/prompt_example/README.md`](../prompt_example/README.md)
+- **Guía de Decisión Rápida**: [`dev-docs/prompt_example/QUICK_REFERENCE.md`](../prompt_example/QUICK_REFERENCE.md)
+- **Templates Individuales**: [`dev-docs/prompt_example/`](../prompt_example/)
+
+---
+
+Última actualización: 2025-01-16
 Autor: Kit Fundador v2.0
