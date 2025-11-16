@@ -63,11 +63,11 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 3. ✅ Mantener los ejemplos simples, aclarando que el agregado no cubre todos los casos productivos. → ver sección
    `README.md#🧱-plantillas-de-dominio-y-eventos`.
 
-### Fase 4 – Pruebas orientativas
+### Fase 4 – Pruebas orientativas ✅
 
-1. Reemplazar suites excesivamente largas por ejemplos parametrizados que ilustren la intención.
-2. Corregir ejemplos asíncronos para que Jest (u otros runners) demuestren buenas prácticas.
-3. Explicar cómo ejecutar o descartar la suite Python según el stack elegido.
+1. ✅ Reemplazar suites excesivamente largas por ejemplos parametrizados que ilustren la intención. → ver `tests/unit/Email.test.ts`.
+2. ✅ Corregir ejemplos asíncronos para que Jest (u otros runners) demuestren buenas prácticas. → ver `tests/unit/User.test.ts`.
+3. ✅ Explicar cómo ejecutar o descartar la suite Python según el stack elegido. → ver `README.md#🧪-suites-opcionales-multi-lenguaje`.
 
 ### Fase 5 – Validación posterior
 

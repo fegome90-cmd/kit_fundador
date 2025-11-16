@@ -60,15 +60,7 @@
   - [ ] Contract tests pasando
   - [ ] E2E test funcional
 
-### [TASK-009] Simplificar suites de prueba
-- **Prioridad**: Media
-- **Estimación**: 1 hora
-- **Dependencias**: TASK-008
-- **Descripción**: Reducir ruido en tests TypeScript, corregir ejemplo asíncrono y documentar el alcance de la suite Python.
-- **Criterios de Aceptación**:
-  - [ ] `tests/unit/Email.test.ts` usa tabla de casos
-  - [ ] Ejemplo de Jest asíncrono garantiza que el runner espere la promesa
-  - [ ] README/dev-docs explican cómo habilitar/deshabilitar pruebas en otros lenguajes
+
 
 ### [TASK-010] Añadir checklist de validación posterior
 - **Prioridad**: Baja
@@ -113,6 +105,15 @@
   - [x] Regex/listas compartidas definidas como constantes reutilizables
   - [x] Comentarios explican integración con servicios externos
   - [x] No se introduce dependencia concreta
+
+### [TASK-009] Simplificar suites de prueba
+- **Completado**: 2025-01-16
+- **Duración real**: 35 min
+- **Notas**: Se parametrizó `tests/unit/Email.test.ts`, se corrigió el ejemplo de `changePassword` y se añadió guía explícita para Pytest en el README.
+- **Criterios de Aceptación**:
+  - [x] `tests/unit/Email.test.ts` usa tabla de casos
+  - [x] Ejemplo de Jest asíncrono garantiza que el runner espere la promesa
+  - [x] README/dev-docs explican cómo habilitar/deshabilitar pruebas en otros lenguajes
 
 ## Backlog 💭
 

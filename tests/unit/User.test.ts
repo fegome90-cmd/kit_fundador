@@ -167,14 +167,13 @@ describe('User Entity', () => {
         name: 'Test User',
         password: Password.create(STRONG_PASSWORD),
       });
-      
+
       const oldUpdatedAt = user.updatedAt;
-      
-      // Small delay to ensure timestamp difference
-      setTimeout(() => {
-        user.changePassword(Password.create('NewSecurePass123!'));
-        expect(user.updatedAt.getTime()).toBeGreaterThan(oldUpdatedAt.getTime());
-      }, 10);
+
+      user.changePassword(Password.create('NewSecurePass123!'));
+
+      expect(user.updatedAt).not.toBe(oldUpdatedAt);
+      expect(user.updatedAt.getTime()).toBeGreaterThanOrEqual(oldUpdatedAt.getTime());
     });
   });
 
