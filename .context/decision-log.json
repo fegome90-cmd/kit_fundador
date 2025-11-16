@@ -71,6 +71,25 @@
         "dev-docs/task.md#task-003-setup-database-y-migrations",
         "dev-docs/plan.md#fase-3-infrastructure"
       ]
+    },
+    {
+      "id": "DEC-2025-01-16-APP-BLUEPRINT",
+      "title": "Blueprint agnóstico para TASK-004",
+      "date": "2025-01-16",
+      "context": "El roadmap requiere un primer caso de uso pero el starkit no debe incluir lógica específica; se necesita una guía reutilizable.",
+      "decision": "Crear `dev-docs/application/use-case-blueprint.md`, enlazarlo desde README/plan/task y mantener TASK-004 pendiente hasta que el consumidor seleccione su flujo.",
+      "consequences": [
+        "Los equipos conocen los artefactos, pruebas y code reviews necesarios antes de implementar su primer handler",
+        "Se evita introducir infraestructura o dependencias accidentales en la capa de aplicación",
+        "La documentación de validación y el backlog ahora señalan explícitamente el blueprint como prerequisito"
+      ],
+      "references": [
+        "dev-docs/application/use-case-blueprint.md",
+        "README.md#🧠-blueprint-de-casos-de-uso-y-handlers",
+        "dev-docs/task.md#task-004-implementar-primer-use-case",
+        "dev-docs/plan.md#fase-2-application-layer",
+        "dev-docs/post-adaptation-validation.md"
+      ]
     }
   ]
 }

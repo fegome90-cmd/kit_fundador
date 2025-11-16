@@ -44,22 +44,24 @@ export class User {
     password: Password;
     role?: UserRole;
   }): User {
-    const now = new Date();
-    const props = User.buildUserProps(params, now);
+    const { props, occurredOn } = User.buildInitialProps(params);
     const user = new User(props);
 
     user.addDomainEvent(
-      new UserCreatedEvent(user.id, user.email.value, now)
+      new UserCreatedEvent(user.id, user.email.value, occurredOn)
     );
 
     return user;
   }
 
-  private static buildUserProps(
-    params: { email: Email; name: string; password: Password; role?: UserRole },
-    now: Date
-  ): UserProps {
-    return {
+  private static buildInitialProps(params: {
+    email: Email;
+    name: string;
+    password: Password;
+    role?: UserRole;
+  }): { props: UserProps; occurredOn: Date } {
+    const now = new Date();
+    const props: UserProps = {
       id: crypto.randomUUID(),
       email: params.email,
       name: params.name,
@@ -69,6 +71,8 @@ export class User {
       createdAt: now,
       updatedAt: now,
     };
+
+    return { props, occurredOn: now };
   }
 
   // Reconstitute from persistence
@@ -167,7 +171,7 @@ export class User {
   }
 
   // For persistence
-  toJSON() {
+  toJSON(): Record<string, unknown> {
     return {
       id: this.props.id,
       email: this.props.email.value,

@@ -18,7 +18,7 @@
 - [ ] Tests de domain layer (100% coverage) → pendiente de expandir cuando se añadan nuevos aggregates.
 
 ### Fase 2: Application Layer
-- [ ] Implementar use cases
+- [ ] Implementar use cases → sigue el plan de [`dev-docs/application/use-case-blueprint.md`](application/use-case-blueprint.md)
 - [ ] Command handlers
 - [ ] Query handlers
 - [ ] Application services

@@ -12,7 +12,7 @@
 ## Active Tasks
 
 - _(sin tareas activas)_
-- Próximo foco sugerido: evaluar si se implementa [TASK-015] (observabilidad opcional del setup) y, en paralelo, ejecutar el blueprint de [TASK-003]/preparar [TASK-004].
+- Próximo foco sugerido: evaluar si se implementa [TASK-015] (observabilidad opcional del setup), avanzar con el blueprint de [TASK-003] y preparar [TASK-004] usando la nueva guía de casos de uso.
 
 ## Recent Changes
 
@@ -20,6 +20,7 @@
 - README, `dev-docs/plan.md`, `dev-docs/setup/setup-sh-remediation-plan.md`, `dev-docs/setup/setup-sh-remediation-report.md`, `dev-docs/tooling-guide.md` y la checklist post-adaptación reflejan el nuevo estado (solo C3.2/TASK-015 quedó como opt-in).
 - `dev-docs/task.md` mueve TASK-013/TASK-014 a Completadas y crea TASK-015 para la observabilidad opcional.
 - Se añadió `dev-docs/infrastructure/database-blueprint.md` y se enlazó desde README, plan y backlog para guiar la futura implementación de TASK-003 sin comprometer el carácter de starkit.
+- Se publicó `dev-docs/application/use-case-blueprint.md` y se referenció desde README, plan, task list y guías de validación para que TASK-004 tenga un camino claro sin agregar código productivo.
 
 ### Last 5 Commits
 ```
@@ -29,10 +30,13 @@ chore: Initialize project with Kit Fundador v2.0
 
 ## Pending Decisions
 
-1. **Database provider para Task-003**
+ 1. **Database provider para Task-003**
    - Needs input from: Platform lead (apoyarse en `dev-docs/infrastructure/database-blueprint.md`).
    - Deliverable: ADR corto que seleccione Postgres/Prisma o alternativa.
-2. **Framework de migrations**
+ 2. **Framework de migrations**
+3. **Primer caso de uso a implementar**
+   - Needs input from: Product/Domain owner.
+   - Deliverable: Nota en `dev-docs/task.md` y decisión en `.context/decision-log.json` usando el blueprint de application layer.
    - Needs input from: Platform lead.
    - Blocked by: Decisión de DB; documentar en `dev-docs/task.md` cuando se defina.
 
@@ -45,6 +49,7 @@ chore: Initialize project with Kit Fundador v2.0
 Stack base documentado (TypeScript + Express + Jest + ESLint/Prettier + esbuild). Próximos pasos sugeridos:
 1. Decidir si vale la pena abordar TASK-015 (observabilidad del setup) o dejarlo como opt-in para el equipo consumidor.
 2. Usar el nuevo blueprint de base de datos para planificar/ejecutar TASK-003 sin introducir dependencias innecesarias y, con ello, habilitar TASK-004.
+3. Seleccionar el primer caso de uso siguiendo `dev-docs/application/use-case-blueprint.md` y documentar la elección antes de escribir código nuevo.
 
 Archivos clave a revisar:
 - `config/rules/ai-guardrails.json` - Reglas del agente

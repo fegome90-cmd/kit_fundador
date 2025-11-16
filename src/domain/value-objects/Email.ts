@@ -28,14 +28,15 @@ export class Email {
   }
 
   private validate(): void {
-    this.validateBasicFormat();
-    const [localPart, domainPart] = this._value.split('@');
-    this.validateEmailParts(localPart, domainPart);
-    this.validateDomainLabels(domainPart);
-    this.validateBlockedDomains(domainPart);
+    this.ensureNotEmpty();
+    this.ensureBasicFormat();
+    const { localPart, domainPart } = this.extractParts();
+    this.validateLocalPart(localPart);
+    this.validateDomain(domainPart);
+    this.ensureDomainNotBlocked(domainPart);
   }
 
-  private validateBasicFormat(): void {
+  private ensureNotEmpty(): void {
     if (!this._value) {
       throw new Error('Email cannot be empty');
     }
@@ -44,30 +45,37 @@ export class Email {
       throw new Error('Invalid email format');
     }
 
-    if (!EMAIL_REGEX.test(this._value)) {
-      throw new Error(`Invalid email format: ${this._value}`);
-    }
-
     if (this._value.length > MAX_EMAIL_LENGTH) {
       throw new Error('Email too long');
     }
   }
 
-  private validateEmailParts(localPart: string, domainPart: string): void {
+  private ensureBasicFormat(): void {
+    if (!EMAIL_REGEX.test(this._value)) {
+      throw new Error(`Invalid email format: ${this._value}`);
+    }
+  }
+
+  private extractParts(): { localPart: string; domainPart: string } {
+    const [localPart, domainPart] = this._value.split('@');
     if (!localPart || !domainPart) {
       throw new Error('Invalid email format');
     }
 
-    if (localPart.startsWith('.') || localPart.endsWith('.')) {
-      throw new Error('Invalid email format');
-    }
+    return { localPart, domainPart };
+  }
 
-    if (domainPart.startsWith('-') || domainPart.endsWith('-')) {
+  private validateLocalPart(localPart: string): void {
+    if (localPart.startsWith('.') || localPart.endsWith('.')) {
       throw new Error('Invalid email format');
     }
   }
 
-  private validateDomainLabels(domainPart: string): void {
+  private validateDomain(domainPart: string): void {
+    if (domainPart.startsWith('-') || domainPart.endsWith('-')) {
+      throw new Error('Invalid email format');
+    }
+
     const domainLabels = domainPart.split('.');
     const hasInvalidLabel = domainLabels.some(
       (label) => !label || label.startsWith('-') || label.endsWith('-')
@@ -78,7 +86,7 @@ export class Email {
     }
   }
 
-  private validateBlockedDomains(domainPart: string): void {
+  private ensureDomainNotBlocked(domainPart: string): void {
     if (BLOCKED_DOMAINS.includes(domainPart)) {
       throw new Error(`Email domain not allowed: ${domainPart}`);
     }

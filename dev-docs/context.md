@@ -36,6 +36,12 @@ Proveer un **starkit de Identity & Access** que incluya ejemplos autocontenidos 
   arrastrar dependencias.
 - TASK-003 permanece pendiente hasta que el equipo defina proveedor y herramienta de migraciones en su fork.
 
+## Estado de la capa de aplicación (TASK-004)
+- La capa `application/` incluye únicamente stubs; el flujo real se documenta en [`dev-docs/application/use-case-blueprint.md`](application/use-case-blueprint.md).
+- El blueprint describe contratos (DTOs/ports), handlers, stubs temporales y el plan de pruebas para guiar la implementación sin
+  acoplar infraestructura.
+- TASK-004 seguirá en “Pendiente” hasta que un consumidor adopte el blueprint y documente qué use case está construyendo.
+
 ## Arquitectura
 
 ```

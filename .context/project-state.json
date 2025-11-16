@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "last_updated": "2025-01-16T14:00:00Z",
+  "last_updated": "2025-01-16T15:00:00Z",
   "project_metadata": {
     "name": "nombre-proyecto",
     "domain": "dominio-negocio",
@@ -53,11 +53,22 @@
           "TASK-004"
         ],
         "notes": "El blueprint describe cómo crear docker-compose, migraciones y seeds sin añadir dependencias al starkit; queda a cargo del consumidor implementarlo."
+      },
+      {
+        "id": "TD-APP-001",
+        "summary": "Primer caso de uso pendiente (TASK-004)",
+        "status": "planned",
+        "remediation_plan": "dev-docs/application/use-case-blueprint.md",
+        "tasks": [
+          "TASK-004",
+          "TASK-005"
+        ],
+        "notes": "El blueprint define contratos, handlers y pruebas mínimas para la capa de aplicación; sigue pendiente seleccionar el primer flujo y documentar la decisión."
       }
     ]
   },
   "ai_context": {
-    "last_session_summary": "Se añadió el blueprint agnóstico para TASK-003, enlazado desde README/plan/backlog, manteniendo pendiente la implementación real mientras se guía al consumidor. El setup sigue con observabilidad opcional (TASK-015).",
+    "last_session_summary": "Se añadieron los blueprints de base de datos y de casos de uso, enlazados desde README/plan/backlog, para que TASK-003 y TASK-004 tengan instrucciones detalladas sin comprometer el starkit. El setup sigue con observabilidad opcional (TASK-015).",
     "next_recommended_tasks": [
       "TASK-003",
       "TASK-004",
@@ -66,7 +77,7 @@
     "areas_needing_attention": [
       "Seleccionar proveedor de base de datos y herramienta de migraciones usando el blueprint como guía",
       "Decidir si se implementa la observabilidad opcional del setup (TASK-015)",
-      "Preparar el primer use case una vez definida la capa de datos"
+      "Elegir el primer caso de uso con base en el blueprint de application layer y registrar la decisión antes de escribir código"
     ],
     "recent_decisions": [
       {
@@ -104,6 +115,16 @@
           "README.md#🗄️-blueprint-de-base-de-datos-y-migraciones",
           "dev-docs/task.md#task-003-setup-database-y-migrations",
           "dev-docs/plan.md#fase-3-infrastructure"
+        ]
+      },
+      {
+        "id": "DEC-2025-01-16-APP-BLUEPRINT",
+        "summary": "Se publicó un blueprint para los casos de uso (TASK-004) que detalla contratos, puertos y pruebas sin añadir dependencias.",
+        "references": [
+          "dev-docs/application/use-case-blueprint.md",
+          "README.md#🧠-blueprint-de-casos-de-uso-y-handlers",
+          "dev-docs/task.md#task-004-implementar-primer-use-case",
+          "dev-docs/plan.md#fase-2-application-layer"
         ]
       }
     ]

@@ -23,6 +23,7 @@ _(sin tareas activas)_
 - **Estimación**: 3 horas
 - **Dependencias**: TASK-002, TASK-003
 - **Descripción**: Crear primer caso de uso end-to-end
+- **Blueprint**: `dev-docs/application/use-case-blueprint.md`
 - **Criterios de Aceptación**:
   - [ ] Command handler implementado
   - [ ] Repository interface definida
