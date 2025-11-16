@@ -457,7 +457,7 @@ Los prompts anteriores activan **roles de agente** (EJECUTOR, VALIDADOR). Para *
 
 | Rol de Agente | Templates Recomendados | Cuándo Usar |
 |---------------|------------------------|-------------|
-| **EJECUTOR** | Templates 1-5, 12-15 | Para planificar e implementar tareas, investigar, documentar decisiones |
+| **EJECUTOR** | Templates 1-5, 12-19 | Para planificar e implementar tareas, investigar, documentar decisiones, testing |
 | **VALIDADOR** | Templates 6, 8-11 | Para auditar y evaluar calidad (general y especializada) |
 | **HANDOFF** | Template 7 | Para traspasar contexto entre agentes/equipos |
 
@@ -467,6 +467,13 @@ Los prompts anteriores activan **roles de agente** (EJECUTOR, VALIDADOR). Para *
 - Template 9: Auditoría de Performance (latencia, carga, optimización)
 - Template 10: Auditoría de Calidad de Código (deuda técnica, code smells)
 - Template 11: Auditoría de UI/UX (accesibilidad WCAG, usabilidad)
+
+**Testing Especializado (Templates 15-19):**
+- Template 15: Plan de Pruebas General (estrategia completa TDD/BDD, cobertura)
+- Template 16: Plan de Pruebas Unitarias (funciones, métodos, componentes)
+- Template 17: Plan de Pruebas de Integración (módulos, servicios, capas)
+- Template 18: Plan de Pruebas E2E (flujos de usuario completos)
+- Template 19: Estrategia TDD/BDD (desarrollo guiado por pruebas)
 
 ### Flujo Completo: Rol + Template
 
@@ -530,7 +537,11 @@ Ver guía completa: [`dev-docs/prompt_example/QUICK_REFERENCE.md`](../prompt_exa
 - Investigación técnica/comparativa → Template 12
 - Planificación de infraestructura → Template 13
 - Arquitectura Decision Record (ADR) → Template 14
-- Plan de pruebas (Testing) → Template 15
+- Plan de pruebas general (Testing) → Template 15
+- Plan de pruebas unitarias → Template 16
+- Plan de pruebas de integración → Template 17
+- Plan de pruebas E2E → Template 18
+- Estrategia TDD/BDD → Template 19
 
 ### Workflow Recomendado
 
@@ -805,6 +816,127 @@ Herramientas:
 
 Criterios de Entrada: Código desplegado en Staging, tests unitarios pasando
 Criterios de Salida: 100% casos críticos ejecutados, cobertura ≥[XX]%, 0 bugs bloqueantes
+
+Comenzar.
+```
+
+#### Testing Especializado
+
+##### Plan de Pruebas Unitarias
+```markdown
+Modo EJECUTOR.
+
+Template: template_16_unit_testing_plan.md
+Plan: [UNIT-YYYYMMDD-MODULE_NAME]
+
+Módulo/Componente: [ej: "UserValidation module"]
+
+Unidades a Probar:
+- Función: `validateEmail(email)`
+- Función: `validatePassword(password)`
+- Componente: `<UserForm />`
+
+Casos de Prueba:
+- Happy paths (inputs válidos)
+- Casos borde (vacíos, muy grandes, límites)
+- Casos de error (null, undefined, tipos incorrectos)
+- Componentes UI (renderizado, interacciones, accesibilidad)
+
+Criterios de Aceptación:
+- Cobertura ≥90%
+- Tests se ejecutan en <2 minutos
+- Todos pasan en CI
+
+Comenzar.
+```
+
+##### Plan de Pruebas de Integración
+```markdown
+Modo EJECUTOR.
+
+Template: template_17_integration_testing_plan.md
+Plan: [INT-YYYYMMDD-FEATURE_NAME]
+
+Funcionalidad: [ej: "Creación de usuarios"]
+
+Puntos de Integración:
+1. UI (Formulario de registro) ↔ API (/api/users)
+2. API ↔ Base de Datos (PostgreSQL)
+3. API ↔ Servicio de Email (notificaciones)
+
+Componentes Reales:
+- Servidor API (real)
+- Base de datos de prueba (Docker container)
+
+Componentes Mockeados:
+- Servicio de email (mock)
+- APIs de terceros (mock)
+
+Escenarios:
+- Flujo completo exitoso (UI → API → DB → Email)
+- Manejo de errores de DB
+- Validación de contratos entre servicios
+
+Comenzar.
+```
+
+##### Plan de Pruebas E2E
+```markdown
+Modo EJECUTOR.
+
+Template: template_18_e2e_testing_plan.md
+Plan: [E2E-YYYYMMDD-APP_NAME]
+
+Aplicación: [ej: "E-commerce Platform"]
+Entorno: https://staging.[app].com
+
+Flujos Críticos:
+1. Registro y onboarding de nuevo usuario
+2. Búsqueda → Añadir al carrito → Checkout → Pago
+3. Creación/edición/eliminación de producto (admin)
+
+Navegadores/Dispositivos:
+- Chrome Desktop
+- Firefox Desktop
+- Safari Desktop
+- Vista Móvil (emulada)
+
+Herramientas:
+- Framework: Cypress / Playwright
+- Gestión de datos: Seeds scripts, usuarios de prueba
+- Reportes: Screenshots y videos de fallos
+
+Comenzar.
+```
+
+##### Estrategia TDD/BDD
+```markdown
+Modo EJECUTOR.
+
+Template: template_19_tdd_bdd_strategy.md
+Estrategia: [TDD-YYYYMMDD-FEATURE_NAME]
+
+Funcionalidad: [ej: "Carrito de compras"]
+
+Escenarios BDD (Given-When-Then):
+
+Escenario 1: Añadir primer artículo al carrito
+- Given: Usuario autenticado con carrito vacío
+- When: Usuario hace clic en "Añadir al Carrito" en producto X
+- Then: Carrito contiene 1 unidad de producto X
+- And: Subtotal = precio de X
+
+Escenario 2: Añadir artículo existente
+- Given: Carrito ya contiene 1 unidad de producto X
+- When: Usuario añade producto X nuevamente
+- Then: Carrito contiene 2 unidades de producto X
+
+Plan de Implementación (Red-Green-Refactor):
+1. Escribir test que falla para Escenario 1
+2. Implementar código mínimo para pasar test 1
+3. Refactorizar
+4. Repetir para Escenario 2
+5. ...continuar iterativamente
 
 Comenzar.
 ```
