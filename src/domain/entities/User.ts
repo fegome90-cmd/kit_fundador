@@ -92,6 +92,8 @@ export class User {
 
     // Raise domain event
     // this.addDomainEvent(new EmailVerifiedEvent(...));
+    // Application layer should persist and dispatch events via your own
+    // DomainEventDispatcher implementation.
   }
 
   changeName(newName: string): void {
@@ -146,6 +148,10 @@ export class User {
     this.domainEvents.push(event);
   }
 
+  /**
+   * Returns a copy of the accumulated events so the application layer can
+   * forward them to an infrastructure adapter (outbox, message bus, etc.).
+   */
   getDomainEvents(): DomainEvent[] {
     return [...this.domainEvents];
   }

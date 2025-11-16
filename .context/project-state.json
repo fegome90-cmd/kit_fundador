@@ -1,24 +1,86 @@
 {
   "version": "2.0.0",
-  "last_updated": "2025-01-15T00:00:00Z",
+  "last_updated": "2025-01-16T12:30:00Z",
   "project_metadata": {
     "name": "nombre-proyecto",
     "domain": "dominio-negocio",
     "stage": "foundation",
-    "tech_stack_hash": ""
+    "tech_stack_hash": "typescript-node20-express-jest-esbuild"
   },
   "current_state": {
-    "active_bounded_contexts": [],
-    "implemented_aggregates": [],
+    "active_bounded_contexts": [
+      {
+        "name": "Identity & Access",
+        "description": "Gestión de cuentas de usuario, credenciales y verificación de email",
+        "status": "documented",
+        "artifacts": [
+          "dev-docs/domain/ubiquitous-language.md#bounded-context-identity--access",
+          "dev-docs/domain/invariants.md"
+        ]
+      }
+    ],
+    "implemented_aggregates": [
+      {
+        "name": "IdentityAccess.UserAccount",
+        "status": "template",
+        "code": "src/domain/entities/User.ts",
+        "tests": [
+          "tests/unit/User.test.ts",
+          "tests/unit/Email.test.ts"
+        ]
+      }
+    ],
     "pending_migrations": [],
     "active_feature_flags": {},
-    "technical_debt_items": []
+    "technical_debt_items": [
+      {
+        "id": "TD-SETUP-001",
+        "summary": "`scripts/setup.sh` tiene hallazgos críticos documentados en AUDITORIA_SETUP_SH.md",
+        "status": "in_progress",
+        "remediation_plan": "dev-docs/setup/setup-sh-remediation-plan.md",
+        "tasks": [
+          "TASK-011",
+          "TASK-012",
+          "TASK-013",
+          "TASK-014"
+        ],
+        "notes": "Fase A completada; pendientes fases B y C del plan."
+      }
+    ]
   },
   "ai_context": {
-    "last_session_summary": "Proyecto inicializado con Kit Fundador v2.0",
-    "next_recommended_tasks": [],
-    "areas_needing_attention": [],
-    "recent_decisions": []
+    "last_session_summary": "Fase A del plan de remediación de setup.sh quedó aplicada (deps Python/TypeScript actualizadas y pip aborta en error); los siguientes pasos son las fases B/C y las tareas del roadmap.",
+    "next_recommended_tasks": [
+      "TASK-012",
+      "TASK-013",
+      "TASK-014",
+      "TASK-003"
+    ],
+    "areas_needing_attention": [
+      "Completar la Fase B (usabilidad) del setup",
+      "Implementar la Fase C (hardening/flags/tests) del setup",
+      "Documentar el cierre de la remediación",
+      "Retomar base de datos y primer use case"
+    ],
+    "recent_decisions": [
+      {
+        "id": "DEC-2025-01-16-STACK",
+        "summary": "Se fija TypeScript + Express como perfil predeterminado del starkit y se documenta en dev-docs/tech-stack-decisions.md.",
+        "references": [
+          "config/tech-stack.json",
+          "dev-docs/tech-stack-decisions.md"
+        ]
+      },
+      {
+        "id": "DEC-2025-01-16-SETUP-PLAN",
+        "summary": "La auditoría AUDITORIA_SETUP_SH.md se adopta y se crea un plan de remediación en dev-docs/setup/setup-sh-remediation-plan.md.",
+        "references": [
+          "document/informes_CC/AUDITORIA_SETUP_SH.md",
+          "dev-docs/setup/setup-sh-remediation-plan.md",
+          "dev-docs/plan.md"
+        ]
+      }
+    ]
   },
   "metrics": {
     "test_coverage": 0,

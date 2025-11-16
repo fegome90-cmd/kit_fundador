@@ -1,18 +1,27 @@
 # Context
 
 ## Propósito del Proyecto
-[Descripción clara del problema que resuelve este proyecto]
+Proveer un **starkit de Identity & Access** que incluya ejemplos autocontenidos de entidades (`User`), value objects (`Email`, `Password`) y eventos de dominio para que cualquier equipo arranque un proyecto desde cero sin depender de infraestructura real.
 
 ## Alcance
 ### En Scope
-- [Funcionalidad 1]
-- [Funcionalidad 2]
+- Documentar bounded contexts iniciales y sus invariantes (ver `dev-docs/domain/ubiquitous-language.md`).
+- Exponer ejemplos de entidades, value objects y eventos sin dependencias de frameworks.
+- Definir checklists y planes para que los equipos consumidores reemplacen los placeholders por implementaciones reales.
 
 ### Out of Scope
-- [Lo que NO se incluye]
+- Implementaciones completas de infraestructura (DB, colas, proveedores de identidad externos).
+- Casos de uso y endpoints listos para producción.
+- Configuración real de CI/CD o despliegues a ambientes compartidos.
 
 ## Stack Tecnológico
-Ver: `config/tech-stack.json`
+- Lenguaje base: **TypeScript (Node.js 20)**.
+- Framework backend: **Express mínimo** (sólo para exponer ejemplos; reemplazar cuando exista entrypoint real).
+- Testing: **Jest** (unit), **Playwright** (e2e), **Pact** (contratos) y **k6** (carga) como referencias.
+- Lint/Format: **ESLint + @typescript-eslint + Prettier**.
+- Build: **esbuild** → `dist/`.
+- Observabilidad & Deploy: PostgreSQL 16 + Prisma, Redis 7, Prometheus/Jaeger/OpenTelemetry, GitHub Actions → GHCR → Kubernetes.
+- Fuente de verdad: `config/tech-stack.json` y `dev-docs/tech-stack-decisions.md`.
 
 ## Arquitectura
 
