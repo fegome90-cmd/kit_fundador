@@ -458,8 +458,15 @@ Los prompts anteriores activan **roles de agente** (EJECUTOR, VALIDADOR). Para *
 | Rol de Agente | Templates Recomendados | Cuándo Usar |
 |---------------|------------------------|-------------|
 | **EJECUTOR** | Templates 1-5 | Para planificar e implementar tareas |
-| **VALIDADOR** | Template 6 | Para auditar y evaluar calidad |
+| **VALIDADOR** | Templates 6, 8-11 | Para auditar y evaluar calidad (general y especializada) |
 | **HANDOFF** | Template 7 | Para traspasar contexto entre agentes/equipos |
+
+**Tipos de Auditoría Disponibles (Templates 6, 8-11):**
+- Template 6: Auditoría General (4 dimensiones, gate de calidad)
+- Template 8: Auditoría de Seguridad (OWASP, dependencias, secretos)
+- Template 9: Auditoría de Performance (latencia, carga, optimización)
+- Template 10: Auditoría de Calidad de Código (deuda técnica, code smells)
+- Template 11: Auditoría de UI/UX (accesibilidad WCAG, usabilidad)
 
 ### Flujo Completo: Rol + Template
 
@@ -514,8 +521,12 @@ Ver guía completa: [`dev-docs/prompt_example/QUICK_REFERENCE.md`](../prompt_exa
 - Bug fix → Template 3
 - Refactorización → Template 4
 - Tarea rápida (< 2 horas) → Template 5
-- Auditoría/Gate → Template 6
+- Auditoría general/Gate → Template 6
 - Traspaso de contexto → Template 7
+- Auditoría de seguridad (OWASP) → Template 8
+- Auditoría de performance → Template 9
+- Auditoría de calidad de código → Template 10
+- Auditoría de UI/UX (WCAG) → Template 11
 
 ### Workflow Recomendado
 
@@ -600,6 +611,8 @@ Comenzar.
 ```
 
 #### Para Auditorías
+
+##### Auditoría General (Gate de Calidad)
 ```markdown
 Modo VALIDADOR.
 
@@ -614,6 +627,82 @@ Metodología de 4 Dimensiones:
 
 Gate threshold: ≥[XX]/100
 Generar decisión: ✅ APROBADO / ❌ RECHAZADO
+
+Comenzar.
+```
+
+##### Auditoría de Seguridad (OWASP)
+```markdown
+Modo VALIDADOR.
+
+Template: template_8_security_audit.md
+Auditar: [Módulo/API a auditar]
+
+Scope:
+- Análisis de dependencias (npm audit, Snyk)
+- Revisión SAST (análisis estático)
+- Checklist OWASP Top 10
+- Autenticación y Autorización
+- Manejo de secretos y configuración
+
+Generar plan de remediación por severidad (Crítica/Alta/Media).
+
+Comenzar.
+```
+
+##### Auditoría de Performance
+```markdown
+Modo VALIDADOR.
+
+Template: template_9_performance_audit.md
+Auditar: [Flujo/API a auditar]
+
+KPIs Target:
+- Latencia p95: < [XX]ms
+- Throughput: > [YY] RPS
+- LCP: < [Z.Z]s
+
+Proceso:
+1. Ejecutar pruebas de carga (k6/JMeter)
+2. Identificar bottlenecks con profiling
+3. Recomendar optimizaciones priorizadas
+
+Comenzar.
+```
+
+##### Auditoría de Calidad de Código
+```markdown
+Modo VALIDADOR.
+
+Template: template_10_code_quality_audit.md
+Auditar: [Repositorio/Módulo a auditar]
+
+Métricas:
+- Complejidad ciclomática
+- Duplicación de código
+- Cobertura de tests
+- Code smells (God Object, métodos largos)
+
+Estimar deuda técnica en días-persona.
+Priorizar plan de refactorización.
+
+Comenzar.
+```
+
+##### Auditoría de UI/UX y Accesibilidad
+```markdown
+Modo VALIDADOR.
+
+Template: template_11_ui_ux_audit.md
+Auditar: [Flujo/Interfaz a auditar]
+
+Verificaciones:
+- Heurísticas de Nielsen (10 heurísticas)
+- WCAG 2.1 AA compliance (Lighthouse, axe)
+- Consistencia de UI (Design System)
+- Testing con lectores de pantalla
+
+Generar plan de remediación con prioridades.
 
 Comenzar.
 ```
