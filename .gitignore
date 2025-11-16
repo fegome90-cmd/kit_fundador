@@ -1,0 +1,232 @@
+# Kit Fundador v2.0 - .gitignore
+# Protege archivos sensibles y previene commits accidentales
+
+# ============================================
+# SECRETOS Y CREDENCIALES (CRÍTICO)
+# ============================================
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+
+# Claves privadas y certificados
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.crt
+id_rsa
+id_dsa
+
+# Directorios de secretos
+secrets/
+credentials/
+.aws/
+.ssh/
+
+# ============================================
+# DEPENDENCIAS
+# ============================================
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.npm
+.yarn/
+
+# Python
+venv/
+env/
+ENV/
+.venv
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Go
+vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# ============================================
+# BUILD OUTPUTS
+# ============================================
+dist/
+build/
+out/
+target/
+*.min.js
+*.min.css
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+
+# ============================================
+# TESTING
+# ============================================
+coverage/
+.nyc_output/
+htmlcov/
+.pytest_cache/
+.coverage
+*.cover
+.hypothesis/
+junit.xml
+test-results/
+
+# ============================================
+# DATABASES
+# ============================================
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+*.mdb
+
+# PostgreSQL
+*.pgdump
+*.dump
+
+# ============================================
+# LOGS
+# ============================================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# ============================================
+# TEMPORALES Y CACHÉ
+# ============================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.cache/
+.temp/
+tmp/
+
+# ============================================
+# IDEs Y EDITORES
+# ============================================
+
+# VSCode
+.vscode/
+*.code-workspace
+.history/
+
+# JetBrains (IntelliJ, PyCharm, WebStorm, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# SISTEMA OPERATIVO
+# ============================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+.nfs*
+
+# ============================================
+# DOCKER
+# ============================================
+*.tar
+*.tar.gz
+
+# ============================================
+# VARIOS
+# ============================================
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Backups
+*.bak
+*.backup
+*.old
+
+# ============================================
+# EXCEPCIONES (Archivos que SÍ deben incluirse)
+# ============================================
+!.gitkeep
+!.gitignore
+!.editorconfig
+!.prettierrc
+!.eslintrc.json
