@@ -38,6 +38,40 @@
 - [ ] Documentation completa
 - [ ] Deployment automation
 
+## Programa de endurecimiento post auditoría (commit 7f0912b)
+
+El commit `7f0912b` incorporó mejoras generales de documentación y guías contextuales. A partir de esa base debemos ejecutar un plan ligero que mantenga el carácter de **starkit agnóstico** del repositorio mientras resolvemos las observaciones de la auditoría más reciente. El objetivo no es completar funcionalidades, sino dejar instrucciones claras para que el consumidor del kit pueda hacerlo.
+
+### Fase 1 – Fundamentos del esqueleto
+
+1. ✅ Documentar en README/dev-docs qué responsabilidades recaen en el consumidor (entrypoint, importación de `crypto`, implementación real de hashing, etc.). → ver `README.md#🧭-post-clone-checklist` y `dev-docs/consumer-checklist.md`.
+2. ✅ Añadir checklist post-clonado que recuerde revisar dependencias implícitas y definir servicios concretos. → `dev-docs/consumer-checklist.md` sirve como lista marcable.
+3. ✅ Señalar explícitamente que las clases actuales son ejemplos ilustrativos y deben ser extendidas o reemplazadas. → se advierte en el README y en la checklist.
+
+### Fase 2 – Tooling mínimo y scripts
+
+1. Ajustar `package.json` para que los comandos apunten a placeholders (`<project-entrypoint>`), evitando rutas inexistentes.
+2. Proveer instrucciones para conectar linting/formatting y `lint-staged` a los lenguajes que el usuario habilite.
+3. Decidir si los tests Bash/Python permanecen como ejemplo y documentar cómo activarlos.
+
+### Fase 3 – Plantillas de dominio y eventos
+
+1. Extraer constantes (regex, listas) fuera de los value objects para mostrar buenas prácticas sin agregar dependencias.
+2. Documentar dónde se espera integrar un dispatcher de eventos o servicios de infraestructura reales.
+3. Mantener los ejemplos simples, aclarando que el agregado no cubre todos los casos productivos.
+
+### Fase 4 – Pruebas orientativas
+
+1. Reemplazar suites excesivamente largas por ejemplos parametrizados que ilustren la intención.
+2. Corregir ejemplos asíncronos para que Jest (u otros runners) demuestren buenas prácticas.
+3. Explicar cómo ejecutar o descartar la suite Python según el stack elegido.
+
+### Fase 5 – Validación posterior
+
+1. Crear checklist para que, tras personalizar el starkit, se ejecuten `lint`, `test` y validaciones de arquitectura.
+2. Añadir preguntas guía para verificar que se cubrieron importaciones, servicios y hooks.
+3. Registrar en `dev-docs/task.md` los artefactos que cada usuario debe actualizar cuando aterriza el kit.
+
 ## Hitos
 
 | Hito | Fecha Objetivo | Estado | Notas |
