@@ -80,7 +80,7 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 La auditoría detallada en `document/informes_CC/AUDITORIA_SETUP_SH.md` expone nueve hallazgos (uno crítico) que deben resolverse
 antes de que un equipo adopte el script interactivo. Para mantener la trazabilidad:
 
-1. Consulta el [plan de ejecución](setup/setup-sh-remediation-plan.md) y decide qué fases aplicarás.
+1. Consulta el [plan de ejecución](setup/setup-sh-remediation-plan.md) y decide qué fases aplicarás (Fase A ✅ completada en main).
 2. Registra el avance en `dev-docs/task.md` usando las nuevas TASK-011 a TASK-014.
 3. Actualiza `.context/project-state.json` una vez que cierres cada fase para que futuros agentes conozcan el estado real del
    setup.

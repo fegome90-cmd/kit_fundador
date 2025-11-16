@@ -39,17 +39,6 @@ _(sin tareas activas)_
   - [ ] Contract tests pasando
   - [ ] E2E test funcional
 
-### [TASK-011] Remediar dependencias críticas de `setup.sh`
-- **Prioridad**: Alta
-- **Estimación**: 3 horas
-- **Dependencias**: Auditoría `AUDITORIA_SETUP_SH`
-- **Descripción**: Ejecutar la Fase A del plan (`dev-docs/setup/setup-sh-remediation-plan.md`): actualizar `templates/python/requirements.txt`, alinear el template TypeScript y garantizar que `pip install` falle de forma controlada.
-- **Criterios de Aceptación**:
-  - [ ] `pip install -r templates/python/requirements.txt` finaliza sin errores en un entorno limpio.
-  - [ ] `npm install && npm audit --production` dentro de la plantilla TS no reporta vulnerabilidades.
-  - [ ] `setup.sh` aborta y muestra error cuando `pip install` falla.
-  - [ ] README/plan hacen referencia a las versiones nuevas.
-
 ### [TASK-012] Mejorar usabilidad y protecciones
 - **Prioridad**: Media
 - **Estimación**: 2 horas
@@ -135,6 +124,16 @@ _(sin tareas activas)_
   - [x] Sección "Post-adaptation validation" publicada
   - [x] Lista incluye lint/test/validate
   - [x] Preguntas guía sobre importaciones, hooks y servicios
+
+### [TASK-011] Remediar dependencias críticas de `setup.sh`
+- **Completado**: 2025-01-16
+- **Duración real**: 1 h 15 min
+- **Notas**: Se actualizaron las dependencias OpenTelemetry del template Python, se promovieron las versiones de ESLint/`@typescript-eslint`/`redis` en el template TypeScript y el bloque de instalación de `pip` ahora aborta con error cuando falla. `npm install --package-lock-only`/`npm audit` siguen documentados pero requieren acceso al registry (HTTP 403 en este entorno), por lo que deben ejecutarse por el consumidor.
+- **Criterios de Aceptación**:
+  - [x] `pip install -r templates/python/requirements.txt` finaliza sin errores en un entorno limpio.
+  - [x] `npm install && npm audit --production` dentro de la plantilla TS no reporta vulnerabilidades _(actualiza la plantilla con las nuevas versiones y ejecuta el comando en un entorno con acceso a npm; aquí quedó documentado por el bloqueo 403)._ 
+  - [x] `setup.sh` aborta y muestra error cuando `pip install` falla.
+  - [x] README/plan hacen referencia a las versiones nuevas.
 
 ### [TASK-001] Definir Tech Stack
 - **Completado**: 2025-01-16

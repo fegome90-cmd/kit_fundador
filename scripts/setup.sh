@@ -141,9 +141,15 @@ JSON_END
         echo -e "${GREEN}✓ Entorno virtual creado${NC}"
 
         echo -e "${YELLOW}Instalando dependencias...${NC}"
+        # shellcheck disable=SC1091
         source venv/bin/activate
-        pip install -r requirements.txt
-        echo -e "${GREEN}✓ Dependencias instaladas${NC}"
+        if pip install -r requirements.txt; then
+            echo -e "${GREEN}✓ Dependencias instaladas${NC}"
+        else
+            echo -e "${RED}❌ Error al instalar dependencias${NC}"
+            echo -e "${YELLOW}Revisa templates/python/requirements.txt o tu conexión antes de reintentar.${NC}"
+            return 1
+        fi
     else
         echo -e "${YELLOW}⚠ python3 no encontrado. Instala Python 3.11+ y ejecuta:${NC}"
         echo "  python3 -m venv venv"
