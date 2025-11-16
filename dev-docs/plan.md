@@ -130,3 +130,149 @@ antes de que un equipo adopte el script interactivo. Para mantener la trazabilid
 - **Bien**: Setup automatizado funciona perfecto
 - **Mal**: [Pendiente]
 - **Mejoras**: [Pendiente]
+
+---
+
+## 📝 Workflow con Templates de Prompts
+
+El proyecto incluye **19 templates estructurados** para diferentes tipos de tareas en [`dev-docs/prompt_example/`](./prompt_example/). Estos templates ayudan a mantener consistencia y calidad al trabajar con agentes IA o al documentar tareas manuales.
+
+### Catálogo de Templates
+
+#### Templates de Implementación (1-5)
+
+| Template | Archivo | Uso Recomendado | Duración Típica |
+|----------|---------|-----------------|-----------------|
+| **1. Implementación Grande** | `prompt_template_1_large_implementation.md` | Sprints completos, arquitecturas complejas | > 5 días |
+| **2. Feature Mediana** | `prompt_template_2_medium_feature.md` | Funcionalidades de tamaño medio | 2-5 días |
+| **3. Bug Fix** | `prompt_template_3_bug_fix.md` | Corrección de bugs, RCA | < 1 día |
+| **4. Refactoring** | `prompt_template_4_refactoring.md` | Reducción de deuda técnica | 1-3 días |
+| **5. Daily Task** | `prompt_template_5_daily_task.md` | Tareas triviales y rápidas | < 2 horas |
+
+#### Templates de Auditoría (6, 8-11)
+
+| Template | Archivo | Uso Recomendado | Duración Típica |
+|----------|---------|-----------------|-----------------|
+| **6. Auditoría General** | `template_6_general_audit.md` | Gate de calidad (4 dimensiones) | Variable |
+| **8. Auditoría de Seguridad** | `template_8_security_audit.md` | OWASP, vulnerabilidades, secretos | 1-3 días |
+| **9. Auditoría de Performance** | `template_9_performance_audit.md` | Latencia, carga, bottlenecks | 1-3 días |
+| **10. Auditoría de Calidad de Código** | `template_10_code_quality_audit.md` | Deuda técnica, code smells | 1-2 días |
+| **11. Auditoría de UI/UX** | `template_11_ui_ux_audit.md` | Accesibilidad WCAG, usabilidad | 1-2 días |
+
+#### Template de Handoff (7)
+
+| Template | Archivo | Uso Recomendado | Duración Típica |
+|----------|---------|-----------------|-----------------|
+| **7. Handoff** | `template_7_general_handoff.md` | Traspasos entre equipos/agentes | Variable |
+
+#### Templates de Investigación y Planificación (12-14)
+
+| Template | Archivo | Uso Recomendado | Duración Típica |
+|----------|---------|-----------------|-----------------|
+| **12. Investigación Técnica** | `template_12_technical_research.md` | Análisis de alternativas, PoC, comparativas | Variable |
+| **13. Planificación de Infraestructura** | `template_13_infrastructure_plan.md` | CI/CD, DevOps, IaC | 2-5 días |
+| **14. Architecture Decision Record** | `template_14_architecture_decision_record.md` | Documentar decisiones de arquitectura | < 1 día |
+
+#### Templates de Testing (15-19)
+
+| Template | Archivo | Uso Recomendado | Duración Típica |
+|----------|---------|-----------------|-----------------|
+| **15. Plan de Pruebas General** | `template_15_testing_plan.md` | Estrategia de testing completa (TDD/BDD, unitarias, E2E) | 1-3 días |
+| **16. Plan de Pruebas Unitarias** | `template_16_unit_testing_plan.md` | Pruebas de funciones/métodos/componentes aislados | < 1 día |
+| **17. Plan de Pruebas de Integración** | `template_17_integration_testing_plan.md` | Integración entre módulos, servicios, capas | 1-2 días |
+| **18. Plan de Pruebas E2E** | `template_18_e2e_testing_plan.md` | Flujos completos de usuario en entorno integrado | 1-3 días |
+| **19. Estrategia TDD/BDD** | `template_19_tdd_bdd_strategy.md` | Desarrollo guiado por pruebas | Variable |
+
+### Integración con Agent Profiles
+
+Los templates se integran con los perfiles de agente documentados en [`dev-docs/agent-profiles/`](./agent-profiles/):
+
+- **EJECUTOR** → Usa templates 1-5, 12-19 para planificar, implementar, investigar, documentar y testing
+- **VALIDADOR** → Usa templates 6, 8-11 para auditorías (general y especializadas)
+- **HANDOFF** → Usa template 7 para traspasos de contexto
+
+Ver guía completa de integración en: [`dev-docs/agent-profiles/PROMPTS.md`](./agent-profiles/PROMPTS.md#-integración-con-templates-de-prompts-estructurados)
+
+### Guía de Decisión Rápida
+
+**¿Qué template usar?**
+
+**Implementación:**
+- Nueva feature grande (> 5 días) → **Template 1**
+- Nueva feature mediana (2-5 días) → **Template 2**
+- Bug fix → **Template 3**
+- Refactorización → **Template 4**
+- Tarea rápida (< 2 horas) → **Template 5**
+
+**Auditoría:**
+- Gate de calidad general → **Template 6**
+- Seguridad (OWASP, vulnerabilidades) → **Template 8**
+- Performance (latencia, carga) → **Template 9**
+- Calidad de código (deuda técnica) → **Template 10**
+- UI/UX (accesibilidad WCAG) → **Template 11**
+
+**Investigación y Planificación:**
+- Investigación técnica/comparativa → **Template 12**
+- Planificación de infraestructura (CI/CD, DevOps) → **Template 13**
+- Documentar decisión de arquitectura (ADR) → **Template 14**
+
+**Testing:**
+- Plan de pruebas general (estrategia completa) → **Template 15**
+- Pruebas unitarias (funciones/componentes) → **Template 16**
+- Pruebas de integración (módulos/servicios) → **Template 17**
+- Pruebas E2E (flujos de usuario) → **Template 18**
+- Estrategia TDD/BDD (desarrollo guiado por tests) → **Template 19**
+
+**Handoff:**
+- Traspaso de contexto → **Template 7**
+
+Ver guía completa: [`dev-docs/prompt_example/QUICK_REFERENCE.md`](./prompt_example/QUICK_REFERENCE.md)
+
+### Workflow Recomendado para Tareas
+
+```
+1. Seleccionar template según tipo y duración de tarea
+                    ↓
+2. Activar agente EJECUTOR + Rellenar template
+                    ↓
+3. Implementar siguiendo plan (TDD, commits frecuentes)
+                    ↓
+4. Activar agente VALIDADOR + Usar template 6 (Audit)
+                    ↓
+5. ¿Gate PASS? → Template 7 (Handoff) → Siguiente tarea
+   ¿Gate FAIL? → Volver a EJECUTOR para remediar issues
+```
+
+### Ejemplo de Uso: Implementar Feature Mediana
+
+```markdown
+# Paso 1: Planificación con Template 2
+Modo EJECUTOR.
+Template: dev-docs/prompt_example/prompt_template_2_medium_feature.md
+Task: TASK-004 - Implementar primer use case
+
+[Rellenar template con objetivos SMART, plan día a día, criterios de aceptación]
+
+# Paso 2: Desarrollo
+[Seguir plan del template con TDD]
+
+# Paso 3: Auditoría con Template 6
+Modo VALIDADOR.
+Template: dev-docs/prompt_example/template_6_general_audit.md
+
+Evaluar en 4 dimensiones:
+- Completitud (30%)
+- Calidad (30%)
+- Impacto (25%)
+- Sostenibilidad (15%)
+
+# Paso 4: Handoff si aprueba
+Template: dev-docs/prompt_example/template_7_general_handoff.md
+[Documentar tareas completadas, artefactos, issues pendientes]
+```
+
+### Documentación Completa
+
+- **README de Templates**: [`dev-docs/prompt_example/README.md`](./prompt_example/README.md)
+- **Guía Rápida**: [`dev-docs/prompt_example/QUICK_REFERENCE.md`](./prompt_example/QUICK_REFERENCE.md)
+- **Integración con Agentes**: [`dev-docs/agent-profiles/PROMPTS.md`](./agent-profiles/PROMPTS.md)
