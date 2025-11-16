@@ -144,4 +144,93 @@ describe('User Entity', () => {
       expect(user.isAdmin()).toBe(false);
     });
   });
+
+  describe('changePassword', () => {
+    it('should change password successfully', () => {
+      const user = User.create({
+        email: Email.create('test@example.com'),
+        name: 'Test User',
+        password: Password.create('OldPass123!'),
+      });
+      
+      const newPassword = Password.create('NewPass456!');
+      user.changePassword(newPassword);
+      
+      expect(user.updatedAt).toBeDefined();
+    });
+
+    it('should update updatedAt timestamp', () => {
+      const user = User.create({
+        email: Email.create('test@example.com'),
+        name: 'Test User',
+        password: Password.create('Pass123!'),
+      });
+      
+      const oldUpdatedAt = user.updatedAt;
+      
+      // Small delay to ensure timestamp difference
+      setTimeout(() => {
+        user.changePassword(Password.create('NewPass123!'));
+        expect(user.updatedAt.getTime()).toBeGreaterThan(oldUpdatedAt.getTime());
+      }, 10);
+    });
+  });
+
+  describe('fromPersistence', () => {
+    it('should reconstitute user from persistence', () => {
+      const email = Email.create('persisted@example.com');
+      const password = Password.create('Pass123!');
+      const now = new Date();
+      
+      const user = User.fromPersistence({
+        id: 'test-id-123',
+        email,
+        name: 'Persisted User',
+        password,
+        role: 'admin',
+        emailVerified: true,
+        createdAt: now,
+        updatedAt: now,
+      });
+      
+      expect(user.id).toBe('test-id-123');
+      expect(user.emailVerified).toBe(true);
+      expect(user.role).toBe('admin');
+    });
+  });
+
+  describe('toJSON', () => {
+    it('should serialize to JSON without password', () => {
+      const user = User.create({
+        email: Email.create('json@example.com'),
+        name: 'JSON User',
+        password: Password.create('Pass123!'),
+        role: 'user',
+      });
+      
+      const json = user.toJSON();
+      
+      expect(json).toHaveProperty('id');
+      expect(json).toHaveProperty('email', 'json@example.com');
+      expect(json).toHaveProperty('name', 'JSON User');
+      expect(json).toHaveProperty('role', 'user');
+      expect(json).not.toHaveProperty('password');
+    });
+  });
+
+  describe('domain events', () => {
+    it('should clear domain events', () => {
+      const user = User.create({
+        email: Email.create('test@example.com'),
+        name: 'Test User',
+        password: Password.create('Pass123!'),
+      });
+      
+      expect(user.getDomainEvents().length).toBeGreaterThan(0);
+      
+      user.clearDomainEvents();
+      
+      expect(user.getDomainEvents()).toHaveLength(0);
+    });
+  });
 });

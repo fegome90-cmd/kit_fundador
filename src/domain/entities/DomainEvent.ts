@@ -1,0 +1,15 @@
+/**
+ * Base class for Domain Events
+ */
+
+export abstract class DomainEvent {
+  public readonly occurredAt: Date;
+  public readonly eventId: string;
+
+  constructor() {
+    this.occurredAt = new Date();
+    this.eventId = crypto.randomUUID();
+  }
+
+  abstract get eventType(): string;
+}
