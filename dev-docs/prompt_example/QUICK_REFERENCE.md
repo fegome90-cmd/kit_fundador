@@ -47,6 +47,18 @@
 │  │  └─ UI/UX (accesibilidad, WCAG)  │
 │  │     └─► Template 11: UI/UX       │
 │  │                                   │
+├─ INVESTIGAR antes de decidir         │
+│  └─► Template 12: Technical Research│
+│                                      │
+├─ PLANIFICAR infraestructura          │
+│  └─► Template 13: Infrastructure    │
+│                                      │
+├─ DOCUMENTAR decisión de arquitectura │
+│  └─► Template 14: ADR                │
+│                                      │
+├─ PLANIFICAR estrategia de testing    │
+│  └─► Template 15: Testing Plan      │
+│                                      │
 └─ TRASPASAR contexto a otro agente    │
    └─► Template 7: Handoff             │
 ```
@@ -68,6 +80,10 @@
 | **9: Performance Audit** | 1-3 días | N/A | Latencia, carga, bottlenecks, optimización | Sí (KPIs) |
 | **10: Code Quality Audit** | 1-2 días | N/A | Deuda técnica, code smells, refactorización | Sí (Índice) |
 | **11: UI/UX Audit** | 1-2 días | N/A | Accesibilidad WCAG, usabilidad, consistencia | Sí (WCAG) |
+| **12: Technical Research** | Variable | Media | Investigación técnica, análisis de alternativas, PoC | No |
+| **13: Infrastructure Plan** | 2-5 días | Alta | CI/CD, DevOps, planificación de infraestructura | No |
+| **14: ADR** | < 1 día | Baja | Documentar decisiones de arquitectura | No |
+| **15: Testing Plan** | 1-3 días | Media | Estrategia de testing (TDD/BDD, unitarias, E2E) | No |
 
 ---
 
@@ -116,6 +132,23 @@
 |-------------|----------|
 | "Documentar estado actual antes de cambiar de agente/chat" | 7: Handoff |
 | "Traspasar contexto del backend al frontend team" | 7: Handoff |
+
+### 🔬 Investigación y Planificación
+
+| Descripción | Template |
+|-------------|----------|
+| "Investigar librerías de estado para React (Redux vs Zustand vs Jotai)" | 12: Technical Research |
+| "Analizar viabilidad de migrar a microservicios" | 12: Technical Research |
+| "Comparar proveedores cloud (AWS vs GCP vs Azure)" | 12: Technical Research |
+| "Configurar pipeline de CI/CD para el servicio api-gateway" | 13: Infrastructure Plan |
+| "Crear entorno de staging en AWS con Terraform" | 13: Infrastructure Plan |
+| "Implementar monitoreo con Prometheus y Grafana" | 13: Infrastructure Plan |
+| "Documentar decisión de usar WebSockets en lugar de polling" | 14: ADR |
+| "Registrar elección de Auth0 como proveedor de identidad" | 14: ADR |
+| "ADR sobre migración de monolito a microservicios" | 14: ADR |
+| "Plan de pruebas para funcionalidad de exportación a PDF" | 15: Testing Plan |
+| "Estrategia de testing para migración a React 19" | 15: Testing Plan |
+| "Definir casos de prueba E2E para flujo de checkout" | 15: Testing Plan |
 
 ---
 
@@ -263,6 +296,10 @@ Template 5 (Daily Task) → Cambio → Merge
 - Auditoría de performance → 9
 - Auditoría de calidad de código → 10
 - Auditoría de UI/UX → 11
+- Investigar/comparar tecnologías → 12
+- Planificar infraestructura → 13
+- Documentar decisión (ADR) → 14
+- Planificar testing → 15
 
 **"¿Cuánto tiempo?"**
 - < 2h → 5

@@ -1,6 +1,6 @@
 # 📝 Catálogo de Templates de Prompts
 
-Esta carpeta contiene **11 templates de prompts estructurados** para diferentes tipos de tareas de desarrollo. Estos templates ayudan a mantener consistencia, claridad y trazabilidad en el trabajo con agentes IA o en documentación de tareas.
+Esta carpeta contiene **15 templates de prompts estructurados** para diferentes tipos de tareas de desarrollo. Estos templates ayudan a mantener consistencia, claridad y trazabilidad en el trabajo con agentes IA o en documentación de tareas.
 
 ## 🎯 Propósito
 
@@ -237,6 +237,92 @@ Los templates sirven para:
 
 ---
 
+### 12. Investigación Técnica - `template_12_technical_research.md`
+
+**Cuándo usar**: Investigación de tecnologías, análisis de alternativas, decisiones técnicas
+
+**Características**:
+- Planteamiento del problema y objetivos SMART
+- Metodología de investigación (fuentes, criterios de evaluación)
+- Plan de trabajo con timeline
+- Desarrollo de PoC (Proof of Concept)
+- Tabla comparativa detallada
+- Informe final de investigación y recomendación
+- Análisis de riesgos de las alternativas
+
+**Ejemplo de uso**:
+```markdown
+"Investigar librerías de estado para React (Redux vs Zustand vs Jotai)"
+"Analizar viabilidad de migrar a microservicios"
+"Comparar proveedores cloud (AWS vs GCP vs Azure) para el proyecto"
+```
+
+---
+
+### 13. Planificación de Infraestructura - `template_13_infrastructure_plan.md`
+
+**Cuándo usar**: Configuración de infraestructura, CI/CD, DevOps
+
+**Características**:
+- Objetivos y contexto (negocio y técnico)
+- Arquitectura de la solución (diagrama, componentes, tecnologías)
+- Plan de implementación detallado por fases
+- Criterios de aceptación (Definition of Done)
+- Estrategia de rollback
+- Análisis de riesgos y consideraciones de costo
+
+**Ejemplo de uso**:
+```markdown
+"Configurar pipeline de CI/CD para el servicio api-gateway"
+"Crear entorno de staging en AWS con Terraform"
+"Implementar monitoreo con Prometheus y Grafana"
+```
+
+---
+
+### 14. Architecture Decision Record (ADR) - `template_14_architecture_decision_record.md`
+
+**Cuándo usar**: Documentar decisiones de arquitectura importantes
+
+**Características**:
+- Contexto (problema y fuerzas en juego)
+- Decisión tomada (clara y sin ambigüedades)
+- Justificación (por qué se tomó esta decisión)
+- Consecuencias (positivas y negativas)
+- Alternativas consideradas y por qué fueron rechazadas
+- Status (Propuesto/Aceptado/Rechazado/Deprecado)
+
+**Ejemplo de uso**:
+```markdown
+"Documentar decisión de usar WebSockets en lugar de polling"
+"Registrar elección de Auth0 como proveedor de identidad"
+"ADR sobre migración de monolito a microservicios"
+```
+
+---
+
+### 15. Plan de Pruebas - `template_15_testing_plan.md`
+
+**Cuándo usar**: Planificación de estrategia de testing completa
+
+**Características**:
+- Objetivo y alcance de las pruebas (in/out of scope)
+- Estrategia TDD/BDD con casos Given-When-Then
+- Pruebas unitarias (componentes/funciones aisladas)
+- Pruebas de integración (colaboración entre módulos)
+- Pruebas E2E (flujos de usuario completos)
+- Criterios de entrada y salida
+- Herramientas y frameworks
+
+**Ejemplo de uso**:
+```markdown
+"Plan de pruebas para funcionalidad de exportación a PDF"
+"Estrategia de testing para migración a nueva versión de React"
+"Definir casos de prueba para flujo de checkout"
+```
+
+---
+
 ## 🔄 Flujo de Trabajo Recomendado
 
 ### Para Implementaciones Grandes
@@ -283,16 +369,22 @@ Estos templates se integran con los perfiles de agente existentes en `dev-docs/a
 
 | Agent Profile | Templates Recomendados |
 |---------------|------------------------|
-| **EJECUTOR** | Templates 1-5 (planificación e implementación) |
-| **VALIDADOR** | Templates 6-11 (auditorías general y especializadas) |
+| **EJECUTOR** | Templates 1-5, 12-15 (implementación, investigación, planificación, testing) |
+| **VALIDADOR** | Templates 6, 8-11 (auditorías general y especializadas) |
 | **HANDOFF** | Template 7 (traspaso) |
 
-**Auditorías Especializadas por Tipo:**
+**Auditorías Especializadas (Templates 6, 8-11):**
 - **Template 6**: Auditoría General (4 dimensiones: completitud, calidad, impacto, sostenibilidad)
 - **Template 8**: Auditoría de Seguridad (OWASP, dependencias, secretos)
 - **Template 9**: Auditoría de Performance (latencia, carga, bottlenecks)
 - **Template 10**: Auditoría de Calidad de Código (deuda técnica, code smells)
 - **Template 11**: Auditoría de UI/UX (accesibilidad WCAG, usabilidad)
+
+**Planificación y Documentación (Templates 12-15):**
+- **Template 12**: Investigación Técnica (análisis de alternativas, PoC, comparativas)
+- **Template 13**: Planificación de Infraestructura (CI/CD, DevOps, IaC)
+- **Template 14**: Architecture Decision Record (ADR - documentar decisiones)
+- **Template 15**: Plan de Pruebas (estrategia TDD/BDD, unitarias, integración, E2E)
 
 Ver: [`dev-docs/agent-profiles/README.md`](../agent-profiles/README.md)
 

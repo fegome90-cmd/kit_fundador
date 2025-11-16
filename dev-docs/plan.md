@@ -136,7 +136,7 @@ antes de que un equipo adopte el script interactivo. Para mantener la trazabilid
 
 ## 📝 Workflow con Templates de Prompts
 
-El proyecto incluye **11 templates estructurados** para diferentes tipos de tareas en [`dev-docs/prompt_example/`](./prompt_example/). Estos templates ayudan a mantener consistencia y calidad al trabajar con agentes IA o al documentar tareas manuales.
+El proyecto incluye **15 templates estructurados** para diferentes tipos de tareas en [`dev-docs/prompt_example/`](./prompt_example/). Estos templates ayudan a mantener consistencia y calidad al trabajar con agentes IA o al documentar tareas manuales.
 
 ### Catálogo de Templates
 
@@ -166,11 +166,20 @@ El proyecto incluye **11 templates estructurados** para diferentes tipos de tare
 |----------|---------|-----------------|-----------------|
 | **7. Handoff** | `template_7_general_handoff.md` | Traspasos entre equipos/agentes | Variable |
 
+#### Templates de Investigación y Planificación (12-15)
+
+| Template | Archivo | Uso Recomendado | Duración Típica |
+|----------|---------|-----------------|-----------------|
+| **12. Investigación Técnica** | `template_12_technical_research.md` | Análisis de alternativas, PoC, comparativas | Variable |
+| **13. Planificación de Infraestructura** | `template_13_infrastructure_plan.md` | CI/CD, DevOps, IaC | 2-5 días |
+| **14. Architecture Decision Record** | `template_14_architecture_decision_record.md` | Documentar decisiones de arquitectura | < 1 día |
+| **15. Plan de Pruebas** | `template_15_testing_plan.md` | Estrategia de testing (TDD/BDD, E2E) | 1-3 días |
+
 ### Integración con Agent Profiles
 
 Los templates se integran con los perfiles de agente documentados en [`dev-docs/agent-profiles/`](./agent-profiles/):
 
-- **EJECUTOR** → Usa templates 1-5 para planificar e implementar
+- **EJECUTOR** → Usa templates 1-5, 12-15 para planificar, implementar, investigar y documentar
 - **VALIDADOR** → Usa templates 6, 8-11 para auditorías (general y especializadas)
 - **HANDOFF** → Usa template 7 para traspasos de contexto
 
@@ -193,6 +202,12 @@ Ver guía completa de integración en: [`dev-docs/agent-profiles/PROMPTS.md`](./
 - Performance (latencia, carga) → **Template 9**
 - Calidad de código (deuda técnica) → **Template 10**
 - UI/UX (accesibilidad WCAG) → **Template 11**
+
+**Investigación y Planificación:**
+- Investigación técnica/comparativa → **Template 12**
+- Planificación de infraestructura (CI/CD, DevOps) → **Template 13**
+- Documentar decisión de arquitectura (ADR) → **Template 14**
+- Plan de pruebas (Testing strategy) → **Template 15**
 
 **Handoff:**
 - Traspaso de contexto → **Template 7**
