@@ -39,22 +39,21 @@
         "status": "in_progress",
         "remediation_plan": "dev-docs/setup/setup-sh-remediation-plan.md",
         "tasks": [
-          "TASK-013",
-          "TASK-014"
+          "TASK-015"
         ],
-        "notes": "Fases A y B completadas; resta aplicar la Fase C (hardening/automatización)."
+        "notes": "Fases A y B completadas; C3.1 (harness) y C3.3 (utc_timestamp + warning docker-compose) ya están en main. La única mejora abierta es la observabilidad opcional (C3.2/TASK-015)."
       }
     ]
   },
   "ai_context": {
-    "last_session_summary": "La Fase B del plan de remediación de setup.sh quedó aplicada (prerequisitos obligatorios, confirmaciones de sobrescritura, prompt para templates y flag --force).",
+    "last_session_summary": "El setup interactivo ahora incluye el harness Bash oficial, `utc_timestamp` con fallback y la advertencia cuando falta docker-compose.dev.yml; solo la observabilidad (--verbose/--no-color) quedó como mejora opt-in (TASK-015).",
     "next_recommended_tasks": [
-      "TASK-013",
-      "TASK-014",
-      "TASK-003"
+      "TASK-015",
+      "TASK-003",
+      "TASK-004"
     ],
     "areas_needing_attention": [
-      "Implementar la Fase C (hardening/flags/tests) del setup",
+      "Decidir si se implementa la observabilidad opcional del setup (TASK-015)",
       "Documentar el cierre de la remediación",
       "Retomar base de datos y primer use case"
     ],
@@ -74,6 +73,16 @@
           "document/informes_CC/AUDITORIA_SETUP_SH.md",
           "dev-docs/setup/setup-sh-remediation-plan.md",
           "dev-docs/plan.md"
+        ]
+      },
+      {
+        "id": "DEC-2025-01-16-SETUP-PHASE-C",
+        "summary": "Se completaron C3.1/C3.3 del setup.sh (harness + utc_timestamp/warnings) y se documentó que C3.2 queda como opt-in.",
+        "references": [
+          "scripts/setup.sh",
+          "tests/setup/setup_script.test.sh",
+          "dev-docs/setup/setup-sh-remediation-plan.md",
+          "dev-docs/setup/setup-sh-remediation-report.md"
         ]
       }
     ]

@@ -38,8 +38,15 @@ las herramientas que elijas. Usa esta guía como referencia al actualizar `packa
 
 ## 3. Suites de pruebas opcionales
 
-Además de Jest, el repositorio contiene ejemplos de pruebas en otros lenguajes que **no están conectados a los scripts por
-defecto**:
+Además de Jest, el repositorio contiene ejemplos de pruebas en otros lenguajes que **no están conectados a los scripts por defecto**:
+
+- `tests/setup/setup_script.test.sh`: harness oficial de `scripts/setup.sh`. Ejecuta las tres opciones del menú dentro de directorios temporales y valida `.context/project-state.json`. Comandos sugeridos:
+  ```bash
+  npm run test:setup
+  # o
+  make test:setup
+  ```
+  El harness exporta `SETUP_SH_SKIP_INSTALLS=true` para omitir `npm install`/`pip install` cuando solo quieres validar la copia de plantillas.
 
 - `tests/integration/test_setup_script.sh`: script Bash que valida la presencia de plantillas. Para ejecutarlo manualmente:
   ```bash
@@ -52,11 +59,9 @@ defecto**:
   pip install -r requirements.txt  # define tus dependencias
   pytest tests/unit/python
   ```
-  Si adoptas Pytest como runner principal, añade un script (`"test:py": "pytest tests/unit/python"`) o ejecútalo desde tu
-  `Makefile`.
+  Si adoptas Pytest como runner principal, añade un script (`"test:py": "pytest tests/unit/python"`) o ejecútalo desde tu `Makefile`.
 
-Aclara en tu documentación interna cuáles de estas suites forman parte del pipeline oficial. Si decides eliminarlas, bórralas o
-muévelas a `templates/` para evitar confusiones.
+Aclara en tu documentación interna cuáles de estas suites forman parte del pipeline oficial. Si decides eliminarlas, bórralas o muévelas a `templates/` para evitar confusiones.
 
 ## 4. Hooks y automatización
 
@@ -78,3 +83,4 @@ stack.
 
 - Usa `./scripts/setup.sh --force` únicamente en pipelines automatizados o cuando estés seguro de que quieres sobrescribir archivos sin confirmación y continuar a pesar de prerequisitos faltantes.
 - Al finalizar, el script pregunta si deseas conservar `templates/`, moverlos a `.templates/` o eliminarlos. Documenta tu elección en `dev-docs/context.md` si cambias el flujo estándar.
+- Define `SETUP_SH_SKIP_INSTALLS=true` cuando ejecutes el script/harness en entornos sin acceso a npm o PyPI; la copia de plantillas y actualización de `.context/` se ejecutará igual, pero se omitirá `npm install`/`pip install`.

@@ -35,6 +35,24 @@
         "dev-docs/setup/setup-sh-remediation-plan.md",
         "dev-docs/tooling-guide.md#5-script-interactivo-scriptssetupsh"
       ]
+    },
+    {
+      "id": "DEC-2025-01-16-SETUP-PHASE-C",
+      "title": "Completar C3.1/C3.3 del setup y diferir C3.2",
+      "date": "2025-01-16",
+      "context": "La auditoría pedía test harness, integridad de contextos y observabilidad; se priorizaron los dos primeros para mantener el starkit simple.",
+      "decision": "Agregar harness Bash + helper utc_timestamp/warning docker-compose y documentar que las banderas --verbose/--no-color quedan como mejora opt-in (TASK-015).",
+      "consequences": [
+        "scripts/setup.sh se valida automáticamente y produce JSON consistente",
+        "README/tooling guide/post-adaptation checklist documentan npm run test:setup y SETUP_SH_SKIP_INSTALLS",
+        "Observabilidad se traslada al backlog opcional (TASK-015)"
+      ],
+      "references": [
+        "scripts/setup.sh",
+        "tests/setup/setup_script.test.sh",
+        "dev-docs/setup/setup-sh-remediation-plan.md",
+        "dev-docs/setup/setup-sh-remediation-report.md"
+      ]
     }
   ]
 }

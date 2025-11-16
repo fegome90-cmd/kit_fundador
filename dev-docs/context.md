@@ -23,6 +23,12 @@ Proveer un **starkit de Identity & Access** que incluya ejemplos autocontenidos 
 - Observabilidad & Deploy: PostgreSQL 16 + Prisma, Redis 7, Prometheus/Jaeger/OpenTelemetry, GitHub Actions → GHCR → Kubernetes.
 - Fuente de verdad: `config/tech-stack.json` y `dev-docs/tech-stack-decisions.md`.
 
+## Estado del setup interactivo
+- Fases A/B completadas (dependencias auditadas, prerequisitos, confirmación/`--force`, prompt para `templates/`).
+- C3.1 (harness Bash + `npm run test:setup`/`make test:setup`) y C3.3 (`utc_timestamp`, serialización via Python, `warn_missing_compose_file`) ya viven en `main`.
+- La observabilidad mínima (C3.2) quedó registrada como opt-in en `TASK-015`; sólo se implementará si el consumidor lo solicita.
+- Usa `SETUP_SH_SKIP_INSTALLS=true` en CI o en el harness cuando quieras validar el flujo sin acceder a npm/PyPI.
+
 ## Arquitectura
 
 ```

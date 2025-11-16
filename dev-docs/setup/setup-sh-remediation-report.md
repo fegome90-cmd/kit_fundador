@@ -12,53 +12,28 @@ Este informe resume los hallazgos del documento `document/informes_CC/AUDITORIA_
 | #4 | 🟡 Medio | Mensajes de éxito engañosos en ruta Python al fallar `pip install`. | ✅ Corregido en Fase A (abortos explícitos y logs). |
 | #5 | 🔵 Bajo | Falta de flujo para eliminar/mover `templates/`. | ✅ Corregido en Fase B (prompt de conservación/movido/eliminación). |
 | #6 | 🔵 Bajo | Sin validación previa de prerequisitos por modo. | ✅ Corregido en Fase B (validator reutilizable). |
-| #7 | 🔵 Bajo | No hay test harness automatizado para `setup.sh`. | ⏳ Pendiente (Fase C – TASK-013). |
-| #8 | 🔵 Bajo | Dependencia implícita de `date -u`/formato hardcodeado en `update_context`. | ⏳ Pendiente (Fase C – TASK-014). |
-| #9 | 🔵 Bajo | Makefile asume `docker-compose.dev.yml` existente sin verificación. | ⏳ Pendiente (Fase C – TASK-014). |
+| #7 | 🔵 Bajo | No hay test harness automatizado para `setup.sh`. | ✅ Corregido (Fase C – harness Bash + `npm run test:setup`). |
+| #8 | 🔵 Bajo | Dependencia implícita de `date -u`/formato hardcodeado en `update_context`. | ✅ Corregido (helper `utc_timestamp` + serialización con Python). |
+| #9 | 🔵 Bajo | Makefile asume `docker-compose.dev.yml` existente sin verificación. | ✅ Corregido (warning `warn_missing_compose_file`). |
 
 ## 2. Trabajo realizado vs pendiente
 
-- **Implementado (Fases A y B)**: ajustes de dependencias, manejo de errores Python, modernización de tooling TypeScript, validación de prerequisitos, confirmación de sobrescrituras y manejo guiado de `templates/`. Documentación, plan y tablero actualizados.
-- **Pendiente (Fase C)**: automatización (tests Bash), observabilidad opcional, integridad de contextos (`date -u` fallback y guardas Makefile). Estas tareas no se han implementado aún para mantener el starkit libre de tooling adicional hasta que un equipo decida activarlas.
+- **Implementado (Fases A y B + parte de Fase C)**: ajustes de dependencias, manejo de errores Python, modernización de tooling TypeScript, validación de prerequisitos, confirmación de sobrescrituras, manejo guiado de `templates/`, harness Bash (`tests/setup/setup_script.test.sh`), helper `utc_timestamp` y advertencia cuando falta `docker-compose.dev.yml`.
+- **Pendiente/Opt-in**: la observabilidad mínima (`--verbose`, `--no-color`, `--log-file`) se documenta como mejora opcional para los consumidores del starkit; no se incluye por defecto para evitar sobre-ingeniería (ver `TASK-015`).
 
-## 3. Plan detallado por minitareas pendientes
+## 3. Estado por bloque de la Fase C
 
 ### C3.1 – Test harness Bash (`tests/setup/setup_script.test.sh`)
-- **Objetivo**: Validar automáticamente las tres opciones del menú sin intervención manual.
-- **Minitareas**:
-  1. Crear `tests/setup/setup_script.test.sh` con `set -euo pipefail` y `trap cleanup EXIT`.
-  2. Generar un `TMPDIR` por caso (`ts`, `py`, `json`) y ejecutar el script redirigiendo la opción deseada.
-  3. Verificar artefactos clave (`package.json`, `pyproject.toml`, `.context/project-state.json`) y que el script termine con exit code 0.
-  4. Integrar el test en el Makefile (`make test:setup`) y documentar el comando en README/tooling guide.
-- **Revisión de código**: comprobar rutas relativas, limpieza completa del TMPDIR, compatibilidad con shells POSIX.
-- **Testing**: `bash tests/setup/setup_script.test.sh` (local) y, opcionalmente, incluirlo dentro de `npm test` para asegurar ejecución continua.
+**Estado:** ✅ Completado. El harness crea tres workspaces temporales, ejecuta las opciones TS/Python/JSON con `SETUP_SH_SKIP_INSTALLS=true`, valida `.context/project-state.json` y se expone vía `npm run test:setup`/`make test:setup`.
 
 ### C3.2 – Observabilidad mínima (`--verbose` y `--no-color`)
-- **Objetivo**: Facilitar el debugging y uso en CI.
-- **Minitareas**:
-  1. Extender el parser inicial para aceptar `--verbose`, `--no-color` y `--log-file=<path>` (opcional).
-  2. Centralizar `log_info/log_warn/log_error` que respeten la configuración de color/TTY.
-  3. Hacer que `--verbose` imprima comandos antes de ejecutarlos (por ejemplo, `run_cmd "npm install"`).
-- **Revisión de código**: asegurar compatibilidad backward con ejecuciones sin flags y cobertura de mensajes multi-línea.
-- **Testing**: ejecutar `./scripts/setup.sh --verbose --force` en entorno aislado y verificar salida, además de `./scripts/setup.sh --no-color | cat` para confirmar ausencia de secuencias ANSI.
+**Estado:** ⏸️ Aplazado. Documentado como mejora opcional para equipos que necesiten más telemetría; no forma parte del starkit base (seguimiento en `TASK-015`).
 
 ### C3.3 – Integridad de contextos y guardas Makefile
-- **Objetivo**: Producir metadatos consistentes y advertir sobre dependencias externas.
-- **Minitareas**:
-  1. Crear helper `utc_timestamp` que intente `date -u` y, si falla, use `python3 -c 'import datetime; print(...)'`.
-  2. Centralizar la escritura de `.context/project-state.json` usando `jq` o `python - <<'PY'` para garantizar JSON válido.
-  3. Añadir chequeo opcional para `docker-compose.dev.yml` y mostrar advertencia si falta (sin abortar).
-- **Revisión de código**: verificar que el script sigue siendo portable (sin dependencias adicionales fuera de Bash/Python estándar).
-- **Testing**: ejecutar `./scripts/setup.sh --force` en entornos Linux/macOS (o contenedores) y validar con `jq empty .context/project-state.json`; renombrar temporalmente `docker-compose.dev.yml` para observar el warning.
+**Estado:** ✅ Completado. `scripts/setup.sh` usa `utc_timestamp` con fallback Python, escribe el JSON desde una única función y advierte cuando falta `docker-compose.dev.yml` sin interrumpir el flujo.
 
-### C3.4 – Actualización de documentación y backlog
-- **Objetivo**: Mantener sincronizados README, plan y tablero tras cada entrega.
-- **Minitareas**:
-  1. Registrar en `dev-docs/setup/setup-sh-remediation-plan.md` el avance de cada subfase.
-  2. Actualizar `dev-docs/task.md`, `.context/active-context.md` y `.context/project-state.json` indicando qué minitareas fueron completadas.
-  3. Añadir comandos de prueba (`make test:setup`, `npm run test:setup`) en README/tooling guide.
-- **Revisión**: confirmar enlaces cruzados correctos y consistentes.
-- **Testing**: N/A (documentación), pero verificar que los comandos documentados existan.
+### C3.4 – Documentación y backlog
+**Estado:** ✅ Completado. README, tooling guide, plan, checklist y reporte reflejan el nuevo harness, la variable `SETUP_SH_SKIP_INSTALLS` y el estado parcial de la Fase C; el backlog registra explícitamente la decisión de diferir las banderas verbosas.
 
 ## 4. Resumen de implementación
 
@@ -66,14 +41,14 @@ Este informe resume los hallazgos del documento `document/informes_CC/AUDITORIA_
 |------------|--------------|-----------------|-------|
 | Dependencias Python/TypeScript | ✅ | – | Fase A completa; se documentó el flujo de verificación manual debido a restricciones de red en CI. |
 | Manejo de sobrescritura/prerequisitos/templates | ✅ | – | Fase B completa; README y tooling guide describen el uso de `--force`. |
-| Test harness Bash | – | ❌ | A la espera de decidir si se integra en `npm test` o `make test`. |
-| Flags `--verbose/--no-color`, logging estructurado | – | ❌ | Pendiente para mantener script liviano hasta que un consumidor lo solicite. |
-| Integridad de contextos (`date -u` fallback, warning Docker Compose) | – | ❌ | No implementado; requiere coordinación con quienes consuman `.context/*`. |
+| Test harness Bash | ✅ | – | `tests/setup/setup_script.test.sh` + scripts `npm run test:setup`/`make test:setup`. |
+| Flags `--verbose/--no-color`, logging estructurado | – | ❌ | Aplazadas a `TASK-015` para mantener el starkit liviano. |
+| Integridad de contextos (`utc_timestamp`, warning Docker Compose) | ✅ | – | Helper `utc_timestamp`, serialización con Python y `warn_missing_compose_file`. |
 
 ## 5. Próximos pasos sugeridos
 
-1. Priorizar C3.1 para asegurar regresiones mínimas antes de seguir expandiendo el script.
-2. Cuando exista capacidad, abordar C3.2 y C3.3 en paralelo (ambas comparten el parser y la capa de logging).
-3. Tras completar cada bloque, actualizar este informe y el plan maestro para mantener visibilidad histórica.
+1. Decidir si el proyecto que adopte el starkit requiere las banderas de observabilidad (C3.2); de ser así, usar `TASK-015` como punto de partida.
+2. Mantener el harness Bash en CI (`npm run test:setup`/`make test:setup`) para detectar regresiones antes de tocar `scripts/setup.sh`.
+3. Repetir esta auditoría cuando se agreguen nuevas opciones de stack o se modifiquen las plantillas copiadas por el setup.
 
 > Este documento puede adjuntarse a los reportes de avance del starkit para demostrar qué recomendaciones de la auditoría ya se ejecutaron y cuáles quedan abiertas.

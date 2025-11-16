@@ -7,6 +7,7 @@
 - [ ] `npm run lint` / `make lint` / comando equivalente se ejecuta sin errores.
 - [ ] `npm run test` (u otro runner) cubre los módulos recién creados y falla cuando se rompe una invariante.
 - [ ] `npm run type-check` o verificación equivalente (mypy, go vet, etc.) completó con éxito.
+- [ ] `npm run test:setup` o `make test:setup` validó que `scripts/setup.sh` siga produciendo artefactos consistentes tras tus personalizaciones (usa `SETUP_SH_SKIP_INSTALLS=true` en CI si no hay acceso a npm/PyPI).
 - [ ] Hooks de `lint-staged`/pre-commit actualizados para todos los lenguajes presentes en el repo.
 
 ## 2. Servicios e integraciones reemplazados

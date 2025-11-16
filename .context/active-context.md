@@ -12,13 +12,13 @@
 ## Active Tasks
 
 - _(sin tareas activas)_
-- Próximo foco sugerido: [TASK-013]-[TASK-014] para completar la Fase C del setup, y, una vez endurecido el script, retomar [TASK-003]/[TASK-004].
+- Próximo foco sugerido: evaluar si se implementa [TASK-015] (observabilidad opcional del setup) y, en paralelo, retomar [TASK-003]/[TASK-004].
 
 ## Recent Changes
 
-- Se completó la Fase B del plan de remediación (prerequisitos obligatorios, confirmación/`--force`, prompt para `templates/`).
-- README, `dev-docs/plan.md`, `dev-docs/tooling-guide.md` y `dev-docs/setup/setup-sh-remediation-plan.md` documentan el nuevo estado (Fases A/B ✅, Fase C pendiente).
-- `dev-docs/task.md` mueve TASK-012 a Completadas y deja TASK-013 → TASK-014 como próximos pasos.
+- Se completaron los bloques C3.1 (harness Bash + `npm run test:setup`) y C3.3 (`utc_timestamp` + warning `docker-compose.dev.yml`) del plan de remediación.
+- README, `dev-docs/plan.md`, `dev-docs/setup/setup-sh-remediation-plan.md`, `dev-docs/setup/setup-sh-remediation-report.md`, `dev-docs/tooling-guide.md` y la checklist post-adaptación reflejan el nuevo estado (solo C3.2/TASK-015 quedó como opt-in).
+- `dev-docs/task.md` mueve TASK-013/TASK-014 a Completadas y crea TASK-015 para la observabilidad opcional.
 
 ### Last 5 Commits
 ```
@@ -42,8 +42,8 @@ chore: Initialize project with Kit Fundador v2.0
 ## Context for Next Session
 
 Stack base documentado (TypeScript + Express + Jest + ESLint/Prettier + esbuild). Próximos pasos sugeridos:
-1. Ejecutar las mejoras de usabilidad/hardening (TASK-012/TASK-013) y documentar el cierre (TASK-014).
-2. Cuando el script quede endurecido, volver a las tareas estructurales del roadmap (TASK-003 y TASK-004).
+1. Decidir si vale la pena abordar TASK-015 (observabilidad del setup) o dejarlo como opt-in para el equipo consumidor.
+2. Retomar las tareas estructurales del roadmap (TASK-003 y TASK-004) ahora que el setup tiene harness y contextos consistentes.
 
 Archivos clave a revisar:
 - `config/rules/ai-guardrails.json` - Reglas del agente

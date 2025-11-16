@@ -39,27 +39,16 @@ _(sin tareas activas)_
   - [ ] Contract tests pasando
   - [ ] E2E test funcional
 
-### [TASK-013] Hardening y automatización del setup
-- **Prioridad**: Media
-- **Estimación**: 5 horas
-- **Dependencias**: TASK-012
-- **Descripción**: Implementar la Fase C: suite bash de pruebas, flags `--verbose/--no-color`, función para timestamps portables y alerta cuando falta `docker-compose.dev.yml`.
-- **Criterios de Aceptación**:
-  - [ ] Existe `tests/setup/setup_script.test.sh` y se documenta cómo ejecutarlo.
-  - [ ] Nuevas banderas documentadas y probadas.
-  - [ ] `update_context` usa helper portable para UTC.
-  - [ ] `setup.sh` advierte si no se encuentra `docker-compose.dev.yml`.
-
-### [TASK-014] Documentar y cerrar la remediación
+### [TASK-015] Observabilidad opcional del setup
 - **Prioridad**: Baja
-- **Estimación**: 1 hora
-- **Dependencias**: TASK-013
-- **Descripción**: Registrar en README, `dev-docs/plan.md`, `dev-docs/post-adaptation-validation.md` y `.context/` los resultados de la remediación y checklist post-fix.
+- **Estimación**: 2 horas
+- **Dependencias**: TASK-013, TASK-014
+- **Descripción**: Implementar (si el consumidor lo necesita) las banderas `--verbose`, `--no-color` y un mecanismo sencillo de logging/redirección para `scripts/setup.sh`, manteniendo la compatibilidad con CI.
 - **Criterios de Aceptación**:
-  - [ ] README enlaza la guía final y describe el estado del script.
-  - [ ] `dev-docs/task.md` y `plan.md` reflejan el cierre de cada fase.
-  - [ ] `.context/project-state.json` y `.context/active-context.md` incluyen el resumen.
-  - [ ] La checklist de validación añade pasos específicos para el setup.
+  - [ ] Parser actualizado con flags documentadas.
+  - [ ] Logs se pueden desactivar (no ANSI) cuando `stdout` no es TTY.
+  - [ ] README/tooling guide explican cuándo habilitar la funcionalidad.
+  - [ ] Tests cubren los nuevos caminos (`./scripts/setup.sh --verbose`, `--no-color`).
 
 
 
@@ -154,6 +143,25 @@ _(sin tareas activas)_
   - [x] Script solicita confirmación o `--force` al detectar archivos existentes.
   - [x] Falta de `npm`, `python3` o `docker-compose` detiene la opción correspondiente con mensaje claro.
   - [x] README explica cómo conservar o eliminar `templates/` tras la ejecución.
+
+### [TASK-013] Hardening y automatización del setup
+- **Completado**: 2025-01-16
+- **Duración real**: 1 h 30 min
+- **Notas**: Se incorporó `tests/setup/setup_script.test.sh`, comandos `npm run test:setup`/`make test:setup`, la variable `SETUP_SH_SKIP_INSTALLS` y el helper `warn_missing_compose_file` para advertir cuando falta `docker-compose.dev.yml`.
+- **Criterios de Aceptación**:
+  - [x] Existe `tests/setup/setup_script.test.sh` y se documenta cómo ejecutarlo.
+  - [x] `update_context` usa helper portable (`utc_timestamp`) para generar los timestamps.
+  - [x] `setup.sh` advierte si no se encuentra `docker-compose.dev.yml`.
+
+### [TASK-014] Documentar y cerrar la remediación
+- **Completado**: 2025-01-16
+- **Duración real**: 45 min
+- **Notas**: README, `dev-docs/plan.md`, `dev-docs/setup/setup-sh-remediation-plan.md`, `dev-docs/setup/setup-sh-remediation-report.md`, `dev-docs/post-adaptation-validation.md` y `.context/` reflejan el nuevo estado (Fases A/B + C3.1/C3.3 completas, C3.2 aplazada).
+- **Criterios de Aceptación**:
+  - [x] README enlaza la guía final, documenta `SETUP_SH_SKIP_INSTALLS` y expone el estado actual del setup.
+  - [x] `dev-docs/task.md` y `plan.md` reflejan el cierre de cada fase y el backlog pendiente (TASK-015).
+  - [x] `.context/project-state.json` y `.context/active-context.md` incluyen el resumen actualizado.
+  - [x] La checklist de validación añade pasos específicos (`npm run test:setup`/`make test:setup`).
 
 ## Backlog 💭
 

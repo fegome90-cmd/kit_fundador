@@ -196,6 +196,9 @@ make health
 # Ejecutar tests
 make test
 
+# Verificar que el setup interactivo siga funcionando
+npm run test:setup     # o make test:setup para usar el harness bash
+
 # Validar arquitectura
 make validate
 ```
@@ -210,9 +213,11 @@ en un proyecto real, sigue el [plan de ejecución](dev-docs/setup/setup-sh-remed
 2. **Mejoras de usabilidad** (confirmación de sobrescritura, validación de prerequisitos y limpieza de templates).
 3. **Hardening opcional** (tests del script, flags verbosos y guardas para `docker-compose`).
 
-> **Estado actual**: ✅ **Fases A y B completadas**. Además de las dependencias auditadas, `setup.sh` ahora valida prerequisitos obligatorios, solicita confirmación (o `--force`) antes de sobrescribir y permite conservar/mover/eliminar `templates/` tras cada ejecución. Pendiente: **Fase C** (suite bash, flags verbosos, guardas adicionales).
+> **Estado actual**: ✅ **Fases A y B completadas**. De la **Fase C** ya están operativos el harness Bash (`tests/setup/setup_script.test.sh`, accesible vía `npm run test:setup`/`make test:setup`) y la integridad de metadatos (`utc_timestamp` + advertencia cuando falta `docker-compose.dev.yml`). La mejora de observabilidad (`--verbose`/`--no-color`) quedó documentada como **opcional** para que cada consumidor decida si la incorpora.
 
 > 📦 Después de cada ejecución, decide qué hacer con `templates/` directamente desde el prompt final; si prefieres evitar preguntas en entornos automatizados, invoca el script con `--force`.
+
+> 🧪 En pipelines sin acceso a npm/PyPI puedes ejecutar `SETUP_SH_SKIP_INSTALLS=true ./scripts/setup.sh` para saltar `npm install`/`pip install` (el harness usa esa variable por defecto) y aun así validar el resto del flujo.
 
 Documenta qué fases aplicaste en `dev-docs/task.md` antes de continuar con las tareas principales del roadmap.
 
@@ -252,13 +257,9 @@ para apuntar a tu implementación definitiva. Sigue las pautas de `dev-docs/tool
 
 ## 🧪 Suites opcionales multi-lenguaje
 
-- `tests/integration/test_setup_script.sh` demuestra cómo validar assets de las plantillas desde Bash. Ejecútalo manualmente o
-  expón un script (`npm run test:templates`) si quieres integrarlo al pipeline.
-- `tests/unit/python/` contiene ejemplos de Pytest para el value object `Email`. Son ilustrativos y no forman parte del comando
-  `npm test`; habilítalos creando un script propio (`npm run test:py`) o desde tu `Makefile` si tu stack final usa Python. Para
-  ejecutarlos directamente basta con instalar tus dependencias (`pip install -r requirements.txt` o equivalente) y correr
-  `pytest tests/unit/python`. Si no vas a mantener una suite en Python, documenta la decisión en `dev-docs/context.md` y borra
-  la carpeta para evitar ruido en tu pipeline.
+- `tests/setup/setup_script.test.sh` es el harness oficial del setup interactivo. Corre `npm run test:setup` o `make test:setup` para validar las tres rutas sin tocar tu árbol local; el script usa `SETUP_SH_SKIP_INSTALLS=true` para evitar instalaciones reales en entornos CI.
+- `tests/integration/test_setup_script.sh` demuestra cómo validar assets de las plantillas desde Bash. Ejecútalo manualmente o  expón un script (`npm run test:templates`) si quieres integrarlo al pipeline.
+- `tests/unit/python/` contiene ejemplos de Pytest para el value object `Email`. Son ilustrativos y no forman parte del comando  `npm test`; habilítalos creando un script propio (`npm run test:py`) o desde tu `Makefile` si tu stack final usa Python. Para  ejecutarlos directamente basta con instalar tus dependencias (`pip install -r requirements.txt` o equivalente) y correr  `pytest tests/unit/python`. Si no vas a mantener una suite en Python, documenta la decisión en `dev-docs/context.md` y borra  la carpeta para evitar ruido en tu pipeline.
 
 ## 🧱 Plantillas de dominio y eventos
 
@@ -321,12 +322,7 @@ make reset            # Reset completo (clean + up + migrate + seed)
 - **[dev-docs/context.md](dev-docs/context.md)**: Visión general del proyecto
 - **[dev-docs/plan.md](dev-docs/plan.md)**: Roadmap y milestones con workflow de templates
 - **[dev-docs/domain/ubiquitous-language.md](dev-docs/domain/ubiquitous-language.md)**: Glosario del dominio
-- **[dev-docs/consumer-checklist.md](dev-docs/consumer-checklist.md)**: Checklist post-clonado
-
-**Calidad y Auditorías (NUEVO):**
-- **[document/informes_CC/SECURITY_AUDIT_REPORT.md](document/informes_CC/SECURITY_AUDIT_REPORT.md)**: Auditoría de seguridad
-- **[document/informes_CC/AUDITORIA_SETUP_SH.md](document/informes_CC/AUDITORIA_SETUP_SH.md)**: Auditoría del setup
-- **[dev-docs/setup/setup-sh-remediation-plan.md](dev-docs/setup/setup-sh-remediation-plan.md)**: Plan de remediación
+- **[dev-docs/consumer-checklist.md](dev-docs/consumer-checklist.md)**: Checklist post-clonado para equipos que adopten el kit
 
 ## 🏗️ Arquitectura
 
