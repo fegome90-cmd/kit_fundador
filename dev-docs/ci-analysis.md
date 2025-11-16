@@ -1,15 +1,17 @@
 # CI failure analysis for docs-only branches
 
 ## Summary
-Pull request #41 (`codex/realizar-auditoria-de-codigo-excluyendo-markdown`) only added documentation files, but the CI workflow keeps linting and testing the whole TypeScript source tree on every push. The "Build and Test" job defined in `.github/workflows/ci.yml` runs `npm run lint`, `npm run type-check`, `npm test`, and `npm run build` after installing dependencies. Because linting enforces architectural guardrails, it failed before tests or the build could complete.
+Pull request #41 (`codex/realizar-auditoria-de-codigo-excluyendo-markdown`) only touched documentation, but the CI workflow still
+installs dependencies and runs `npm run lint`, `npm run type-check`, `npm test`, and `npm run build`. Linting failed before the
+other steps could start because `eslint` crashed with a parsing error inside `src/domain/value-objects/Email.ts`.
 
 ## Root cause
-The project-wide ESLint config (`.eslintrc.json`) sets `max-lines-per-function` to 20. When the PR branch was created, the domain layer still contained earlier scaffolding implementations where `Email.validate` and `User.create` held multiple responsibilities inside a single method. ESLint rightfully flagged both functions as too long and stopped the workflow during the `npm run lint` step. The failing code can be seen in commit `7d6e6eb` before it was refactored—`Email.validate` mixed emptiness, format, domain parsing, and blocking logic, while `User.create` mixed entity construction and domain-event registration without delegating to helper methods.
+The stack uses `@typescript-eslint/parser` v6.x, which officially supports TypeScript versions `>=4.3.5 <5.4.0`. Our
+`package.json` allowed any TypeScript `^5.0.0`, so GitHub Actions installed 5.9.3 during `npm ci`. That unsupported compiler
+version caused the parser to throw `Parsing error: ';' expected` near the `domainLabels.some(...)` call in `Email.ts`, which is
+why ESLint stopped the workflow even though the syntax is valid.
 
 ## Resolution
-Splitting the logic into focused helpers keeps each function short and makes the rule pass (see the refactor recorded in commit `7d6e6eb`).
-
-1. `Email.validate` now just orchestrates validation helpers such as `ensureNotEmpty`, `ensureBasicFormat`, `extractParts`, `validateLocalPart`, `validateDomain`, and `ensureDomainNotBlocked`. Each helper owns a specific check, so no single method exceeds the 20-line cap.
-2. `User.create` now delegates the initial state assembly to `buildInitialProps`, reducing the factory to orchestration plus domain-event emission.
-
-With those refactors in place, rerunning `npm run lint`, `npm run type-check`, `npm test`, and `npm run build` completes successfully, so the workflow can pass even when subsequent PRs only touch docs.
+Pin TypeScript to a version the parser understands. The repo now declares and locks TypeScript to `~5.3.3`, so `npm ci` installs a
+compatible compiler locally and in CI. Once dependencies are aligned, `npm run lint`, `npm run type-check`, `npm test`, and
+`npm run build` proceed normally for documentation-only branches too.
