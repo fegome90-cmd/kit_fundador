@@ -1,24 +1,50 @@
 {
   "version": "2.0.0",
-  "last_updated": "2025-01-15T00:00:00Z",
+  "last_updated": "2025-01-16T00:00:00Z",
   "project_metadata": {
     "name": "nombre-proyecto",
     "domain": "dominio-negocio",
     "stage": "foundation",
-    "tech_stack_hash": ""
+    "tech_stack_hash": "typescript-node20-express-jest-esbuild"
   },
   "current_state": {
-    "active_bounded_contexts": [],
-    "implemented_aggregates": [],
+    "active_bounded_contexts": [
+      {
+        "name": "Identity & Access",
+        "description": "Gestión de cuentas de usuario, credenciales y verificación de email",
+        "status": "documented",
+        "artifacts": [
+          "dev-docs/domain/ubiquitous-language.md#bounded-context-identity--access",
+          "dev-docs/domain/invariants.md"
+        ]
+      }
+    ],
+    "implemented_aggregates": [
+      {
+        "name": "IdentityAccess.UserAccount",
+        "status": "template",
+        "code": "src/domain/entities/User.ts",
+        "tests": [
+          "tests/unit/User.test.ts",
+          "tests/unit/Email.test.ts"
+        ]
+      }
+    ],
     "pending_migrations": [],
     "active_feature_flags": {},
     "technical_debt_items": []
   },
   "ai_context": {
-    "last_session_summary": "Proyecto inicializado con Kit Fundador v2.0",
-    "next_recommended_tasks": [],
-    "areas_needing_attention": [],
-    "recent_decisions": []
+    "last_session_summary": "Se documentó el bounded context Identity & Access, se catalogaron los invariantes del aggregate User y se enlazaron los artefactos con las pruebas del dominio.",
+    "next_recommended_tasks": ["TASK-003", "TASK-004"],
+    "areas_needing_attention": ["Configurar base de datos y migraciones (TASK-003)", "Diseñar el primer use case/endpoints (TASK-004/TASK-005)"],
+    "recent_decisions": [
+      {
+        "id": "DEC-2025-01-16-STACK",
+        "summary": "Se fija TypeScript + Express como perfil predeterminado del starkit y se documenta en dev-docs/tech-stack-decisions.md.",
+        "references": ["config/tech-stack.json", "dev-docs/tech-stack-decisions.md"]
+      }
+    ]
   },
   "metrics": {
     "test_coverage": 0,
