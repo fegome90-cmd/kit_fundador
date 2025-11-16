@@ -28,6 +28,14 @@ export class Email {
   }
 
   private validate(): void {
+    this.validateBasicFormat();
+    const [localPart, domainPart] = this._value.split('@');
+    this.validateEmailParts(localPart, domainPart);
+    this.validateDomainLabels(domainPart);
+    this.validateBlockedDomains(domainPart);
+  }
+
+  private validateBasicFormat(): void {
     if (!this._value) {
       throw new Error('Email cannot be empty');
     }
@@ -46,6 +54,32 @@ export class Email {
     if (this._value.length > MAX_EMAIL_LENGTH) {
       throw new Error('Email too long');
     }
+  }
+
+  private validateEmailParts(localPart: string, domainPart: string): void {
+    if (!localPart || !domainPart) {
+      throw new Error('Invalid email format');
+    }
+
+    if (localPart.startsWith('.') || localPart.endsWith('.')) {
+      throw new Error('Invalid email format');
+    }
+
+    if (domainPart.startsWith('-') || domainPart.endsWith('-')) {
+      throw new Error('Invalid email format');
+    }
+  }
+
+  private validateDomainLabels(domainPart: string): void {
+    const domainLabels = domainPart.split('.');
+    const hasInvalidLabel = domainLabels.some(
+      (label) => !label || label.startsWith('-') || label.endsWith('-')
+    );
+
+    if (hasInvalidLabel) {
+      throw new Error('Invalid email format');
+    }
+  }
 
     const [localPart, domainPart] = this._value.split('@');
     if (!localPart || !domainPart) {
