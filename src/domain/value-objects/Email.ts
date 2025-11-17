@@ -77,9 +77,9 @@ export class Email {
     }
 
     const domainLabels = domainPart.split('.');
-    const hasInvalidLabel = domainLabels.some(
-      (label) => !label || label.startsWith('-') || label.endsWith('-')
-    );
+    const hasInvalidLabel = domainLabels.some((label) => {
+      return !label || label.startsWith('-') || label.endsWith('-');
+    });
 
     if (hasInvalidLabel) {
       throw new Error('Invalid email format');
@@ -87,8 +87,7 @@ export class Email {
   }
 
   private ensureDomainNotBlocked(domainPart: string): void {
-    const normalizedDomain = domainPart.toLowerCase();
-    if (BLOCKED_DOMAINS.includes(normalizedDomain)) {
+    if (BLOCKED_DOMAINS.some((d) => domainPart.toLowerCase() === d.toLowerCase())) {
       throw new Error(`Email domain not allowed: ${domainPart}`);
     }
   }
