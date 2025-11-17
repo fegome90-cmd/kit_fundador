@@ -55,7 +55,9 @@ async function seedReferenceUser(client: Client): Promise<void> {
 
 async function runSeed(): Promise<void> {
   const connectionString = resolveDatabaseUrl();
-  console.log(`[Kit Fundador] Conectando a la base de datos definida en ${connectionString} ...`);
+  // Avoid logging sensitive credentials
+  const dbName = process.env.DB_NAME ?? 'myapp_dev';
+  console.log(`[Kit Fundador] Conectando a la base de datos "${dbName}" ...`);
 
   const client = new Client({ connectionString });
 
