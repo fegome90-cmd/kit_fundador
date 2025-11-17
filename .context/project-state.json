@@ -1,11 +1,11 @@
 {
   "version": "2.0.0",
-  "last_updated": "2025-01-16T17:00:00Z",
+  "last_updated": "2025-01-18T10:00:00Z",
   "project_metadata": {
     "name": "nombre-proyecto",
     "domain": "dominio-negocio",
     "stage": "foundation",
-    "tech_stack_hash": "typescript-node20-express-jest-esbuild"
+    "tech_stack_hash": "typescript-node20-express-jest-esbuild-postgres16"
   },
   "current_state": {
     "active_bounded_contexts": [
@@ -46,24 +46,34 @@
       {
         "id": "TD-DB-001",
         "summary": "Infraestructura de base de datos pendiente (TASK-003)",
-        "status": "planned",
+        "status": "resolved",
         "remediation_plan": "dev-docs/infrastructure/database-blueprint.md",
         "tasks": [
           "TASK-003",
           "TASK-004"
         ],
-        "notes": "El blueprint describe cómo crear docker-compose, migraciones y seeds sin añadir dependencias al starkit; queda a cargo del consumidor implementarlo."
+        "notes": "Servicio `db` + runner SQL (`scripts/migrate.ts`) están activos. El backlog ahora se enfoca en repositorios reales (TASK-004+)."
+      },
+      {
+        "id": "TD-DB-002",
+        "summary": "Adoptar herramienta de migraciones oficial o endurecer el runner SQL",
+        "status": "planned",
+        "remediation_plan": "dev-docs/infrastructure/database-blueprint.md",
+        "tasks": [
+          "TASK-004"
+        ],
+        "notes": "El runner actual ejecuta archivos `-- up/-- down` y registra en `kit_migrations`, pero carece de validaciones avanzadas (checksum, locking). Se recomienda migrar a node-pg-migrate/Prisma cuando el consumidor tenga acceso a su registry."
       },
       {
         "id": "TD-APP-001",
         "summary": "Primer caso de uso pendiente (TASK-004)",
-        "status": "planned",
+        "status": "in_progress",
         "remediation_plan": "dev-docs/application/use-case-blueprint.md",
         "tasks": [
           "TASK-004",
           "TASK-005"
         ],
-        "notes": "El blueprint define contratos, handlers y pruebas mínimas para la capa de aplicación; sigue pendiente seleccionar el primer flujo y documentar la decisión."
+        "notes": "`RegisterUserAccount` avanza según el blueprint: existen DTOs/puertos y ahora también el handler (`RegisterUserAccountHandler`) con unit tests basados en un repositorio in-memory. Falta preparar el adapter temporal para integración y exponer el flujo vía API (TASK-005)."
       },
       {
         "id": "TD-DEP-001",
@@ -79,19 +89,18 @@
     ]
   },
   "ai_context": {
-    "last_session_summary": "Se publicó PLAN_EJECUCION_DEPENDABOT.md, se añadieron TASK-016/TASK-017 y se actualizaron README, plan, tooling guide y checklists para documentar cómo abordar las 19 vulnerabilidades de npm antes de que los consumidores adopten el kit.",
+    "last_session_summary": "Se avanzó en TASK-004 implementando `RegisterUserAccountHandler`, cubriéndolo con unit tests (repositorio in-memory) y actualizando las notas/plan para reflejar que el flujo ya orquesta el aggregate `User`. Las siguientes fases requieren un adapter temporal para integrar el handler y exponerlo vía API.",
     "next_recommended_tasks": [
-      "TASK-003",
       "TASK-004",
       "TASK-016",
       "TASK-017",
       "TASK-015"
     ],
     "areas_needing_attention": [
-      "Seleccionar proveedor de base de datos y herramienta de migraciones usando el blueprint como guía",
+      "Crear el adapter temporal/in-memory en infraestructura para poder correr pruebas de integración del use case",
       "Decidir si se implementa la observabilidad opcional del setup (TASK-015)",
-      "Elegir el primer caso de uso con base en el blueprint de application layer y registrar la decisión antes de escribir código",
-      "Ejecutar PLAN_EJECUCION_DEPENDABOT.md (TASK-016/TASK-017) para eliminar las 19 vulnerabilidades detectadas por npm ci"
+      "Ejecutar PLAN_EJECUCION_DEPENDABOT.md (TASK-016/TASK-017) para eliminar las 19 vulnerabilidades detectadas por npm ci",
+      "Planear cómo reemplazar el runner SQL por node-pg-migrate/Prisma cuando se habilite el pipeline del consumidor"
     ],
     "recent_decisions": [
       {
@@ -152,6 +161,27 @@
           "dev-docs/task.md#task-017-actualizar-baseline-de-dependencias",
           "dev-docs/plan.md#programa-de-ejecución-dependabot",
           "dev-docs/context.md#estado-de-dependabot-y-escaneo-de-dependencias"
+        ]
+      },
+      {
+        "id": "DEC-2025-01-17-DB-STACK",
+        "summary": "Se seleccionó PostgreSQL 16 con runner SQL estilo node-pg-migrate; se añadieron `db` en docker-compose, scripts `npm run migrate:*`/`npm run seed` y pruebas de integración.",
+        "references": [
+          "docker-compose.dev.yml",
+          "Makefile",
+          "scripts/migrate.ts",
+          "scripts/seed.ts",
+          "db/migrations/README.md",
+          "tests/integration/db/connection.test.ts"
+        ]
+      },
+      {
+        "id": "DEC-2025-01-17-APP-UC1",
+        "summary": "Se eligió `RegisterUserAccount` como primer caso de uso para TASK-004, documentando el alcance en dev-docs/task.md y dev-docs/plan.md.",
+        "references": [
+          "dev-docs/task.md",
+          "dev-docs/plan.md",
+          ".context/decision-log.json#DEC-2025-01-17-APP-UC1"
         ]
       }
     ]
