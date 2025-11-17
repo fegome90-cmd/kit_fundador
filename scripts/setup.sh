@@ -74,6 +74,7 @@ PY
 }
 
 # has_compose checks whether `docker-compose` is available either as a standalone command or as the Docker CLI `compose` subcommand.
+
 has_compose() {
     if command -v docker-compose &> /dev/null; then
         return 0
