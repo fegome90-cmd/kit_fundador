@@ -3,6 +3,13 @@ import fs from 'fs';
 import path from 'path';
 import { Client } from 'pg';
 
+/**
+ * Loads environment variables from the specified .env file into process.env.
+ *
+ * Reads the file as UTF-8 and parses each non-empty, non-comment line. Lines are split at the first `=` into a key and value; surrounding single or double quotes are removed from the value. Existing environment variables are preserved and will not be overwritten. If the file does not exist, the function returns without modifying environment variables.
+ *
+ * @param filePath - Path to the .env file to load
+ */
 function loadEnvFile(filePath: string): void {
   if (!fs.existsSync(filePath)) {
     return;
@@ -34,6 +41,13 @@ const DEFAULT_DB_NAME = process.env.DB_NAME ?? 'myapp_dev';
 
 const FALLBACK_URL = `postgresql://${DEFAULT_DB_USER}:${DEFAULT_DB_PASSWORD}@localhost:5432/${DEFAULT_DB_NAME}`;
 
+/**
+ * Selects the PostgreSQL connection URL to use for the application.
+ *
+ * If the `DATABASE_URL` environment variable is present and non-empty, that value is returned; otherwise a local fallback URL is returned and a warning is logged.
+ *
+ * @returns The chosen database connection URL.
+ */
 function resolveDatabaseUrl(): string {
   const fromEnv = process.env.DATABASE_URL?.trim();
   if (fromEnv) {
@@ -44,6 +58,11 @@ function resolveDatabaseUrl(): string {
   return FALLBACK_URL;
 }
 
+/**
+ * Ensures a reference user with email "founder@example.com" exists in the `seed_users` table.
+ *
+ * If a row with that email already exists, the operation makes no changes.
+ */
 async function seedReferenceUser(client: Client): Promise<void> {
   await client.query(
     `INSERT INTO seed_users (email)
@@ -53,6 +72,13 @@ async function seedReferenceUser(client: Client): Promise<void> {
   );
 }
 
+/**
+ * Connects to the configured database, performs the minimal seed operations, and closes the connection.
+ *
+ * Determines the database connection URL from the environment (or a fallback), logs the target
+ * database name without exposing credentials, runs required seed inserts, and ensures the
+ * database client is closed; if closing fails, a warning is logged.
+ */
 async function runSeed(): Promise<void> {
   const connectionString = resolveDatabaseUrl();
   // Avoid logging sensitive credentials

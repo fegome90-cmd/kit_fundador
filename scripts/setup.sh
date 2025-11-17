@@ -9,7 +9,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m' # load_dotenv loads environment variables from a .env file into the current shell and prints a warning if the file is missing.
 
 load_dotenv() {
     local dotenv_file=".env"
@@ -45,7 +45,7 @@ USAGE
 }
 
 # parse_args parses supported command-line flags.
-# It sets FORCE_MODE=true when `--force` is provided, prints usage and exits on `-h`/`--help`, and prints an error and exits with status 1 for any unknown flag.
+# parse_args parses CLI flags and configures runtime options: `--force` sets FORCE_MODE=true, `-h`/`--help` prints usage and exits 0, and any unknown flag prints an error and exits with status 1.
 parse_args() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
