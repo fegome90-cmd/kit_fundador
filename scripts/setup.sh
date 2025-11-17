@@ -9,7 +9,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # load_dotenv loads environment variables from a .env file into the current shell and prints a warning if the file is missing.
+NC='\033[0m' # No Color
 
 load_dotenv() {
     local dotenv_file=".env"
