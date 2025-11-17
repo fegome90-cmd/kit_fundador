@@ -111,6 +111,27 @@
         "dev-docs/plan.md#programa-de-ejecución-dependabot",
         "dev-docs/context.md#estado-de-dependabot-y-escaneo-de-dependencias"
       ]
+    },
+    {
+      "id": "DEC-2025-01-17-DB-STACK",
+      "title": "Adoptar PostgreSQL 16 + runner SQL estilo node-pg-migrate",
+      "date": "2025-01-17",
+      "context": "TASK-003 estaba bloqueada hasta seleccionar un motor y herramienta de migraciones reales para el starkit.",
+      "decision": "Configurar servicio `db` (PostgreSQL 16) en docker-compose, exponer scripts `npm run migrate:*` respaldados por `scripts/migrate.ts` (runner SQL compatible con node-pg-migrate), y documentar el uso de `.env` para `DATABASE_URL`/credenciales.",
+      "consequences": [
+        "El repositorio incluye migraciones bootstrap (`db/migrations/000000000000__bootstrap.sql`) y seeds reproducibles.",
+        "`Makefile`/README documentan los comandos `db:up`, `db:reset`, `npm run migrate:up`, `npm run seed`.",
+        "tests/integration/db/connection.test.ts` verifica la conexión y la presencia de la migración inicial."
+      ],
+      "references": [
+        "docker-compose.dev.yml",
+        "Makefile",
+        "db/migrations/README.md",
+        "scripts/migrate.ts",
+        "scripts/seed.ts",
+        "tests/integration/db/connection.test.ts",
+        "README.md#🗄️-blueprint-de-base-de-datos-y-migraciones"
+      ]
     }
   ]
 }

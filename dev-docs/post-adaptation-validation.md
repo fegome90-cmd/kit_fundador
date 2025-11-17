@@ -10,6 +10,7 @@
       `tests/integration/application`) pasan con los adapters/stubs reales del proyecto.
 - [ ] `npm run type-check` o verificación equivalente (mypy, go vet, etc.) completó con éxito.
 - [ ] `npm run test:setup` o `make test:setup` validó que `scripts/setup.sh` siga produciendo artefactos consistentes tras tus personalizaciones (usa `SETUP_SH_SKIP_INSTALLS=true` en CI si no hay acceso a npm/PyPI).
+- [ ] `npm run test:integration:db` (o comando equivalente) confirma que las migraciones aplicadas aparecen en `kit_migrations` y que la conexión a la base local funciona con tus credenciales.
 - [ ] Hooks de `lint-staged`/pre-commit actualizados para todos los lenguajes presentes en el repo.
 
 ## 2. Servicios e integraciones reemplazados
