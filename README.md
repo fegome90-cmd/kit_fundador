@@ -36,7 +36,7 @@ Este repositorio proporciona el **esqueleto profesional mínimo** para arrancar 
 ### Prerrequisitos
 
 - **Node.js 20.x** y **npm 10.x** (los scripts usan características modernas de ES2022).
-- **Docker Engine 20.10+** con el plugin `docker compose` v2 (el Makefile invoca `docker compose ...`).
+- **Docker Engine 20.10.13+** con el plugin `docker compose` v2 (el Makefile invoca `docker compose ...`).
 - **Git** y `bash` para ejecutar `scripts/setup.sh`.
 
 > 💡 Si tu host aún usa `docker-compose` clásico, actualiza Docker Engine o ajusta el Makefile antes de continuar.

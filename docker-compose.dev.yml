@@ -18,7 +18,7 @@ services:
       DB_USER: ${DB_USER:-dev}
       DB_PASSWORD: ${DB_PASSWORD:-devpass}
       DB_NAME: ${DB_NAME:-myapp_dev}
-      DATABASE_URL: "${DATABASE_URL:-postgresql://dev:devpass@db:5432/myapp_dev}"
+      DATABASE_URL: "postgresql://${DB_USER:-dev}:${DB_PASSWORD:-devpass}@db:5432/${DB_NAME:-myapp_dev}"
       REDIS_URL: redis://redis:6379
       LOG_LEVEL: debug
     depends_on:
