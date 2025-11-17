@@ -1,4 +1,4 @@
-.PHONY: help dev up down logs test migrate seed clean db:up db:down db:reset
+.PHONY: help dev up down logs test migrate seed clean db-up db-down db-reset test-setup
 
 PROJECT_NAME := myapp
 COMPOSE := docker compose -f docker-compose.dev.yml -p $(PROJECT_NAME)
@@ -26,9 +26,6 @@ test-watch: ## Run tests in watch mode
 
 test-coverage: ## Run tests with coverage
 	$(COMPOSE) run --rm app npm run test:coverage
-
-test:setup: ## Run setup.sh harness locally
-	bash tests/setup/setup_script.test.sh
 
 test-setup: ## Run setup.sh harness locally
 	bash tests/setup/setup_script.test.sh
@@ -69,14 +66,14 @@ health: ## Check health of all services
 	@$(COMPOSE) exec db pg_isready -U ${DB_USER:-dev} || echo "❌ Postgres unhealthy"
 	@$(COMPOSE) exec redis redis-cli ping || echo "❌ Redis unhealthy"
 
-db\:up: ## Start only the database service
+db-up: ## Start only the database service
 	$(COMPOSE) up -d db
 
-db\:down: ## Stop only the database service
+db-down: ## Stop only the database service
 	$(COMPOSE) stop db
 
-db\:reset: ## Recreate the database container and volume
+db-reset: ## Recreate the database container and volume
 	$(COMPOSE) stop db || true
 	$(COMPOSE) rm -f db || true
 	docker volume rm $(PROJECT_NAME)_db-data || true
-	$(MAKE) db:up
+	$(MAKE) db-up
