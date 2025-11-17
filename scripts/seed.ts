@@ -3,6 +3,13 @@ import fs from 'fs';
 import path from 'path';
 import { Client } from 'pg';
 
+/**
+ * Loads key-value pairs from the specified dotenv file into `process.env`.
+ *
+ * Reads the file at `filePath` if it exists, parses non-empty, non-comment lines of the form `KEY=VALUE`, strips surrounding single or double quotes from values, and sets any keys that are not already present in `process.env`.
+ *
+ * @param filePath - Path to the .env file to load
+ */
 function loadEnvFile(filePath: string): void {
   if (!fs.existsSync(filePath)) {
     return;
@@ -34,6 +41,13 @@ const DEFAULT_DB_NAME = process.env.DB_NAME ?? 'myapp_dev';
 
 const FALLBACK_URL = `postgresql://${DEFAULT_DB_USER}:${DEFAULT_DB_PASSWORD}@localhost:5432/${DEFAULT_DB_NAME}`;
 
+/**
+ * Determine which database connection URL to use.
+ *
+ * If the `DATABASE_URL` environment variable is set and non-empty, its trimmed value is returned; otherwise the local fallback connection string is returned and a console warning is emitted.
+ *
+ * @returns The trimmed `DATABASE_URL` from the environment if present; otherwise `FALLBACK_URL`.
+ */
 function resolveDatabaseUrl(): string {
   const fromEnv = process.env.DATABASE_URL?.trim();
   if (fromEnv) {
@@ -44,6 +58,11 @@ function resolveDatabaseUrl(): string {
   return FALLBACK_URL;
 }
 
+/**
+ * Ensures a reference user with email "founder@example.com" exists in the seed_users table.
+ *
+ * @param client - A connected PostgreSQL `Client` used to execute the insert.
+ */
 async function seedReferenceUser(client: Client): Promise<void> {
   await client.query(
     `INSERT INTO seed_users (email)
@@ -53,6 +72,12 @@ async function seedReferenceUser(client: Client): Promise<void> {
   );
 }
 
+/**
+ * Connects to the configured database, applies the minimal seed data, and ensures the database client is closed.
+ *
+ * Performs the seeding workflow against the resolved database URL; any error encountered during connection or seeding
+ * is propagated to the caller.
+ */
 async function runSeed(): Promise<void> {
   const connectionString = resolveDatabaseUrl();
   console.log(`[Kit Fundador] Conectando a la base de datos definida en ${connectionString} ...`);
