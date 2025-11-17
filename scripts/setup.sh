@@ -9,7 +9,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m' # load_dotenv loads environment variables from a local `.env` file into the current shell (exports all variables) and prints a warning if the file is missing.
 
 load_dotenv() {
     local dotenv_file=".env"
@@ -45,7 +45,7 @@ USAGE
 }
 
 # parse_args parses supported command-line flags.
-# parse_args parses CLI flags and configures runtime options: `--force` sets FORCE_MODE=true, `-h`/`--help` prints usage and exits 0, and any unknown flag prints an error and exits with status 1.
+# parse_args parses command-line flags and sets runtime options: `--force` enables FORCE_MODE, `-h`/`--help` shows usage and exits, and any unknown flag prints an error and exits 1.
 parse_args() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -69,7 +69,7 @@ parse_args() {
 parse_args "$@"
 load_dotenv
 
-# utc_timestamp returns the current UTC timestamp in ISO 8601 `YYYY-MM-DDTHH:MM:SSZ` format, falling back to Python if `date` is unavailable and to `1970-01-01T00:00:00Z` if neither is available.
+# utc_timestamp returns the current UTC timestamp in ISO 8601 YYYY-MM-DDTHH:MM:SSZ format; if `date` is unavailable it uses `python3`, and if neither is available it emits the fixed timestamp 1970-01-01T00:00:00Z.
 utc_timestamp() {
     if command -v date &> /dev/null; then
         if ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2> /dev/null); then

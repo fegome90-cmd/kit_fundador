@@ -73,12 +73,11 @@ function listMigrationFiles() {
         .sort();
 }
 /**
- * Parses a SQL migration file into its "up" and optional "down" sections.
+ * Parse a SQL migration file into its "up" and optional "down" sections.
  *
- * The file is split at a line containing only `-- down` (case-insensitive); an optional leading `-- up` marker is removed from the up section.
- *
- * @param filePath - Path to the migration `.sql` file
- * @returns An object with `up` containing the SQL to apply the migration and `down` containing the SQL to revert it, or `null` if no down section is present
+ * Splits the file at a line containing only `-- down` (case-insensitive). If present, a leading `-- up` marker is removed from the up section.
+ * @param {string} filePath - Path to the migration `.sql` file.
+ * @returns {{ up: string, down: string | null }} An object where `up` is the SQL to apply the migration and `down` is the SQL to revert it, or `null` when no down section is present.
  */
 function readMigrationParts(filePath) {
     const raw = fs_1.default.readFileSync(filePath, 'utf8');
@@ -88,12 +87,12 @@ function readMigrationParts(filePath) {
     return { up, down };
 }
 /**
- * Ensure the migrations history table exists in the connected database.
+ * Create the migrations history table if it does not already exist.
  *
- * Creates a table named `kit_migrations` (if it does not already exist) with the columns:
+ * The table created is named `kit_migrations` and has the following columns:
  * - `id`: serial primary key
- * - `name`: text, unique identifier for the migration
- * - `run_on`: timestamp with time zone, defaults to the current time
+ * - `name`: text, unique identifier for the migration (not null)
+ * - `run_on`: timestamptz, defaults to the current time
  */
 async function ensureHistoryTable(client) {
     await client.query(`
@@ -127,9 +126,9 @@ async function runMigrations(direction) {
     }
 }
 /**
- * Applies all pending "up" migrations from the migrations directory and records each applied file in the migrations history table.
+ * Apply all pending "up" migrations from the migrations directory and record each applied file in the migrations history table.
  *
- * Skips files that are already recorded in the history table or that do not contain an `-- up` block. Executes each migration's `up` SQL using the provided database client and inserts the migration filename into the history table upon success.
+ * For each migration file not already recorded, executes its `-- up` SQL block and inserts the filename into the history table. Files that lack an `-- up` block are skipped and not recorded.
  */
 async function migrateUp(client) {
     const files = listMigrationFiles();
@@ -154,11 +153,9 @@ async function migrateUp(client) {
 /**
  * Reverts the most recently applied migration by executing its `-- down` SQL and removing its record from the migrations history.
  *
- * Uses the provided PostgreSQL client to run the down migration SQL and delete the corresponding entry from the history table.
- *
- * @param client - Connected PostgreSQL client used to execute migration SQL and update the migrations history
- * @throws Error if the migration file for the latest applied migration is missing
- * @throws Error if the latest migration file does not contain a `-- down` block
+ * @param {import('pg').Client} client - Connected PostgreSQL client used to execute the down SQL and update the migrations history table.
+ * @throws {Error} If the migration file for the latest applied migration is missing.
+ * @throws {Error} If the latest migration file does not contain a `-- down` block.
  */
 async function migrateDown(client) {
     const latest = await client.query(`SELECT name FROM ${HISTORY_TABLE} ORDER BY run_on DESC LIMIT 1`);
@@ -180,10 +177,10 @@ async function migrateDown(client) {
     await client.query(`DELETE FROM ${HISTORY_TABLE} WHERE name = $1`, [file]);
 }
 /**
- * Converts a string into a normalized slug suitable for filenames or identifiers.
+ * Produce a filename-safe slug from a string.
  *
- * @param name - Input string to convert
- * @returns A lowercase slug with runs of non-alphanumeric characters replaced by single underscores and with no leading or trailing underscores
+ * @param {string} name - Input string to convert.
+ * @returns {string} The slug: lowercased, runs of non-alphanumeric characters replaced by single underscores, with no leading or trailing underscores.
  */
 function toSlug(name) {
     return name
@@ -193,11 +190,8 @@ function toSlug(name) {
         .replace(/^_+|_+$/g, '');
 }
 /**
- * Creates a new timestamped SQL migration file containing `-- up` and `-- down` sections in the migrations directory.
- *
- * The created filename follows the pattern `<timestamp>__<slug>.sql`, where `timestamp` is a 12-character ISO-derived prefix and `slug` is derived from `rawName` (or `new_migration` when omitted).
- *
- * @param rawName - Optional human-readable name used to generate the file slug; if omitted, `new_migration` is used
+ * Create a timestamped SQL migration file containing `-- up` and `-- down` sections in the migrations directory.
+ * @param {string} [rawName] - Optional human-readable name for the migration; used to generate the slug. Defaults to `new_migration` when omitted.
  */
 function createMigrationFile(rawName) {
     ensureMigrationsDir();
@@ -213,14 +207,14 @@ function createMigrationFile(rawName) {
     console.log(`[migrate] Archivo creado: ${target}`);
 }
 /**
- * Parse command-line arguments and perform the requested migration action.
+ * Parse CLI arguments and execute the requested migration command.
  *
- * Supports three actions:
- * - `create <name>`: generate a new migration file and exit
- * - `up`: apply pending migrations
- * - `down`: revert the most recently applied migration
+ * Supported actions:
+ * - `create <name>`: create a new timestamped migration file and exit.
+ * - `up`: apply all pending migrations.
+ * - `down`: revert the most recently applied migration.
  *
- * @throws Error if the provided action is not `up`, `down`, or `create`
+ * @throws {Error} If the action is not one of `create`, `up`, or `down`.
  */
 async function main() {
     const rawArgs = process.argv.slice(2).filter((arg) => arg !== '--');

@@ -56,9 +56,10 @@ function resolveDatabaseUrl() {
     return FALLBACK_URL;
 }
 /**
- * Ensures a reference user with email "founder@example.com" exists in the `seed_users` table.
+ * Ensure a reference user with email "founder@example.com" exists in the `seed_users` table.
  *
- * If a row with that email already exists, the operation makes no changes.
+ * This operation is idempotent: it creates the row if missing and leaves existing rows unchanged.
+ * @param {import('pg').Client} client - Connected PostgreSQL client used to execute the query.
  */
 async function seedReferenceUser(client) {
     await client.query(`INSERT INTO seed_users (email)
@@ -66,11 +67,9 @@ async function seedReferenceUser(client) {
      ON CONFLICT (email) DO NOTHING`, ['founder@example.com']);
 }
 /**
- * Connects to the configured database, performs the minimal seed operations, and closes the connection.
+ * Connects to the configured database, runs minimal seed operations, and closes the connection.
  *
- * Determines the database connection URL from the environment (or a fallback), logs the target
- * database name without exposing credentials, runs required seed inserts, and ensures the
- * database client is closed; if closing fails, a warning is logged.
+ * Errors thrown while seeding are propagated to the caller; a failure to close the client is caught and logged as a warning.
  */
 async function runSeed() {
     const connectionString = resolveDatabaseUrl();
