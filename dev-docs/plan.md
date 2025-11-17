@@ -25,14 +25,13 @@
 - [ ] Integration tests
 
 ### Fase 3: Infrastructure
-- [ ] Database setup y migrations
+- [x] Database setup y migrations → PostgreSQL 16 como servicio `db`, scripts `npm run migrate:*`/`npm run seed` y smoke tests `tests/integration/db`.
 - [ ] Repository implementations
 - [ ] API REST/GraphQL
 - [ ] Authentication/Authorization
 - [ ] Observability (logs, metrics, traces)
 
-> 🔎 Consulta [`dev-docs/infrastructure/database-blueprint.md`](infrastructure/database-blueprint.md) antes de abordar TASK-003.
-> El documento desgrana minitareas, revisiones de código y pruebas para adaptar el starkit sin introducir dependencias nuevas.
+> 🔎 Consulta [`dev-docs/infrastructure/database-blueprint.md`](infrastructure/database-blueprint.md) para extender el runner SQL (`scripts/migrate.ts`), añadir nuevas migraciones y mantener la documentación sincronizada cuando cambie el motor.
 
 ### Fase 4: Production Ready
 - [ ] Performance testing
