@@ -56,7 +56,7 @@ cp .env.example .env
 
 ```bash
 # Arranca la base de datos local (persistente)
-make db:up
+make db-up
 
 # Aplica la migración bootstrap y deja registro en kit_migrations
 npm run migrate:up
@@ -211,9 +211,9 @@ make migrate          # Ejecutar migraciones
 make migrate-down     # Rollback última migración
 make seed             # Seed development data
 make db-shell         # PostgreSQL shell
-make db:up            # Levantar sólo la base de datos
-make db:down          # Detener sólo la base de datos
-make db:reset         # Recrear contenedor + volumen
+make db-up            # Levantar sólo la base de datos
+make db-down          # Detener sólo la base de datos
+make db-reset         # Recrear contenedor + volumen
 
 # Quality
 make lint             # Ejecutar linter
