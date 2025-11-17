@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "last_updated": "2025-01-17T15:30:00Z",
+  "last_updated": "2025-01-17T16:00:00Z",
   "project_metadata": {
     "name": "nombre-proyecto",
     "domain": "dominio-negocio",
@@ -73,7 +73,7 @@
           "TASK-004",
           "TASK-005"
         ],
-        "notes": "El blueprint define contratos, handlers y pruebas mínimas para la capa de aplicación. Se seleccionó `RegisterUserAccount` como primer flujo (DEC-2025-01-17-APP-UC1); restan DTOs, puertos y handlers."
+        "notes": "El blueprint define contratos, handlers y pruebas mínimas para la capa de aplicación. `RegisterUserAccount` quedó seleccionado (DEC-2025-01-17-APP-UC1) y ya existen los DTOs + helper (`RegisterUserAccountCommand`) y el puerto `UserAccountRepository` con unit tests; el siguiente paso es implementar el handler y los stubs de infraestructura."
       },
       {
         "id": "TD-DEP-001",
@@ -89,7 +89,7 @@
     ]
   },
   "ai_context": {
-    "last_session_summary": "Se completó TASK-003 habilitando PostgreSQL 16 en docker-compose, scripts `npm run migrate:*`/`npm run seed`, seeds reproducibles y pruebas de integración contra la migración bootstrap. Además, se seleccionó el use case `RegisterUserAccount` para iniciar TASK-004 siguiendo el blueprint de application layer.",
+    "last_session_summary": "Se completó TASK-003 habilitando PostgreSQL 16 en docker-compose, scripts `npm run migrate:*`/`npm run seed`, seeds reproducibles y pruebas de integración contra la migración bootstrap. Además, se seleccionó `RegisterUserAccount` para iniciar TASK-004 y ya se modelaron los DTOs, el helper de normalización y el puerto `UserAccountRepository` con sus pruebas.",
     "next_recommended_tasks": [
       "TASK-004",
       "TASK-016",
@@ -97,7 +97,7 @@
       "TASK-015"
     ],
     "areas_needing_attention": [
-      "Implementar DTOs, puertos y handler de `RegisterUserAccount` para cerrar TASK-004",
+      "Implementar handler + pruebas para `RegisterUserAccount` (DTOs/puertos ya listos)",
       "Decidir si se implementa la observabilidad opcional del setup (TASK-015)",
       "Ejecutar PLAN_EJECUCION_DEPENDABOT.md (TASK-016/TASK-017) para eliminar las 19 vulnerabilidades detectadas por npm ci",
       "Planear cómo reemplazar el runner SQL por node-pg-migrate/Prisma cuando se habilite el pipeline del consumidor"

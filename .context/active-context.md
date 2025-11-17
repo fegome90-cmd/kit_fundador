@@ -6,7 +6,7 @@
 ## Current Session
 
 **Started**: 2025-01-16T00:00:00Z
-**Last Updated**: 2025-01-17T15:30:00Z
+**Last Updated**: 2025-01-17T16:00:00Z
 **Agent**: gpt-5-codex
 
 ## Active Tasks
@@ -23,7 +23,7 @@
 - `db/migrations/000000000000__bootstrap.sql` define `-- up/-- down`, `db/migrations/README.md` explica el naming y el runner registra entradas en `kit_migrations`.
 - Se añadió `tests/integration/db/connection.test.ts` para validar la conexión y la migración bootstrap; `package.json` expone `npm run test:integration:db`.
 - `.env.example`, `scripts/setup.sh` y la guía de tooling documentan cómo cargar `DATABASE_URL` automáticamente.
-- `RegisterUserAccount` fue seleccionado como primer use case (DEC-2025-01-17-APP-UC1); TASK-004 se movió a "En progreso" y ya está documentado en dev-docs/plan.md y dev-docs/task.md.
+- `RegisterUserAccount` fue seleccionado como primer use case (DEC-2025-01-17-APP-UC1); TASK-004 se movió a "En progreso", sus DTOs (`RegisterUserAccountCommand`) + helper y el puerto `UserAccountRepository` ya viven en `src/application/` con pruebas unitarias dedicadas.
 
 ### Last 5 Commits
 ```
