@@ -6,7 +6,7 @@
 ## Current Session
 
 **Started**: 2025-01-16T00:00:00Z
-**Last Updated**: 2025-01-17T16:00:00Z
+**Last Updated**: 2025-01-18T10:00:00Z
 **Agent**: gpt-5-codex
 
 ## Active Tasks
@@ -24,6 +24,7 @@
 - Se añadió `tests/integration/db/connection.test.ts` para validar la conexión y la migración bootstrap; `package.json` expone `npm run test:integration:db`.
 - `.env.example`, `scripts/setup.sh` y la guía de tooling documentan cómo cargar `DATABASE_URL` automáticamente.
 - `RegisterUserAccount` fue seleccionado como primer use case (DEC-2025-01-17-APP-UC1); TASK-004 se movió a "En progreso", sus DTOs (`RegisterUserAccountCommand`) + helper y el puerto `UserAccountRepository` ya viven en `src/application/` con pruebas unitarias dedicadas.
+- 2025-01-18: `RegisterUserAccountHandler` quedó implementado con unit tests que usan un repositorio in-memory; dev-docs/task.md, dev-docs/plan.md y .context/project-state.json reflejan el avance y apuntan a la siguiente fase (adapter temporal + pruebas de integración).
 
 ### Last 5 Commits
 ```
@@ -53,7 +54,7 @@ chore: Initialize project with Kit Fundador v2.0
 
 Stack base documentado (TypeScript + Express + Jest + ESLint/Prettier + esbuild). Próximos pasos sugeridos:
 1. Ejecutar TASK-016/TASK-017 del plan de Dependabot para que `npm ci` deje de reportar vulnerabilidades moderadas.
-2. Seleccionar el primer caso de uso siguiendo `dev-docs/application/use-case-blueprint.md` y documentar la elección antes de escribir código nuevo.
+2. Completar TASK-004 creando el adapter temporal en `src/infrastructure/_stubs/` y añadiendo pruebas de integración que orquesten `RegisterUserAccountHandler`.
 3. Decidir si vale la pena abordar TASK-015 (observabilidad del setup) o mantenerlo como opt-in.
 4. Planear la transición del runner SQL a la herramienta definitiva (node-pg-migrate/Prisma) cuando el entorno del consumidor lo permita.
 

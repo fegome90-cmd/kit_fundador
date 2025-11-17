@@ -14,12 +14,15 @@
   - La elección se registró en `.context/decision-log.json` (DEC-2025-01-17-APP-UC1).
   - `dev-docs/plan.md` y `.context/project-state.json` reflejan que el flujo `RegisterUserAccount` será el primero en implementarse siguiendo el blueprint de application layer.
   - 2025-01-17: Se definieron los DTOs (`RegisterUserAccountCommand`) y el puerto `UserAccountRepository`, con pruebas unitarias en `tests/unit/application/register-user-account/`.
+  - 2025-01-18: `RegisterUserAccountHandler` y sus unit tests (stub in-memory) viven en `src/application/use-cases/register-user-account/` y `tests/unit/application/register-user-account/register-user-account-handler.test.ts`.
 - **Blueprint**: `dev-docs/application/use-case-blueprint.md`
 - **Criterios de Aceptación**:
-  - [ ] Command handler implementado
-  - [ ] Repository interface definida
+  - [x] Command handler implementado
+  - [x] Repository interface definida
   - [ ] Tests de integración pasando
-  - [ ] Documentado en plan.md
+  - [x] Documentado en plan.md
+
+## Pendientes 📋
 
 ## Pendientes 📋
 
