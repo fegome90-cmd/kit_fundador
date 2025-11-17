@@ -11,6 +11,22 @@ Los templates sirven para:
 - **Facilitar** handoffs entre agentes o equipos
 - **Auditar** la calidad de las implementaciones
 
+## 🔄 Checklist cuando se agrega un nuevo template
+
+Para mantener sincronizado el catálogo con el resto de la documentación, cada nuevo template debe ir acompañado de los siguientes cambios:
+
+1. **Crear o actualizar el archivo del template** dentro de `dev-docs/prompt_example/` siguiendo la estructura estándar (cuándo usar, características, ejemplos) y numeración correlativa.
+2. **Actualizar este README**:
+   - Incrementar el contador del encabezado ("Esta carpeta contiene **N templates**...").
+   - Añadir la nueva subsección `### {N}. Nombre - \`archivo.md\`` con la descripción formal.
+   - Revisar si la tabla o descripciones de roles mencionadas más abajo necesitan hacer referencia al nuevo template.
+3. **Actualizar la guía rápida** en `dev-docs/prompt_example/QUICK_REFERENCE.md` (árbol de decisión, tablas comparativas y secciones por tipo de tarea) para que liste el nuevo ID.
+4. **Actualizar el plan maestro** en `dev-docs/plan.md`, que contiene el “Catálogo de Templates” tabular y la “Integración con Agent Profiles”. Inserta el nuevo registro en la categoría correcta y menciona cómo impacta al flujo Ejecutor→Validador→Handoff.
+5. **Actualizar las guías de agentes** en `dev-docs/agent-profiles/PROMPTS.md` si el nuevo template afecta las recomendaciones para EJECUTOR, VALIDADOR, HANDOFF o PLANIFICADOR.
+6. **Actualizar checklists adicionales** (`dev-docs/task.md`, `dev-docs/context.md` u otros) solo si el template introduce un tipo de tarea que dichos documentos deben contemplar explícitamente.
+
+Mantener este checklist asegura que cualquier incorporación se propague a todas las guías que usan el catálogo como fuente de verdad.
+
 ## 📚 Templates Disponibles
 
 ### 1. Implementación Grande - `prompt_template_1_large_implementation.md`
