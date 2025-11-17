@@ -5,14 +5,13 @@ las herramientas que elijas. Usa esta guía como referencia al actualizar `packa
 
 ## 1. Entry points y scripts de npm
 
-- `package.json` ya apunta a `src/index.ts`, `dist/index.js` y `scripts/seed.ts`, que son stubs funcionales. Úsalos como punto de
-  partida o reemplázalos por completo cuando definas tu bootstrap real. Ejemplos:
+- `package.json` ya apunta a `src/index.ts`, `dist/index.js`, `scripts/migrate.ts` y `scripts/seed.ts`, que son stubs funcionales.
+  Úsalos como punto de partida o reemplázalos por completo cuando definas tu bootstrap real. Ejemplos:
   - TypeScript: `src/http/server.ts` para desarrollo y `dist/http/server.js` tras compilar.
   - Python: crea un wrapper en `scripts/start_api.py` y ajusta los comandos para llamar a `python scripts/start_api.py`.
 - Si tu stack no usa `ts-node`/`node`, modifica por completo los comandos `dev`/`start` para invocar tu runtime (por ejemplo,
   `uvicorn app.main:app --reload`).
-- Actualiza `seed:dev` o crea nuevos scripts (`seed:local`, `db:reset`, etc.) apuntando a tus scripts reales o extendiendo el stub
-  `scripts/seed.ts`.
+- Actualiza `seed:dev`, `migrate:*` o crea nuevos scripts (`seed:local`, `db:reset`, etc.) apuntando a tus scripts reales o extendiendo los stubs `scripts/migrate.ts`/`scripts/seed.ts`.
 
 > 📌 Recomendación: documenta los reemplazos en `dev-docs/task.md` dentro de la task activa para que todo el equipo conozca el nuevo entry point.
 
@@ -91,3 +90,12 @@ stack.
 - Configuración recomendada (TASK-016): `.github/dependabot.yml` con tres entradas → `npm` (raíz), `npm` (templates/typescript) y `github-actions`, frecuencia semanal y `open-pull-requests-limit: 5`.
 - Baseline (TASK-017): alinear `package.json` raíz con las versiones publicadas en la plantilla TypeScript, ejecutar `npm run lint`, `npm test`, `npm run test:setup` y documentar la fecha del último `npm audit`.
 - Opt-in: auto-merge, herramientas alternativas (Renovate, Snyk) o ecosistemas adicionales dependen de cada consumidor; documenta cualquier personalización en `dev-docs/context.md`.
+
+## 7. Migrations y seeds reproducibles
+
+- **Variables de entorno**: copia `.env.example` a `.env` y define `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DATABASE_URL`. `scripts/migrate.ts` y `scripts/seed.ts` cargan ese archivo automáticamente antes de conectarse.
+- **Runner**: `npm run migrate:up`/`npm run migrate:down` ejecutan `scripts/migrate.ts`, que aplica archivos `db/migrations/` con el formato `YYYYMMDDHHMM__descripcion.sql` (`-- up` / `-- down`). Cada ejecución se registra en `kit_migrations`.
+- **Creación de archivos**: `npm run migrate:create -- add_users` genera un archivo nuevo con la plantilla `-- up/-- down`. Documenta cualquier convención adicional en `db/migrations/README.md`.
+- **Seeds**: `npm run seed` usa `scripts/seed.ts` para poblar `seed_users`. Extiéndelo con tus propios inserts, ORMs o llamadas HTTP; manténlo idempotente para poder ejecutar `make db:reset && npm run seed` en CI.
+- **Makefile**: `make db:up`, `make db:down` y `make db:reset` envuelven `docker compose` para que puedas recrear la base local sin afectar otros servicios.
+- **Testing**: `npm run test:integration:db` (o `jest --testPathPattern=tests/integration/db`) confirma que la conexión funciona y que `000000000000__bootstrap.sql` fue registrada. Úsalo como smoke test antes de compartir nuevas migraciones.

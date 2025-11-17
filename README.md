@@ -4,7 +4,7 @@ Un starter kit **agnóstico de lenguaje**, diseñado para iniciar proyectos de s
 
 Este repositorio proporciona el **esqueleto profesional mínimo** para arrancar un proyecto sin deuda técnica inicial, con una estructura clara, tests desde el día 1 y un setup robusto que guía a desarrolladores y agentes hacia decisiones correctas.
 
-- ✅ **TypeScript** (Node.js + Express + Jest + Prisma)
+- ✅ **TypeScript** (Node.js + Express + Jest + runner SQL estilo node-pg-migrate)
 - ✅ **Python** (FastAPI + Pytest + SQLAlchemy)
 - ✅ **JSON/Config** (para cualquier otro lenguaje)
 
@@ -42,19 +42,30 @@ chmod +x scripts/setup.sh
 
 # Selecciona el stack cuando se solicite
 # Opciones disponibles:
-#   1) TypeScript + Node.js (Express, Jest, Prisma)
+#   1) TypeScript + Node.js (Express, Jest, SQL runner)
 #   2) Python (FastAPI, Pytest, SQLAlchemy)
 #   3) JSON/Config only (para usar con cualquier lenguaje)
+
+cp .env.example .env
+# Ajusta DB_USER/DB_PASSWORD/DATABASE_URL antes de correr migraciones o seeds.
 ```
 
 > 💡 El script valida prerequisitos (`git`, `npm`, `python3`, `docker-compose`) antes de copiar archivos y te pedirá confirmación si detecta contenido existente. Usa `--force` solo cuando estés seguro de sobrescribir y omitir las validaciones.
 
 ### 2. Configurar Proyecto
 
-```
-1) TypeScript + Node.js (Express + Jest + Prisma)
-2) Python (FastAPI + Pytest + SQLAlchemy)
-3) JSON/Config only
+```bash
+# Arranca la base de datos local (persistente)
+make db:up
+
+# Aplica la migración bootstrap y deja registro en kit_migrations
+npm run migrate:up
+
+# Crea los datos de referencia
+npm run seed
+
+# Prueba la conexión vía Jest
+npm run test:integration:db
 ```
 
 ---
@@ -101,17 +112,20 @@ El pipeline de `npm ci` aún reporta 19 vulnerabilidades moderadas en el `packag
 
 ## 🗄️ Blueprint de base de datos y migraciones
 
-Aunque el starkit no provisiona una base de datos real, TASK-003 exige que cada equipo defina su propia estrategia de
-persistencia. Consulta [`dev-docs/infrastructure/database-blueprint.md`](dev-docs/infrastructure/database-blueprint.md)
-para seguir una guía agnóstica que cubre:
+TASK-003 ya aterrizó el blueprint: el repositorio trae PostgreSQL 16 como servicio `db`, scripts `npm run migrate:*`
+y seeds reproducibles. Consulta [`dev-docs/infrastructure/database-blueprint.md`](dev-docs/infrastructure/database-blueprint.md)
+para entender cómo extenderlo:
 
-- Servicios recomendados en `docker-compose.dev.yml` (ejemplo con Postgres, adaptable a otros motores).
-- Archivos esperados (`.env.example`, `db/migrations/`, seeds) y su relación con `package.json`/`Makefile`.
-- Minitareas, revisiones y comandos de testing que puedes usar para adaptar el kit sin añadir dependencias
-  obligatorias.
+- `docker-compose.dev.yml` expone el servicio `db` con volumen `db-data` y healthcheck `pg_isready`.
+- `.env.example` define `DB_USER`, `DB_PASSWORD`, `DB_NAME` y `DATABASE_URL` para que `scripts/migrate.ts`/`scripts/seed.ts`
+  funcionen sin hardcodear credenciales.
+- `db/migrations/` usa archivos `YYYYMMDDHHMM__descripcion.sql` con bloques `-- up/-- down`; el runner (`npm run migrate:up`)
+  registra cada ejecución en `kit_migrations` y puedes generar plantillas con `npm run migrate:create -- add_users`.
+- `scripts/seed.ts` crea datos mínimos (`seed_users`) y sirve como ejemplo para tu propio pipeline de fixtures.
+- `tests/integration/db/connection.test.ts` valida la conexión y comprueba que la migración bootstrap existe.
 
-Completa la checklist del blueprint y actualiza `dev-docs/task.md` cuando definas tu stack real para que el resto del
-equipo conozca el estado de TASK-003.
+Cuando adaptes el stack (otro motor, ORM o herramienta real como Prisma/`node-pg-migrate`), documenta los cambios en `dev-docs/task.md`
+para mantener la trazabilidad.
 
 ## 🧠 Blueprint de casos de uso y handlers
 
@@ -164,6 +178,7 @@ para apuntar a tu implementación definitiva. Sigue las pautas de `dev-docs/tool
 
 - `tests/setup/setup_script.test.sh` es el harness oficial del setup interactivo. Corre `npm run test:setup` o `make test:setup` para validar las tres rutas sin tocar tu árbol local; el script usa `SETUP_SH_SKIP_INSTALLS=true` para evitar instalaciones reales en entornos CI.
 - `tests/integration/test_setup_script.sh` demuestra cómo validar assets de las plantillas desde Bash. Ejecútalo manualmente o  expón un script (`npm run test:templates`) si quieres integrarlo al pipeline.
+- `tests/integration/db/connection.test.ts` verifica la conexión a PostgreSQL y que la migración bootstrap figure en `kit_migrations`. Ejecuta `npm run test:integration:db` después de `make db:up` y `npm run migrate:up`.
 - `tests/unit/python/` contiene ejemplos de Pytest para el value object `Email`. Son ilustrativos y no forman parte del comando  `npm test`; habilítalos creando un script propio (`npm run test:py`) o desde tu `Makefile` si tu stack final usa Python. Para  ejecutarlos directamente basta con instalar tus dependencias (`pip install -r requirements.txt` o equivalente) y correr  `pytest tests/unit/python`. Si no vas a mantener una suite en Python, documenta la decisión en `dev-docs/context.md` y borra  la carpeta para evitar ruido en tu pipeline.
 
 ## 🧱 Plantillas de dominio y eventos
@@ -196,6 +211,9 @@ make migrate          # Ejecutar migraciones
 make migrate-down     # Rollback última migración
 make seed             # Seed development data
 make db-shell         # PostgreSQL shell
+make db:up            # Levantar sólo la base de datos
+make db:down          # Detener sólo la base de datos
+make db:reset         # Recrear contenedor + volumen
 
 # Quality
 make lint             # Ejecutar linter
