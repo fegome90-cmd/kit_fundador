@@ -24,6 +24,8 @@
 
 ## Pendientes 📋
 
+## Pendientes 📋
+
 ### [TASK-005] API REST endpoint
 - **Prioridad**: Media
 - **Estimación**: 2 horas
