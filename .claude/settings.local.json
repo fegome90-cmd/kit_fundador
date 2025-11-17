@@ -13,7 +13,8 @@
       "Bash(./scripts/adr-reference-checker.sh check-keyword integration)",
       "Bash(./scripts/adr-reference-checker.sh check-keyword \"usage\")",
       "Bash(./scripts/adr-reference-checker.sh check-keyword \"system\")",
-      "Bash(./scripts/adr-reference-checker.sh suggest \"implement new feature\")"
+      "Bash(./scripts/adr-reference-checker.sh suggest \"implement new feature\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://github.com/fegome90-cmd/kit_fundador)"
     ],
     "deny": [],
     "ask": []
