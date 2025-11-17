@@ -111,6 +111,45 @@
         "dev-docs/plan.md#programa-de-ejecución-dependabot",
         "dev-docs/context.md#estado-de-dependabot-y-escaneo-de-dependencias"
       ]
+    },
+    {
+      "id": "DEC-2025-01-17-DB-STACK",
+      "title": "Adoptar PostgreSQL 16 + runner SQL estilo node-pg-migrate",
+      "date": "2025-01-17",
+      "context": "TASK-003 estaba bloqueada hasta seleccionar un motor y herramienta de migraciones reales para el starkit.",
+      "decision": "Configurar servicio `db` (PostgreSQL 16) en docker-compose, exponer scripts `npm run migrate:*` respaldados por `scripts/migrate.ts` (runner SQL compatible con node-pg-migrate), y documentar el uso de `.env` para `DATABASE_URL`/credenciales.",
+      "consequences": [
+        "El repositorio incluye migraciones bootstrap (`db/migrations/000000000000__bootstrap.sql`) y seeds reproducibles.",
+        "`Makefile`/README documentan los comandos `db:up`, `db:reset`, `npm run migrate:up`, `npm run seed`.",
+        "tests/integration/db/connection.test.ts` verifica la conexión y la presencia de la migración inicial."
+      ],
+      "references": [
+        "docker-compose.dev.yml",
+        "Makefile",
+        "db/migrations/README.md",
+        "scripts/migrate.ts",
+        "scripts/seed.ts",
+        "tests/integration/db/connection.test.ts",
+        "README.md#🗄️-blueprint-de-base-de-datos-y-migraciones"
+      ]
+    },
+    {
+      "id": "DEC-2025-01-17-APP-UC1",
+      "title": "Seleccionar RegisterUserAccount como primer use case",
+      "date": "2025-01-17",
+      "context": "TASK-004 requería definir qué flujo de negocio implementaría la capa de aplicación sin perder el alineamiento con el bounded context Identity & Access.",
+      "decision": "Adoptar el escenario `RegisterUserAccount`, que recibe un comando con email/nombre/password, invoca al aggregate `User` y persiste mediante un `UserAccountRepository` abstracto mientras publica los eventos recolectados.",
+      "consequences": [
+        "`dev-docs/task.md` y `dev-docs/plan.md` marcan el avance del use case siguiendo el blueprint.",
+        "`.context/project-state.json` refleja que la deuda TD-APP-001 está en progreso y detalla el flujo seleccionado.",
+        "Los siguientes pasos (DTOs, puertos, handler) quedan delimitados para futuros agentes sin ambigüedad."
+      ],
+      "references": [
+        "dev-docs/task.md#task-004-implementar-primer-use-case",
+        "dev-docs/plan.md#fase-2-application-layer",
+        "dev-docs/domain/ubiquitous-language.md#bounded-context-identity--access",
+        ".context/project-state.json"
+      ]
     }
   ]
 }

@@ -2,33 +2,25 @@
 
 ## En Progreso 🔄
 
-_(sin tareas activas)_
-
-## Pendientes 📋
-
-### [TASK-003] Setup database y migrations
-- **Prioridad**: Media
-- **Estimación**: 3 horas
-- **Dependencias**: TASK-001
-- **Descripción**: Configurar base de datos y sistema de migraciones
-- **Blueprint**: `dev-docs/infrastructure/database-blueprint.md`
-- **Criterios de Aceptación**:
-  - [ ] Docker compose con DB
-  - [ ] Migration framework configurado
-  - [ ] Primera migration funcional
-  - [ ] Seeds para desarrollo
-
 ### [TASK-004] Implementar primer use case
 - **Prioridad**: Alta
 - **Estimación**: 3 horas
 - **Dependencias**: TASK-002, TASK-003
-- **Descripción**: Crear primer caso de uso end-to-end
+- **Estado actual**: 🚧 En progreso
+- **Use case seleccionado**: `RegisterUserAccount`
+  - Bounded context: Identity & Access
+  - Objetivo: Orquestar la creación de un `UserAccount` nuevo a partir de un comando `RegisterUserAccountCommand` y persistirlo vía un `UserAccountRepository` abstracto.
+- **Notas**:
+  - La elección se registró en `.context/decision-log.json` (DEC-2025-01-17-APP-UC1).
+  - `dev-docs/plan.md` y `.context/project-state.json` reflejan que el flujo `RegisterUserAccount` será el primero en implementarse siguiendo el blueprint de application layer.
 - **Blueprint**: `dev-docs/application/use-case-blueprint.md`
 - **Criterios de Aceptación**:
   - [ ] Command handler implementado
   - [ ] Repository interface definida
   - [ ] Tests de integración pasando
   - [ ] Documentado en plan.md
+
+## Pendientes 📋
 
 ### [TASK-005] API REST endpoint
 - **Prioridad**: Media
@@ -185,7 +177,17 @@ _(sin tareas activas)_
   - [x] README enlaza la guía final, documenta `SETUP_SH_SKIP_INSTALLS` y expone el estado actual del setup.
   - [x] `dev-docs/task.md` y `plan.md` reflejan el cierre de cada fase y el backlog pendiente (TASK-015).
   - [x] `.context/project-state.json` y `.context/active-context.md` incluyen el resumen actualizado.
-  - [x] La checklist de validación añade pasos específicos (`npm run test:setup`/`make test:setup`).
+- [x] La checklist de validación añade pasos específicos (`npm run test:setup`/`make test:setup`).
+
+### [TASK-003] Setup database y migrations
+- **Completado**: 2025-01-17
+- **Duración real**: 4 h
+- **Notas**: Se habilitó el servicio `db` (PostgreSQL 16) en `docker-compose.dev.yml`, `Makefile` expone `db:up/db:reset`, `scripts/migrate.ts` aplica archivos `db/migrations/` (`-- up/-- down`), `scripts/seed.ts` crea datos mínimos leyendo `.env` y `tests/integration/db/connection.test.ts` valida la conexión.
+- **Criterios de Aceptación**:
+  - [x] Docker compose con DB (`docker-compose.dev.yml` + volumen `db-data`).
+  - [x] Migration framework configurado (runner SQL compatible con node-pg-migrate).
+  - [x] Primera migration funcional (`000000000000__bootstrap.sql`).
+  - [x] Seeds para desarrollo (`scripts/seed.ts`).
 
 ## Backlog 💭
 

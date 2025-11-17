@@ -4,14 +4,29 @@
 
 set -e
 
-SKIP_INSTALLS=${SETUP_SH_SKIP_INSTALLS:-false}
-
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
+load_dotenv() {
+    local dotenv_file=".env"
+
+    if [[ ! -f $dotenv_file ]]; then
+        echo -e "${YELLOW}⚠ No se encontró .env. Copia .env.example si deseas que el setup use tus credenciales locales.${NC}"
+        return 0
+    fi
+
+    set -a
+    # shellcheck disable=SC1090
+    source "$dotenv_file"
+    set +a
+    echo -e "${BLUE}ℹ️ Variables de .env cargadas en el entorno actual.${NC}"
+}
+
+SKIP_INSTALLS=${SETUP_SH_SKIP_INSTALLS:-false}
 
 FORCE_MODE=false
 
@@ -52,6 +67,7 @@ parse_args() {
 }
 
 parse_args "$@"
+load_dotenv
 
 # utc_timestamp returns the current UTC timestamp in ISO 8601 `YYYY-MM-DDTHH:MM:SSZ` format, falling back to Python if `date` is unavailable and to `1970-01-01T00:00:00Z` if neither is available.
 utc_timestamp() {

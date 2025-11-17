@@ -6,22 +6,24 @@
 ## Current Session
 
 **Started**: 2025-01-16T00:00:00Z
-**Last Updated**: 2025-01-16T17:00:00Z
+**Last Updated**: 2025-01-17T15:30:00Z
 **Agent**: gpt-5-codex
 
 ## Active Tasks
 
-- _(sin tareas activas)_
-- Próximo foco sugerido: ejecutar [TASK-016]/[TASK-017] del plan de Dependabot para eliminar las 19 vulnerabilidades del `package.json` raíz, evaluar si se implementa [TASK-015] (observabilidad opcional del setup) y avanzar con los blueprints de [TASK-003]/[TASK-004].
+- [TASK-004] Implementar primer use case (`RegisterUserAccount` en progreso; sigue blueprint `dev-docs/application/use-case-blueprint.md`).
+- [TASK-016]/[TASK-017] Plan de Dependabot (configuración + baseline de dependencias).
+- [TASK-015] Observabilidad opcional del setup (`--verbose`/`--no-color`).
+
+> Próximo foco sugerido: ejecutar el plan de Dependabot antes de mover el primer use case a “En progreso”.
 
 ## Recent Changes
 
-- Se completaron los bloques C3.1 (harness Bash + `npm run test:setup`) y C3.3 (`utc_timestamp` + warning `docker-compose.dev.yml`) del plan de remediación.
-- README, `dev-docs/plan.md`, `dev-docs/setup/setup-sh-remediation-plan.md`, `dev-docs/setup/setup-sh-remediation-report.md`, `dev-docs/tooling-guide.md` y la checklist post-adaptación reflejan el nuevo estado (solo C3.2/TASK-015 quedó como opt-in).
-- `dev-docs/task.md` mueve TASK-013/TASK-014 a Completadas y crea TASK-015 para la observabilidad opcional.
-- Se añadió `dev-docs/infrastructure/database-blueprint.md` y se enlazó desde README, plan y backlog para guiar la futura implementación de TASK-003 sin comprometer el carácter de starkit.
-- Se publicó `dev-docs/application/use-case-blueprint.md` y se referenció desde README, plan, task list y guías de validación para que TASK-004 tenga un camino claro sin agregar código productivo.
-- Se creó `PLAN_EJECUCION_DEPENDABOT.md`, se añadieron las TASK-016/TASK-017 y se actualizaron README, tooling guide, plan, checklist del consumidor y guía de validación para documentar qué alertas debe atender el starkit.
+- Se completó TASK-003: servicio `db` (PostgreSQL 16) en `docker-compose.dev.yml`, comandos `make db:*`, runner SQL `scripts/migrate.ts`, seeds (`scripts/seed.ts`) y README/plan/tooling guide actualizados.
+- `db/migrations/000000000000__bootstrap.sql` define `-- up/-- down`, `db/migrations/README.md` explica el naming y el runner registra entradas en `kit_migrations`.
+- Se añadió `tests/integration/db/connection.test.ts` para validar la conexión y la migración bootstrap; `package.json` expone `npm run test:integration:db`.
+- `.env.example`, `scripts/setup.sh` y la guía de tooling documentan cómo cargar `DATABASE_URL` automáticamente.
+- `RegisterUserAccount` fue seleccionado como primer use case (DEC-2025-01-17-APP-UC1); TASK-004 se movió a "En progreso" y ya está documentado en dev-docs/plan.md y dev-docs/task.md.
 
 ### Last 5 Commits
 ```
@@ -31,19 +33,17 @@ chore: Initialize project with Kit Fundador v2.0
 
 ## Pending Decisions
 
- 1. **Database provider para Task-003**
-   - Needs input from: Platform lead (apoyarse en `dev-docs/infrastructure/database-blueprint.md`).
-   - Deliverable: ADR corto que seleccione Postgres/Prisma o alternativa.
- 2. **Framework de migrations**
-3. **Primer caso de uso a implementar**
-   - Needs input from: Product/Domain owner.
-   - Deliverable: Nota en `dev-docs/task.md` y decisión en `.context/decision-log.json` usando el blueprint de application layer.
-   - Needs input from: Platform lead.
-   - Blocked by: Decisión de DB; documentar en `dev-docs/task.md` cuando se defina.
-4. **Responsable de PRs de Dependabot**
+ 1. **Observabilidad opcional del setup (`--verbose`/`--no-color`)**
+   - Needs input from: Equipo que adopte `scripts/setup.sh`.
+   - Deliverable: Decidir si TASK-015 se ejecuta o se deja como opt-in documentado.
+ 2. **Responsable de PRs de Dependabot**
    - Needs input from: Team lead que adopte el starkit.
    - Deliverable: Actualizar `dev-docs/task.md`/`PLAN_EJECUCION_DEPENDABOT.md` indicando quién revisará los PRs automáticos y en qué cadencia.
    - Blocked by: Implementar TASK-016 para que exista `.github/dependabot.yml`.
+ 3. **Adapters provisionales para `RegisterUserAccount`**
+   - Needs input from: Equipo de aplicación.
+   - Deliverable: Decidir qué stub/repositorio temporal se usará en `src/infrastructure/_stubs` para las pruebas de integración del use case.
+   - Blocked by: Definir los puertos/DTOs del handler.
 
 ## Known Issues
 
@@ -52,10 +52,10 @@ chore: Initialize project with Kit Fundador v2.0
 ## Context for Next Session
 
 Stack base documentado (TypeScript + Express + Jest + ESLint/Prettier + esbuild). Próximos pasos sugeridos:
-1. Decidir si vale la pena abordar TASK-015 (observabilidad del setup) o dejarlo como opt-in para el equipo consumidor.
-2. Usar el nuevo blueprint de base de datos para planificar/ejecutar TASK-003 sin introducir dependencias innecesarias y, con ello, habilitar TASK-004.
-3. Ejecutar TASK-016/TASK-017 del plan de Dependabot para que `npm ci` deje de reportar vulnerabilidades moderadas.
-4. Seleccionar el primer caso de uso siguiendo `dev-docs/application/use-case-blueprint.md` y documentar la elección antes de escribir código nuevo.
+1. Ejecutar TASK-016/TASK-017 del plan de Dependabot para que `npm ci` deje de reportar vulnerabilidades moderadas.
+2. Seleccionar el primer caso de uso siguiendo `dev-docs/application/use-case-blueprint.md` y documentar la elección antes de escribir código nuevo.
+3. Decidir si vale la pena abordar TASK-015 (observabilidad del setup) o mantenerlo como opt-in.
+4. Planear la transición del runner SQL a la herramienta definitiva (node-pg-migrate/Prisma) cuando el entorno del consumidor lo permita.
 
 Archivos clave a revisar:
 - `config/rules/ai-guardrails.json` - Reglas del agente
