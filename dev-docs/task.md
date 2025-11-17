@@ -2,27 +2,7 @@
 
 ## En Progreso 🔄
 
-### [TASK-004] Implementar primer use case
-- **Prioridad**: Alta
-- **Estimación**: 3 horas
-- **Dependencias**: TASK-002, TASK-003
-- **Estado actual**: 🚧 En progreso
-- **Use case seleccionado**: `RegisterUserAccount`
-  - Bounded context: Identity & Access
-  - Objetivo: Orquestar la creación de un `UserAccount` nuevo a partir de un comando `RegisterUserAccountCommand` y persistirlo vía un `UserAccountRepository` abstracto.
-- **Notas**:
-  - La elección se registró en `.context/decision-log.json` (DEC-2025-01-17-APP-UC1).
-  - `dev-docs/plan.md` y `.context/project-state.json` reflejan que el flujo `RegisterUserAccount` será el primero en implementarse siguiendo el blueprint de application layer.
-  - 2025-01-17: Se definieron los DTOs (`RegisterUserAccountCommand`) y el puerto `UserAccountRepository`, con pruebas unitarias en `tests/unit/application/register-user-account/`.
-  - 2025-01-18: `RegisterUserAccountHandler` y sus unit tests (stub in-memory) viven en `src/application/use-cases/register-user-account/` y `tests/unit/application/register-user-account/register-user-account-handler.test.ts`.
-- **Blueprint**: `dev-docs/application/use-case-blueprint.md`
-- **Criterios de Aceptación**:
-  - [x] Command handler implementado
-  - [x] Repository interface definida
-  - [ ] Tests de integración pasando
-  - [x] Documentado en plan.md
-
-## Pendientes 📋
+_(Sin tareas activas; consulta la sección Pendientes para el siguiente foco.)_
 
 ## Pendientes 📋
 
@@ -192,6 +172,16 @@
   - [x] Migration framework configurado (runner SQL compatible con node-pg-migrate).
   - [x] Primera migration funcional (`000000000000__bootstrap.sql`).
   - [x] Seeds para desarrollo (`scripts/seed.ts`).
+
+### [TASK-004] Implementar primer use case
+- **Completado**: 2025-01-18
+- **Duración real**: 3 h
+- **Notas**: Se eligió `RegisterUserAccount` (DEC-2025-01-17-APP-UC1), se crearon el command/helper y el puerto `UserAccountRepository`, se implementó `RegisterUserAccountHandler` con unit tests y se añadió el stub `src/infrastructure/_stubs/InMemoryUserAccountRepository.ts` más la suite `tests/integration/application/register-user-account/register-user-account.integration.test.ts`. README, dev-docs/plan.md, dev-docs/tooling-guide.md y dev-docs/post-adaptation-validation.md documentan el flujo.
+- **Criterios de Aceptación**:
+  - [x] Command handler implementado
+  - [x] Repository interface definida
+  - [x] Tests de integración pasando
+  - [x] Documentado en plan.md
 
 ## Backlog 💭
 

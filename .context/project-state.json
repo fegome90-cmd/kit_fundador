@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "last_updated": "2025-01-18T10:00:00Z",
+  "last_updated": "2025-01-18T12:30:00Z",
   "project_metadata": {
     "name": "nombre-proyecto",
     "domain": "dominio-negocio",
@@ -67,13 +67,12 @@
       {
         "id": "TD-APP-001",
         "summary": "Primer caso de uso pendiente (TASK-004)",
-        "status": "in_progress",
+        "status": "resolved",
         "remediation_plan": "dev-docs/application/use-case-blueprint.md",
         "tasks": [
-          "TASK-004",
-          "TASK-005"
+          "TASK-004"
         ],
-        "notes": "`RegisterUserAccount` avanza según el blueprint: existen DTOs/puertos y ahora también el handler (`RegisterUserAccountHandler`) con unit tests basados en un repositorio in-memory. Falta preparar el adapter temporal para integración y exponer el flujo vía API (TASK-005)."
+        "notes": "`RegisterUserAccount` completó el blueprint: DTOs, puerto, handler con unit tests y ahora también el stub `src/infrastructure/_stubs/InMemoryUserAccountRepository.ts` + la suite `tests/integration/application/register-user-account/register-user-account.integration.test.ts`. El siguiente paso (TASK-005) es exponer el handler vía API, pero pertenece a otra deuda."
       },
       {
         "id": "TD-DEP-001",
@@ -89,17 +88,17 @@
     ]
   },
   "ai_context": {
-    "last_session_summary": "Se avanzó en TASK-004 implementando `RegisterUserAccountHandler`, cubriéndolo con unit tests (repositorio in-memory) y actualizando las notas/plan para reflejar que el flujo ya orquesta el aggregate `User`. Las siguientes fases requieren un adapter temporal para integrar el handler y exponerlo vía API.",
+    "last_session_summary": "Se cerró TASK-004 añadiendo el stub `InMemoryUserAccountRepository`, las pruebas de integración `tests/integration/application/register-user-account/register-user-account.integration.test.ts` y la documentación correspondiente (README/tooling guide/post-adaptation). El flujo RegisterUserAccount ya tiene DTOs, puerto, handler y tests completos; el siguiente foco es publicar el endpoint (TASK-005) y retomar Dependabot (TASK-016/017).",
     "next_recommended_tasks": [
-      "TASK-004",
+      "TASK-005",
       "TASK-016",
       "TASK-017",
       "TASK-015"
     ],
     "areas_needing_attention": [
-      "Crear el adapter temporal/in-memory en infraestructura para poder correr pruebas de integración del use case",
-      "Decidir si se implementa la observabilidad opcional del setup (TASK-015)",
+      "Definir y documentar el endpoint REST/OpenAPI para RegisterUserAccount (TASK-005)",
       "Ejecutar PLAN_EJECUCION_DEPENDABOT.md (TASK-016/TASK-017) para eliminar las 19 vulnerabilidades detectadas por npm ci",
+      "Decidir si se implementa la observabilidad opcional del setup (TASK-015)",
       "Planear cómo reemplazar el runner SQL por node-pg-migrate/Prisma cuando se habilite el pipeline del consumidor"
     ],
     "recent_decisions": [

@@ -47,6 +47,8 @@ Además de Jest, el repositorio contiene ejemplos de pruebas en otros lenguajes 
   ```
   El harness exporta `SETUP_SH_SKIP_INSTALLS=true` para omitir `npm install`/`pip install` cuando solo quieres validar la copia de plantillas.
 
+- `tests/integration/application/register-user-account/register-user-account.integration.test.ts`: suite de integración que orquesta `RegisterUserAccountHandler` con el stub `src/infrastructure/_stubs/InMemoryUserAccountRepository.ts`. Úsala como blueprint para tus propios adapters y ejecútala con `npm run test -- --testPathPattern=tests/integration/application`.
+
 - `tests/integration/test_setup_script.sh`: script Bash que valida la presencia de plantillas. Para ejecutarlo manualmente:
   ```bash
   bash tests/integration/test_setup_script.sh
