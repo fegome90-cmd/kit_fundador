@@ -1,0 +1,116 @@
+{
+  "version": "1.0.0",
+  "decisions": [
+    {
+      "id": "DEC-2025-01-16-STACK",
+      "title": "Stack base TypeScript + Express",
+      "date": "2025-01-16",
+      "context": "Necesitamos fijar un perfil predeterminado para que los agentes sepan qué dependencias ejemplificar en el starkit.",
+      "decision": "Mantener TypeScript (Node.js 20) con Express mínimo, Jest/Playwright/Pact/k6 para testing, ESLint + Prettier para lint/format y esbuild como build tool.",
+      "consequences": [
+        "Facilita reemplazo rápido por otros frameworks al no introducir dependencias complejas",
+        "Documentación actualizada en README, dev-docs/context.md y dev-docs/tech-stack-decisions.md",
+        "Los consumidores deben actualizar el config si eligen otro stack"
+      ],
+      "references": [
+        "config/tech-stack.json",
+        "dev-docs/tech-stack-decisions.md",
+        "dev-docs/context.md"
+      ]
+    },
+    {
+      "id": "DEC-2025-01-16-SETUP-PHASE-B",
+      "title": "Aplicar Fase B del plan de remediación del setup",
+      "date": "2025-01-16",
+      "context": "El auditor reportó riesgos de pérdida de datos y prerequisitos no verificados en `scripts/setup.sh`.",
+      "decision": "Agregar validación temprana de prerequisitos, confirmaciones de sobrescritura con soporte `--force` y un prompt para conservar/mover/eliminar `templates/`.",
+      "consequences": [
+        "Los usuarios ven errores claros antes de que el script copie archivos si falta git/npm/python3/pip/docker-compose",
+        "Los repos existentes no se sobrescriben sin confirmación explícita",
+        "Se documenta cómo automatizar el flujo desde README y dev-docs/tooling-guide.md"
+      ],
+      "references": [
+        "scripts/setup.sh",
+        "README.md#🚀-quick-start",
+        "dev-docs/setup/setup-sh-remediation-plan.md",
+        "dev-docs/tooling-guide.md#5-script-interactivo-scriptssetupsh"
+      ]
+    },
+    {
+      "id": "DEC-2025-01-16-SETUP-PHASE-C",
+      "title": "Completar C3.1/C3.3 del setup y diferir C3.2",
+      "date": "2025-01-16",
+      "context": "La auditoría pedía test harness, integridad de contextos y observabilidad; se priorizaron los dos primeros para mantener el starkit simple.",
+      "decision": "Agregar harness Bash + helper utc_timestamp/warning docker-compose y documentar que las banderas --verbose/--no-color quedan como mejora opt-in (TASK-015).",
+      "consequences": [
+        "scripts/setup.sh se valida automáticamente y produce JSON consistente",
+        "README/tooling guide/post-adaptation checklist documentan npm run test:setup y SETUP_SH_SKIP_INSTALLS",
+        "Observabilidad se traslada al backlog opcional (TASK-015)"
+      ],
+      "references": [
+        "scripts/setup.sh",
+        "tests/setup/setup_script.test.sh",
+        "dev-docs/setup/setup-sh-remediation-plan.md",
+        "dev-docs/setup/setup-sh-remediation-report.md"
+      ]
+    },
+    {
+      "id": "DEC-2025-01-16-DB-BLUEPRINT",
+      "title": "Blueprint agnóstico para TASK-003",
+      "date": "2025-01-16",
+      "context": "El roadmap exige documentar cómo implementar base de datos y migraciones sin comprometer el carácter de starkit.",
+      "decision": "Publicar `dev-docs/infrastructure/database-blueprint.md`, enlazarlo desde README/plan/backlog y mantener TASK-003 pendiente hasta que un consumidor adopte el plan.",
+      "consequences": [
+        "Los equipos tienen una guía paso a paso sin que el repo arrastre dependencias de DB",
+        "TASK-003 referencia explícita al blueprint y puede moverse a 'En progreso' apenas se seleccione proveedor real",
+        "El estado global refleja la deuda de infraestructura como TD-DB-001 para facilitar seguimiento"
+      ],
+      "references": [
+        "dev-docs/infrastructure/database-blueprint.md",
+        "README.md#🗄️-blueprint-de-base-de-datos-y-migraciones",
+        "dev-docs/task.md#task-003-setup-database-y-migrations",
+        "dev-docs/plan.md#fase-3-infrastructure"
+      ]
+    },
+    {
+      "id": "DEC-2025-01-16-APP-BLUEPRINT",
+      "title": "Blueprint agnóstico para TASK-004",
+      "date": "2025-01-16",
+      "context": "El roadmap requiere un primer caso de uso pero el starkit no debe incluir lógica específica; se necesita una guía reutilizable.",
+      "decision": "Crear `dev-docs/application/use-case-blueprint.md`, enlazarlo desde README/plan/task y mantener TASK-004 pendiente hasta que el consumidor seleccione su flujo.",
+      "consequences": [
+        "Los equipos conocen los artefactos, pruebas y code reviews necesarios antes de implementar su primer handler",
+        "Se evita introducir infraestructura o dependencias accidentales en la capa de aplicación",
+        "La documentación de validación y el backlog ahora señalan explícitamente el blueprint como prerequisito"
+      ],
+      "references": [
+        "dev-docs/application/use-case-blueprint.md",
+        "README.md#🧠-blueprint-de-casos-de-uso-y-handlers",
+        "dev-docs/task.md#task-004-implementar-primer-use-case",
+        "dev-docs/plan.md#fase-2-application-layer",
+        "dev-docs/post-adaptation-validation.md"
+      ]
+    },
+    {
+      "id": "DEC-2025-01-16-DEPENDABOT-PLAN",
+      "title": "Planificar la ejecución de Dependabot sin sobre-ingeniería",
+      "date": "2025-01-16",
+      "context": "El pipeline `npm ci` reporta 19 vulnerabilidades moderadas y no existe `.github/dependabot.yml`; necesitamos priorizar qué arreglar dentro del starkit y qué dejar al consumidor.",
+      "decision": "Crear PLAN_EJECUCION_DEPENDABOT.md, añadir TASK-016/TASK-017 y actualizar README/tooling guide/checklists para documentar que configuraremos Dependabot y actualizaremos el package.json raíz antes de delegar nuevas alertas.",
+      "consequences": [
+        "Hay un documento único que distingue entre hallazgos críticos y mejoras opcionales",
+        "El backlog incluye tareas concretas (configuración + baseline) sin introducir auto-merge ni herramientas externas",
+        "README/dev-docs señalan a los consumidores dónde documentar su propia estrategia si difiere"
+      ],
+      "references": [
+        "PLAN_EJECUCION_DEPENDABOT.md",
+        "README.md#🤖-plan-de-dependabot",
+        "dev-docs/tooling-guide.md#6-dependabot-y-mantenimiento-de-dependencias",
+        "dev-docs/task.md#task-016-configurar-dependabot-mínimo",
+        "dev-docs/task.md#task-017-actualizar-baseline-de-dependencias",
+        "dev-docs/plan.md#programa-de-ejecución-dependabot",
+        "dev-docs/context.md#estado-de-dependabot-y-escaneo-de-dependencias"
+      ]
+    }
+  ]
+}

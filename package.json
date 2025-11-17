@@ -13,6 +13,7 @@
     "test:e2e": "jest --testPathPattern=tests/e2e",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:setup": "bash tests/setup/setup_script.test.sh",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",
