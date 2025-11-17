@@ -6,8 +6,11 @@
 
 - [ ] `npm run lint` / `make lint` / comando equivalente se ejecuta sin errores.
 - [ ] `npm run test` (u otro runner) cubre los módulos recién creados y falla cuando se rompe una invariante.
+- [ ] Los comandos específicos del blueprint de casos de uso (`npm run test -- --testPathPattern=tests/unit/application`,
+      `tests/integration/application`) pasan con los adapters/stubs reales del proyecto.
 - [ ] `npm run type-check` o verificación equivalente (mypy, go vet, etc.) completó con éxito.
 - [ ] `npm run test:setup` o `make test:setup` validó que `scripts/setup.sh` siga produciendo artefactos consistentes tras tus personalizaciones (usa `SETUP_SH_SKIP_INSTALLS=true` en CI si no hay acceso a npm/PyPI).
+- [ ] `npm run test:integration:db` (el script habilita `RUN_DB_TESTS=true`) confirma que las migraciones aplicadas aparecen en `kit_migrations` y que la conexión a la base local funciona con tus credenciales. Si lo integras a otra suite, recuerda exportar `RUN_DB_TESTS=true` para evitar que se omita.
 - [ ] Hooks de `lint-staged`/pre-commit actualizados para todos los lenguajes presentes en el repo.
 
 ## 2. Servicios e integraciones reemplazados
@@ -23,6 +26,7 @@
 - [ ] Los pipelines de CI ejecutan lint + test + type-check de punta a punta.
 - [ ] `README` y `dev-docs/plan.md` reflejan el estado actual del stack y de los milestones.
 - [ ] El script `scripts/validate-architecture.sh` (o equivalente) pasa en el entorno local.
+- [ ] Se ejecutó el plan de Dependabot (`PLAN_EJECUCION_DEPENDABOT.md`) o se documentó explícitamente la estrategia alternativa en `dev-docs/context.md`.
 
 ## 4. Preguntas guía para el equipo
 

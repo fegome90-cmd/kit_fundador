@@ -18,21 +18,23 @@
 - [ ] Tests de domain layer (100% coverage) → pendiente de expandir cuando se añadan nuevos aggregates.
 
 ### Fase 2: Application Layer
-- [ ] Implementar use cases
+- [ ] Implementar use cases → sigue el plan de [`dev-docs/application/use-case-blueprint.md`](application/use-case-blueprint.md)
+  - ✅ Use case seleccionado: `RegisterUserAccount` (bounded context Identity & Access). El objetivo es tomar un comando `RegisterUserAccountCommand`, crear el aggregate `User` y persistirlo mediante un `UserAccountRepository` abstracto. Documentado en `dev-docs/task.md` y `.context/decision-log.json` (DEC-2025-01-17-APP-UC1).
+  - ✅ Contratos definidos: `RegisterUserAccountCommand` + helper de normalización y el puerto `UserAccountRepository` viven en `src/application/`, con unit tests en `tests/unit/application/register-user-account/`.
+  - 🟡 Handler en progreso: `RegisterUserAccountHandler` ya expone `execute` y cuenta con unit tests basados en un stub in-memory (`tests/unit/application/register-user-account/register-user-account-handler.test.ts`); resta crear el adapter temporal para las pruebas de integración.
 - [ ] Command handlers
 - [ ] Query handlers
 - [ ] Application services
 - [ ] Integration tests
 
 ### Fase 3: Infrastructure
-- [ ] Database setup y migrations
+- [x] Database setup y migrations → PostgreSQL 16 como servicio `db`, scripts `npm run migrate:*`/`npm run seed` y smoke tests `tests/integration/db`.
 - [ ] Repository implementations
 - [ ] API REST/GraphQL
 - [ ] Authentication/Authorization
 - [ ] Observability (logs, metrics, traces)
 
-> 🔎 Consulta [`dev-docs/infrastructure/database-blueprint.md`](infrastructure/database-blueprint.md) antes de abordar TASK-003.
-> El documento desgrana minitareas, revisiones de código y pruebas para adaptar el starkit sin introducir dependencias nuevas.
+> 🔎 Consulta [`dev-docs/infrastructure/database-blueprint.md`](infrastructure/database-blueprint.md) para extender el runner SQL (`scripts/migrate.ts`), añadir nuevas migraciones y mantener la documentación sincronizada cuando cambie el motor.
 
 ### Fase 4: Production Ready
 - [ ] Performance testing
@@ -86,6 +88,16 @@ antes de que un equipo adopte el script interactivo. Para mantener la trazabilid
 1. Consulta el [plan de ejecución](setup/setup-sh-remediation-plan.md) y decide qué fases aplicarás (Fases A/B y los bloques C3.1/C3.3 ✅ ya viven en main; la observabilidad C3.2 quedó como mejora opcional documentada en `TASK-015`).
 2. Registra el avance en `dev-docs/task.md` usando las TASK-011 a TASK-015.
 3. Actualiza `.context/project-state.json` una vez que cierres cada fase para que futuros agentes conozcan el estado real del setup.
+
+## Programa de ejecución Dependabot
+
+El pipeline de GitHub Actions sigue reportando 19 vulnerabilidades moderadas porque el `package.json` raíz conserva dependencias antiguas (ESLint 8, `@typescript-eslint` 6, glob@7, rimraf@3). Además, el repositorio aún no expone `.github/dependabot.yml`. Para ordenar el trabajo:
+
+1. Sigue [`PLAN_EJECUCION_DEPENDABOT.md`](../PLAN_EJECUCION_DEPENDABOT.md), que divide la remediación en tres fases.
+2. Registra el avance usando **TASK-016** (configuración) y **TASK-017** (baseline). Ninguna otra task se creó para auto-merge/logging porque se consideró sobre-ingeniería.
+3. Actualiza README, tooling guide, checklist del consumidor y guía de validación cuando cierres cada fase para mantener la trazabilidad.
+
+> 📌 El starkit sólo garantiza dependencias saludables por defecto; cualquier flujo adicional (auto-merge, alertas custom) queda documentado como opt-in para los consumidores del kit.
 
 ## Hitos
 
