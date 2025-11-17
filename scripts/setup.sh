@@ -15,6 +15,7 @@ NC='\033[0m' # No Color
 
 FORCE_MODE=false
 
+# usage displays the script's usage/help text and available options (shown in Spanish).
 usage() {
     cat <<USAGE
 Uso: ./scripts/setup.sh [opciones]
@@ -28,6 +29,7 @@ Variables de entorno:
 USAGE
 }
 
+# parse_args parses recognized command-line flags; sets FORCE_MODE when `--force` is provided, prints usage and exits on `-h`/`--help`, and reports an error for unrecognized flags.
 parse_args() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -50,6 +52,8 @@ parse_args() {
 
 parse_args "$@"
 
+# utc_timestamp returns the current UTC timestamp in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ).
+# It prefers the `date` command, falls back to `python3` if `date` is unavailable, and returns "1970-01-01T00:00:00Z" if neither is present.
 utc_timestamp() {
     if command -v date &> /dev/null; then
         if ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2> /dev/null); then
@@ -69,6 +73,7 @@ PY
     echo "1970-01-01T00:00:00Z"
 }
 
+# has_compose checks whether Docker Compose is available and returns success (0) if either the `docker-compose` binary or the `docker` CLI with the compose plugin is present, failing (1) otherwise.
 has_compose() {
     if command -v docker-compose &> /dev/null; then
         return 0
@@ -83,6 +88,7 @@ has_compose() {
     return 1
 }
 
+# validate_prerequisites validates required command-line tools for the given mode (`typescript`, `python`, or `generic`) and prints any missing tools then exits unless `FORCE_MODE` is true, in which case it warns and continues.
 validate_prerequisites() {
     local mode=$1
     local -a missing
@@ -146,6 +152,11 @@ validate_prerequisites() {
     fi
 }
 
+# confirm_overwrite checks for existing project files that would be overwritten and prompts the user to confirm before proceeding.
+# It builds a list of potential overwrite targets based on the given mode (`typescript`, `python`, or `generic`), prints any existing targets, and:
+# - if `FORCE_MODE` is true, proceeds without prompting;
+# - otherwise asks the user to confirm and exits the script if the user declines.
+# @param mode The setup mode influencing which files are considered (allowed: "typescript", "python", "generic").
 confirm_overwrite() {
     local mode=$1
     local -a targets=("src" "tests" "config/tech-stack.json" ".context/project-state.json")
@@ -277,7 +288,7 @@ JSON_END
     echo "  make dev                 # Con Docker Compose"
 }
 
-# setup_python configures a Python (FastAPI) project by copying template files, writing config/tech-stack.json, creating a virtual environment and installing dependencies if python3 is available, and printing next-step instructions.
+# setup_python configures a Python (FastAPI) project by copying template files, writing config/tech-stack.json, creating a virtual environment if python3 is available, and installing dependencies unless SETUP_SH_SKIP_INSTALLS is set.
 setup_python() {
     validate_prerequisites "python"
     confirm_overwrite "python"
@@ -351,7 +362,7 @@ JSON_END
     echo "  make dev                  # Con Docker Compose"
 }
 
-# setup_json creates a minimal JSON/config-only project structure with placeholder `.gitkeep` files, writes a default `config/tech-stack.json`, and prints next-step guidance.
+# setup_json creates a minimal language-agnostic project layout with placeholder `.gitkeep` files, writes `config/tech-stack.json` describing a generic stack, and prints concise next-step guidance.
 setup_json() {
     validate_prerequisites "generic"
     confirm_overwrite "generic"
@@ -405,7 +416,7 @@ JSON_END
     echo "  3. Revisa dev-docs/ para guías de arquitectura"
 }
 
-# cleanup_templates prints a notice that template files are being cleaned from the project, reminds the user that the templates/ directory is kept for reference, and shows the command to remove it (rm -rf templates/).
+# cleanup_templates offers interactive options to keep, move to .templates/, or delete the templates/ directory; returns immediately if templates/ is not present.
 cleanup_templates() {
     if [[ ! -d templates ]]; then
         return
@@ -433,6 +444,7 @@ cleanup_templates() {
     esac
 }
 
+# warn_missing_compose_file warns when `docker-compose.dev.yml` is missing and informs the user that Makefile targets relying on Docker Compose will fail until a compose file is provided.
 warn_missing_compose_file() {
     if [[ -f docker-compose.dev.yml ]]; then
         return
@@ -444,7 +456,7 @@ warn_missing_compose_file() {
 }
 
 # update_context writes .context/project-state.json recording initialization timestamp, selected language, phase, and a default last_session with suggested next steps.
-# Accepts a single argument `lang` that is stored as the project's language identifier (e.g., "typescript", "python", "generic").
+# update_context writes .context/project-state.json containing project metadata (version, initialized timestamp, language, phase, aggregates_implemented, bounded_contexts, and last_session with date, summary, and next_steps).
 update_context() {
     local lang=$1
     local timestamp=${2:-$(utc_timestamp)}
