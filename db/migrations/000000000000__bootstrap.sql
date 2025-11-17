@@ -1,0 +1,9 @@
+-- up
+CREATE TABLE IF NOT EXISTS seed_users (
+    id BIGSERIAL PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- down
+DROP TABLE IF EXISTS seed_users;

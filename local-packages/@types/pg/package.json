@@ -1,0 +1,6 @@
+{
+  "name": "@types/pg",
+  "version": "8.15.6",
+  "types": "index.d.ts",
+  "license": "MIT"
+}
