@@ -2,21 +2,25 @@
 
 ## En Progreso 🔄
 
-_(sin tareas activas)_
-
-## Pendientes 📋
-
 ### [TASK-004] Implementar primer use case
 - **Prioridad**: Alta
 - **Estimación**: 3 horas
 - **Dependencias**: TASK-002, TASK-003
-- **Descripción**: Crear primer caso de uso end-to-end
+- **Estado actual**: 🚧 En progreso
+- **Use case seleccionado**: `RegisterUserAccount`
+  - Bounded context: Identity & Access
+  - Objetivo: Orquestar la creación de un `UserAccount` nuevo a partir de un comando `RegisterUserAccountCommand` y persistirlo vía un `UserAccountRepository` abstracto.
+- **Notas**:
+  - La elección se registró en `.context/decision-log.json` (DEC-2025-01-17-APP-UC1).
+  - `dev-docs/plan.md` y `.context/project-state.json` reflejan que el flujo `RegisterUserAccount` será el primero en implementarse siguiendo el blueprint de application layer.
 - **Blueprint**: `dev-docs/application/use-case-blueprint.md`
 - **Criterios de Aceptación**:
   - [ ] Command handler implementado
   - [ ] Repository interface definida
   - [ ] Tests de integración pasando
   - [ ] Documentado en plan.md
+
+## Pendientes 📋
 
 ### [TASK-005] API REST endpoint
 - **Prioridad**: Media
