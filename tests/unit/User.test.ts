@@ -128,7 +128,7 @@ describe('User Entity', () => {
       const user = User.create({
         email: Email.create('admin@example.com'),
         name: 'Admin User',
-        password: Password.create('SecurePass123!'),
+        password: Password.create(STRONG_PASSWORD),
         role: 'admin',
       });
       
@@ -139,7 +139,7 @@ describe('User Entity', () => {
       const user = User.create({
         email: Email.create('user@example.com'),
         name: 'Regular User',
-        password: Password.create('SecurePass123!'),
+        password: Password.create(STRONG_PASSWORD),
         role: 'user',
       });
       

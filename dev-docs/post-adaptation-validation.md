@@ -25,6 +25,7 @@
 - [ ] Los pipelines de CI ejecutan lint + test + type-check de punta a punta.
 - [ ] `README` y `dev-docs/plan.md` reflejan el estado actual del stack y de los milestones.
 - [ ] El script `scripts/validate-architecture.sh` (o equivalente) pasa en el entorno local.
+- [ ] Se ejecutó el plan de Dependabot (`PLAN_EJECUCION_DEPENDABOT.md`) o se documentó explícitamente la estrategia alternativa en `dev-docs/context.md`.
 
 ## 4. Preguntas guía para el equipo
 

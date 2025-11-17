@@ -6,13 +6,13 @@
 ## Current Session
 
 **Started**: 2025-01-16T00:00:00Z
-**Last Updated**: 2025-01-16T14:00:00Z
+**Last Updated**: 2025-01-16T17:00:00Z
 **Agent**: gpt-5-codex
 
 ## Active Tasks
 
 - _(sin tareas activas)_
-- Próximo foco sugerido: evaluar si se implementa [TASK-015] (observabilidad opcional del setup), avanzar con el blueprint de [TASK-003] y preparar [TASK-004] usando la nueva guía de casos de uso.
+- Próximo foco sugerido: ejecutar [TASK-016]/[TASK-017] del plan de Dependabot para eliminar las 19 vulnerabilidades del `package.json` raíz, evaluar si se implementa [TASK-015] (observabilidad opcional del setup) y avanzar con los blueprints de [TASK-003]/[TASK-004].
 
 ## Recent Changes
 
@@ -21,6 +21,7 @@
 - `dev-docs/task.md` mueve TASK-013/TASK-014 a Completadas y crea TASK-015 para la observabilidad opcional.
 - Se añadió `dev-docs/infrastructure/database-blueprint.md` y se enlazó desde README, plan y backlog para guiar la futura implementación de TASK-003 sin comprometer el carácter de starkit.
 - Se publicó `dev-docs/application/use-case-blueprint.md` y se referenció desde README, plan, task list y guías de validación para que TASK-004 tenga un camino claro sin agregar código productivo.
+- Se creó `PLAN_EJECUCION_DEPENDABOT.md`, se añadieron las TASK-016/TASK-017 y se actualizaron README, tooling guide, plan, checklist del consumidor y guía de validación para documentar qué alertas debe atender el starkit.
 
 ### Last 5 Commits
 ```
@@ -39,6 +40,10 @@ chore: Initialize project with Kit Fundador v2.0
    - Deliverable: Nota en `dev-docs/task.md` y decisión en `.context/decision-log.json` usando el blueprint de application layer.
    - Needs input from: Platform lead.
    - Blocked by: Decisión de DB; documentar en `dev-docs/task.md` cuando se defina.
+4. **Responsable de PRs de Dependabot**
+   - Needs input from: Team lead que adopte el starkit.
+   - Deliverable: Actualizar `dev-docs/task.md`/`PLAN_EJECUCION_DEPENDABOT.md` indicando quién revisará los PRs automáticos y en qué cadencia.
+   - Blocked by: Implementar TASK-016 para que exista `.github/dependabot.yml`.
 
 ## Known Issues
 
@@ -49,7 +54,8 @@ chore: Initialize project with Kit Fundador v2.0
 Stack base documentado (TypeScript + Express + Jest + ESLint/Prettier + esbuild). Próximos pasos sugeridos:
 1. Decidir si vale la pena abordar TASK-015 (observabilidad del setup) o dejarlo como opt-in para el equipo consumidor.
 2. Usar el nuevo blueprint de base de datos para planificar/ejecutar TASK-003 sin introducir dependencias innecesarias y, con ello, habilitar TASK-004.
-3. Seleccionar el primer caso de uso siguiendo `dev-docs/application/use-case-blueprint.md` y documentar la elección antes de escribir código nuevo.
+3. Ejecutar TASK-016/TASK-017 del plan de Dependabot para que `npm ci` deje de reportar vulnerabilidades moderadas.
+4. Seleccionar el primer caso de uso siguiendo `dev-docs/application/use-case-blueprint.md` y documentar la elección antes de escribir código nuevo.
 
 Archivos clave a revisar:
 - `config/rules/ai-guardrails.json` - Reglas del agente

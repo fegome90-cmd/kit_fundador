@@ -52,6 +52,28 @@ _(sin tareas activas)_
   - [ ] README/tooling guide explican cuándo habilitar la funcionalidad.
   - [ ] Tests cubren los nuevos caminos (`./scripts/setup.sh --verbose`, `--no-color`).
 
+### [TASK-016] Configurar Dependabot mínimo
+- **Prioridad**: Media
+- **Estimación**: 1 hora
+- **Dependencias**: Ninguna
+- **Descripción**: Crear `.github/dependabot.yml` siguiendo [`PLAN_EJECUCION_DEPENDABOT.md`](../PLAN_EJECUCION_DEPENDABOT.md) para que el starkit reciba PRs semanales de npm (raíz y plantilla TypeScript) y GitHub Actions.
+- **Criterios de Aceptación**:
+  - [ ] Archivo `.github/dependabot.yml` con tres `package-ecosystem` configurados y `open-pull-requests-limit` <= 5.
+  - [ ] README y `dev-docs/tooling-guide.md` explican cómo pausar o ajustar los intervalos.
+  - [ ] `.context/project-state.json` registra la deuda `TD-DEP-001` como "en progreso" o "resuelta" según corresponda.
+  - [ ] Se documenta en `dev-docs/task.md` qué equipos revisarán los PRs automáticos.
+
+### [TASK-017] Actualizar baseline de dependencias
+- **Prioridad**: Alta
+- **Estimación**: 2 horas
+- **Dependencias**: TASK-016
+- **Descripción**: Elevar las dependencias del `package.json` raíz para igualar las versiones auditadas en la plantilla TypeScript (ESLint 9, `@typescript-eslint` 8, `redis` 5, etc.) y eliminar las 19 vulnerabilidades reportadas por `npm ci`.
+- **Criterios de Aceptación**:
+  - [ ] `npm outdated` y `npm audit` ejecutados antes/después, con resultados documentados en `PLAN_EJECUCION_DEPENDABOT.md`.
+  - [ ] `package-lock.json` regenerado y committeado.
+  - [ ] `npm run lint`, `npm test` y `npm run test:setup` en verde con las nuevas versiones.
+  - [ ] README/plan/tooling guide reflejan la fecha del último baseline.
+
 
 
 ## Completadas ✅

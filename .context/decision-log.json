@@ -90,6 +90,27 @@
         "dev-docs/plan.md#fase-2-application-layer",
         "dev-docs/post-adaptation-validation.md"
       ]
+    },
+    {
+      "id": "DEC-2025-01-16-DEPENDABOT-PLAN",
+      "title": "Planificar la ejecución de Dependabot sin sobre-ingeniería",
+      "date": "2025-01-16",
+      "context": "El pipeline `npm ci` reporta 19 vulnerabilidades moderadas y no existe `.github/dependabot.yml`; necesitamos priorizar qué arreglar dentro del starkit y qué dejar al consumidor.",
+      "decision": "Crear PLAN_EJECUCION_DEPENDABOT.md, añadir TASK-016/TASK-017 y actualizar README/tooling guide/checklists para documentar que configuraremos Dependabot y actualizaremos el package.json raíz antes de delegar nuevas alertas.",
+      "consequences": [
+        "Hay un documento único que distingue entre hallazgos críticos y mejoras opcionales",
+        "El backlog incluye tareas concretas (configuración + baseline) sin introducir auto-merge ni herramientas externas",
+        "README/dev-docs señalan a los consumidores dónde documentar su propia estrategia si difiere"
+      ],
+      "references": [
+        "PLAN_EJECUCION_DEPENDABOT.md",
+        "README.md#🤖-plan-de-dependabot",
+        "dev-docs/tooling-guide.md#6-dependabot-y-mantenimiento-de-dependencias",
+        "dev-docs/task.md#task-016-configurar-dependabot-mínimo",
+        "dev-docs/task.md#task-017-actualizar-baseline-de-dependencias",
+        "dev-docs/plan.md#programa-de-ejecución-dependabot",
+        "dev-docs/context.md#estado-de-dependabot-y-escaneo-de-dependencias"
+      ]
     }
   ]
 }

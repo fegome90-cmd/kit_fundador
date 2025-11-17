@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "last_updated": "2025-01-16T15:00:00Z",
+  "last_updated": "2025-01-16T17:00:00Z",
   "project_metadata": {
     "name": "nombre-proyecto",
     "domain": "dominio-negocio",
@@ -64,20 +64,34 @@
           "TASK-005"
         ],
         "notes": "El blueprint define contratos, handlers y pruebas mínimas para la capa de aplicación; sigue pendiente seleccionar el primer flujo y documentar la decisión."
+      },
+      {
+        "id": "TD-DEP-001",
+        "summary": "Alertas de dependencias sin configuración de Dependabot",
+        "status": "planned",
+        "remediation_plan": "PLAN_EJECUCION_DEPENDABOT.md",
+        "tasks": [
+          "TASK-016",
+          "TASK-017"
+        ],
+        "notes": "El pipeline reporta 19 vulnerabilidades moderadas porque el package.json raíz usa ESLint 8/\"@typescript-eslint\" 6. Falta crear `.github/dependabot.yml` para npm (raíz + plantilla TS) y GitHub Actions."
       }
     ]
   },
   "ai_context": {
-    "last_session_summary": "Se añadieron los blueprints de base de datos y de casos de uso, enlazados desde README/plan/backlog, para que TASK-003 y TASK-004 tengan instrucciones detalladas sin comprometer el starkit. El setup sigue con observabilidad opcional (TASK-015).",
+    "last_session_summary": "Se publicó PLAN_EJECUCION_DEPENDABOT.md, se añadieron TASK-016/TASK-017 y se actualizaron README, plan, tooling guide y checklists para documentar cómo abordar las 19 vulnerabilidades de npm antes de que los consumidores adopten el kit.",
     "next_recommended_tasks": [
       "TASK-003",
       "TASK-004",
+      "TASK-016",
+      "TASK-017",
       "TASK-015"
     ],
     "areas_needing_attention": [
       "Seleccionar proveedor de base de datos y herramienta de migraciones usando el blueprint como guía",
       "Decidir si se implementa la observabilidad opcional del setup (TASK-015)",
-      "Elegir el primer caso de uso con base en el blueprint de application layer y registrar la decisión antes de escribir código"
+      "Elegir el primer caso de uso con base en el blueprint de application layer y registrar la decisión antes de escribir código",
+      "Ejecutar PLAN_EJECUCION_DEPENDABOT.md (TASK-016/TASK-017) para eliminar las 19 vulnerabilidades detectadas por npm ci"
     ],
     "recent_decisions": [
       {
@@ -125,6 +139,19 @@
           "README.md#🧠-blueprint-de-casos-de-uso-y-handlers",
           "dev-docs/task.md#task-004-implementar-primer-use-case",
           "dev-docs/plan.md#fase-2-application-layer"
+        ]
+      },
+      {
+        "id": "DEC-2025-01-16-DEPENDABOT-PLAN",
+        "summary": "Se definió el plan de ejecución de Dependabot, se añadieron TASK-016/TASK-017 y se actualizó la documentación para priorizar la configuración de Dependabot y la actualización del package.json raíz.",
+        "references": [
+          "PLAN_EJECUCION_DEPENDABOT.md",
+          "README.md#🤖-plan-de-dependabot",
+          "dev-docs/tooling-guide.md#6-dependabot-y-mantenimiento-de-dependencias",
+          "dev-docs/task.md#task-016-configurar-dependabot-mínimo",
+          "dev-docs/task.md#task-017-actualizar-baseline-de-dependencias",
+          "dev-docs/plan.md#programa-de-ejecución-dependabot",
+          "dev-docs/context.md#estado-de-dependabot-y-escaneo-de-dependencias"
         ]
       }
     ]

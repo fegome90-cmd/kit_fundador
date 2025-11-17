@@ -84,3 +84,10 @@ stack.
 - Usa `./scripts/setup.sh --force` únicamente en pipelines automatizados o cuando estés seguro de que quieres sobrescribir archivos sin confirmación y continuar a pesar de prerequisitos faltantes.
 - Al finalizar, el script pregunta si deseas conservar `templates/`, moverlos a `.templates/` o eliminarlos. Documenta tu elección en `dev-docs/context.md` si cambias el flujo estándar.
 - Define `SETUP_SH_SKIP_INSTALLS=true` cuando ejecutes el script/harness en entornos sin acceso a npm o PyPI; la copia de plantillas y actualización de `.context/` se ejecutará igual, pero se omitirá `npm install`/`pip install`.
+
+## 6. Dependabot y mantenimiento de dependencias
+
+- Sigue [`PLAN_EJECUCION_DEPENDABOT.md`](../PLAN_EJECUCION_DEPENDABOT.md) para decidir qué alertas atender dentro del starkit.
+- Configuración recomendada (TASK-016): `.github/dependabot.yml` con tres entradas → `npm` (raíz), `npm` (templates/typescript) y `github-actions`, frecuencia semanal y `open-pull-requests-limit: 5`.
+- Baseline (TASK-017): alinear `package.json` raíz con las versiones publicadas en la plantilla TypeScript, ejecutar `npm run lint`, `npm test`, `npm run test:setup` y documentar la fecha del último `npm audit`.
+- Opt-in: auto-merge, herramientas alternativas (Renovate, Snyk) o ecosistemas adicionales dependen de cada consumidor; documenta cualquier personalización en `dev-docs/context.md`.

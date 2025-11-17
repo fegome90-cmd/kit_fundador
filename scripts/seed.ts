@@ -1,6 +1,7 @@
 /**
- * Ejecutor de seeds de ejemplo para mantener `npm run seed:dev` funcional.
- * Reemplaza el contenido con tu lógica de carga de datos iniciales.
+ * Seed script stub that logs informational messages and serves as an entry point for initial data loading.
+ *
+ * Intended to be replaced with application-specific seeding logic such as ORM calls, HTTP client requests, or fixture insertion.
  */
 async function runSeed() {
   console.log('[Kit Fundador] scripts/seed.ts es un stub listo para personalizar.');

@@ -87,6 +87,16 @@ antes de que un equipo adopte el script interactivo. Para mantener la trazabilid
 2. Registra el avance en `dev-docs/task.md` usando las TASK-011 a TASK-015.
 3. Actualiza `.context/project-state.json` una vez que cierres cada fase para que futuros agentes conozcan el estado real del setup.
 
+## Programa de ejecución Dependabot
+
+El pipeline de GitHub Actions sigue reportando 19 vulnerabilidades moderadas porque el `package.json` raíz conserva dependencias antiguas (ESLint 8, `@typescript-eslint` 6, glob@7, rimraf@3). Además, el repositorio aún no expone `.github/dependabot.yml`. Para ordenar el trabajo:
+
+1. Sigue [`PLAN_EJECUCION_DEPENDABOT.md`](../PLAN_EJECUCION_DEPENDABOT.md), que divide la remediación en tres fases.
+2. Registra el avance usando **TASK-016** (configuración) y **TASK-017** (baseline). Ninguna otra task se creó para auto-merge/logging porque se consideró sobre-ingeniería.
+3. Actualiza README, tooling guide, checklist del consumidor y guía de validación cuando cierres cada fase para mantener la trazabilidad.
+
+> 📌 El starkit sólo garantiza dependencias saludables por defecto; cualquier flujo adicional (auto-merge, alertas custom) queda documentado como opt-in para los consumidores del kit.
+
 ## Hitos
 
 | Hito | Fecha Objetivo | Estado | Notas |

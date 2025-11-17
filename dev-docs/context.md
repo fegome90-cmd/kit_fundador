@@ -29,6 +29,11 @@ Proveer un **starkit de Identity & Access** que incluya ejemplos autocontenidos 
 - La observabilidad mínima (C3.2) quedó registrada como opt-in en `TASK-015`; sólo se implementará si el consumidor lo solicita.
 - Usa `SETUP_SH_SKIP_INSTALLS=true` en CI o en el harness cuando quieras validar el flujo sin acceder a npm/PyPI.
 
+## Estado de Dependabot y escaneo de dependencias
+- No existe `.github/dependabot.yml` en la rama principal; las alertas deben configurarse siguiendo [`PLAN_EJECUCION_DEPENDABOT.md`](../PLAN_EJECUCION_DEPENDABOT.md) para cubrir npm (raíz + plantilla TS) y GitHub Actions.
+- El `package.json` raíz todavía usa ESLint 8 / `@typescript-eslint` 6, lo que provoca 19 vulnerabilidades moderadas en `npm ci`; la plantilla TypeScript ya sirve como referencia para las versiones esperadas (ESLint 9, `@typescript-eslint` 8, `redis` 5).
+- TASK-016 (configuración) y TASK-017 (baseline de dependencias) documentan qué debe implementarse en el starkit antes de delegar nuevas alertas a los consumidores.
+
 ## Estado de infraestructura (TASK-003)
 - No se incluye base de datos real en el starkit; se publicó [`dev-docs/infrastructure/database-blueprint.md`](infrastructure/database-blueprint.md)
   como guía agnóstica.

@@ -45,13 +45,6 @@ export class Email {
       throw new Error('Invalid email format');
     }
 
-    // Basic email validation
-    // In production, use a proper library or more comprehensive regex
-    if (!EMAIL_REGEX.test(this._value)) {
-      throw new Error(`Invalid email format: ${this._value}`);
-    }
-
-    // Additional business rules
     if (this._value.length > MAX_EMAIL_LENGTH) {
       throw new Error('Email too long');
     }
@@ -94,7 +87,8 @@ export class Email {
   }
 
   private ensureDomainNotBlocked(domainPart: string): void {
-    if (BLOCKED_DOMAINS.some((d) => domainPart.toLowerCase() === d.toLowerCase())) {
+    const normalizedDomain = domainPart.toLowerCase();
+    if (BLOCKED_DOMAINS.includes(normalizedDomain)) {
       throw new Error(`Email domain not allowed: ${domainPart}`);
     }
   }

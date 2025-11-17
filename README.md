@@ -64,6 +64,9 @@ chmod +x scripts/setup.sh
 # Verificar que el setup interactivo siga funcionando
 npm run test:setup     # o make test:setup para usar el harness bash
 
+# Verificar que el setup interactivo siga funcionando
+npm run test:setup     # o make test:setup para usar el harness bash
+
 # Validar arquitectura
 make validate
 ```
@@ -85,6 +88,16 @@ en un proyecto real, sigue el [plan de ejecución](dev-docs/setup/setup-sh-remed
 > 🧪 En pipelines sin acceso a npm/PyPI puedes ejecutar `SETUP_SH_SKIP_INSTALLS=true ./scripts/setup.sh` para saltar `npm install`/`pip install` (el harness usa esa variable por defecto) y aun así validar el resto del flujo.
 
 Documenta qué fases aplicaste en `dev-docs/task.md` antes de continuar con las tareas principales del roadmap.
+
+## 🤖 Plan de Dependabot
+
+El pipeline de `npm ci` aún reporta 19 vulnerabilidades moderadas en el `package.json` raíz (glob@7, rimraf@3, eslint@8.x, etc.) y el repositorio no cuenta con `.github/dependabot.yml`. Para evitar que los consumidores arranquen desde una base insegura se publicó [`PLAN_EJECUCION_DEPENDABOT.md`](PLAN_EJECUCION_DEPENDABOT.md), que detalla:
+
+- **Fase A – Configuración**: crear la configuración mínima de Dependabot para `npm` (raíz y plantilla TypeScript) y `github-actions`, limitando el número de PRs abiertos y documentando cómo pausar los recordatorios.
+- **Fase B – Baseline**: actualizar las dependencias del `package.json` raíz hasta igualar las versiones ya presentes en la plantilla TypeScript (ESLint 9, `@typescript-eslint` 8, `redis` 5, etc.) y volver a ejecutar `npm run lint`, `npm test` y `npm run test:setup`.
+- **Fase C – Documentación**: extender README, tooling guide, checklist del consumidor y guía de validación con pasos explícitos para triagear alertas en cada fork.
+
+> 🎯 Resultado esperado: el starkit entrega dependencias saludables por defecto y cada equipo sabe qué alertas debe resolver en su proyecto vs. cuáles puede posponer.
 
 ## 🗄️ Blueprint de base de datos y migraciones
 
