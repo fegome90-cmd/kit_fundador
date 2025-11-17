@@ -25,9 +25,9 @@ test-watch: ## Run tests in watch mode
 	$(COMPOSE) run --rm app npm run test:watch
 
 test-coverage: ## Run tests with coverage
-        $(COMPOSE) run --rm app npm run test:coverage
+	$(COMPOSE) run --rm app npm run test:coverage
 
-test:setup: ## Run setup.sh harness locally
+test-setup: ## Run setup.sh harness locally
 	bash tests/setup/setup_script.test.sh
 
 migrate: ## Run database migrations
