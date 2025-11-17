@@ -19,20 +19,21 @@
 
 ### Fase 2: Application Layer
 - [ ] Implementar use cases → sigue el plan de [`dev-docs/application/use-case-blueprint.md`](application/use-case-blueprint.md)
+  - ✅ Use case seleccionado: `RegisterUserAccount` (bounded context Identity & Access). El objetivo es tomar un comando `RegisterUserAccountCommand`, crear el aggregate `User` y persistirlo mediante un `UserAccountRepository` abstracto. Documentado en `dev-docs/task.md` y `.context/decision-log.json` (DEC-2025-01-17-APP-UC1).
+  - ✅ Contratos definidos: `RegisterUserAccountCommand` + helper de normalización y el puerto `UserAccountRepository` viven en `src/application/`, con unit tests en `tests/unit/application/register-user-account/`.
 - [ ] Command handlers
 - [ ] Query handlers
 - [ ] Application services
 - [ ] Integration tests
 
 ### Fase 3: Infrastructure
-- [ ] Database setup y migrations
+- [x] Database setup y migrations → PostgreSQL 16 como servicio `db`, scripts `npm run migrate:*`/`npm run seed` y smoke tests `tests/integration/db`.
 - [ ] Repository implementations
 - [ ] API REST/GraphQL
 - [ ] Authentication/Authorization
 - [ ] Observability (logs, metrics, traces)
 
-> 🔎 Consulta [`dev-docs/infrastructure/database-blueprint.md`](infrastructure/database-blueprint.md) antes de abordar TASK-003.
-> El documento desgrana minitareas, revisiones de código y pruebas para adaptar el starkit sin introducir dependencias nuevas.
+> 🔎 Consulta [`dev-docs/infrastructure/database-blueprint.md`](infrastructure/database-blueprint.md) para extender el runner SQL (`scripts/migrate.ts`), añadir nuevas migraciones y mantener la documentación sincronizada cuando cambie el motor.
 
 ### Fase 4: Production Ready
 - [ ] Performance testing

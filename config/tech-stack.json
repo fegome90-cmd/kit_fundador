@@ -41,8 +41,8 @@
 
   "database": {
     "primary": "postgresql",
-    "orm": "prisma",
-    "migrations": "prisma-migrate",
+    "orm": "none",
+    "migrations": "sql-runner-node-pg-migrate-style",
     "version": "16"
   },
 
