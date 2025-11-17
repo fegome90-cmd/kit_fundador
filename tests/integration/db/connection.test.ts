@@ -7,6 +7,21 @@ type DbClient = Client;
 const ENV_PATH = path.resolve(process.cwd(), '.env');
 loadEnvConfig({ path: ENV_PATH });
 
+const npmLifecycleEvent = process.env.npm_lifecycle_event ?? '';
+const runFlag = (process.env.RUN_DB_TESTS ?? '').toLowerCase();
+const runFlagEnabled = ['1', 'true', 'yes', 'on'].includes(runFlag);
+const triggeredByDbScript = npmLifecycleEvent === 'test:integration:db';
+const isCI = process.env.CI === 'true';
+const shouldRunDbTests = !isCI && (runFlagEnabled || triggeredByDbScript);
+const describeDb = shouldRunDbTests ? describe : describe.skip;
+
+if (!shouldRunDbTests) {
+  console.warn(
+    '[Kit Fundador] Saltando tests de integración contra PostgreSQL. Ejecuta `RUN_DB_TESTS=true npm run test:integration:db` ' +
+      'luego de `make db:up` y `npm run migrate:up` para habilitarlos localmente.'
+  );
+}
+
 const DEFAULT_DB_USER = process.env.DB_USER ?? 'dev';
 const DEFAULT_DB_PASSWORD = process.env.DB_PASSWORD ?? 'devpass';
 const DEFAULT_DB_NAME = process.env.DB_NAME ?? 'myapp_dev';
@@ -17,7 +32,7 @@ function resolveDatabaseUrl(): string {
   return fromEnv && fromEnv.length > 0 ? fromEnv : FALLBACK_URL;
 }
 
-describe('database bootstrap', () => {
+describeDb('database bootstrap', () => {
   let client: DbClient;
 
   beforeAll(async () => {

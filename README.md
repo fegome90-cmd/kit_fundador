@@ -186,7 +186,7 @@ para apuntar a tu implementación definitiva. Sigue las pautas de `dev-docs/tool
 
 - `tests/setup/setup_script.test.sh` es el harness oficial del setup interactivo. Corre `npm run test:setup` o `make test:setup` para validar las tres rutas sin tocar tu árbol local; el script usa `SETUP_SH_SKIP_INSTALLS=true` para evitar instalaciones reales en entornos CI.
 - `tests/integration/test_setup_script.sh` demuestra cómo validar assets de las plantillas desde Bash. Ejecútalo manualmente o  expón un script (`npm run test:templates`) si quieres integrarlo al pipeline.
-- `tests/integration/db/connection.test.ts` verifica la conexión a PostgreSQL y que la migración bootstrap figure en `kit_migrations`. Ejecuta `npm run test:integration:db` después de `make db:up` y `npm run migrate:up`.
+- `tests/integration/db/connection.test.ts` verifica la conexión a PostgreSQL y que la migración bootstrap figure en `kit_migrations`. Ejecuta `npm run test:integration:db` después de `make db:up` y `npm run migrate:up`; el script exporta `RUN_DB_TESTS=true` automáticamente. Para incluir esta suite en `npm test`, exporta esa variable manualmente.
 - `tests/unit/python/` contiene ejemplos de Pytest para el value object `Email`. Son ilustrativos y no forman parte del comando  `npm test`; habilítalos creando un script propio (`npm run test:py`) o desde tu `Makefile` si tu stack final usa Python. Para  ejecutarlos directamente basta con instalar tus dependencias (`pip install -r requirements.txt` o equivalente) y correr  `pytest tests/unit/python`. Si no vas a mantener una suite en Python, documenta la decisión en `dev-docs/context.md` y borra  la carpeta para evitar ruido en tu pipeline.
 
 ## 🧱 Plantillas de dominio y eventos

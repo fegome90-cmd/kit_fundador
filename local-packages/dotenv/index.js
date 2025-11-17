@@ -1,31 +1,37 @@
 const fs = require('fs');
 const path = require('path');
 
-const NEWLINES_MATCH = /(?:\n|\r|\r\n)/;
-const RE_INI_KEY_VAL = /^\s*([\w.-]+)\s*=\s*(.*)?\s*$/;
-const RE_SINGLE_QUOTES = /^'([^']*)'$/;
-const RE_DOUBLE_QUOTES = /^"([^"\\]*(\\.[^"\\]*)*)"$/;
-
 function parse(src) {
   const obj = {};
   src
     .toString()
-    .split(NEWLINES_MATCH)
+    .split(/\r\n|\n|\r/)
     .forEach((line) => {
-      const keyValueArr = line.match(RE_INI_KEY_VAL);
-      if (keyValueArr != null) {
-        const key = keyValueArr[1];
-        let value = keyValueArr[2] || '';
-        const end = value.length - 1;
-        const isQuoted = value[0] === '"' && value[end] === '"';
-        if (isQuoted) {
-          value = value.replace(RE_DOUBLE_QUOTES, '$1');
-        } else {
-          value = value.replace(RE_SINGLE_QUOTES, '$1');
-        }
-        value = value.trim();
-        obj[key] = value;
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) {
+        return;
       }
+
+      const separatorIndex = trimmed.indexOf('=');
+      if (separatorIndex === -1) {
+        return;
+      }
+
+      const key = trimmed.slice(0, separatorIndex).trim();
+      if (!key) {
+        return;
+      }
+
+      let value = trimmed.slice(separatorIndex + 1).trim();
+      const firstChar = value[0];
+      const lastChar = value[value.length - 1];
+      const hasQuotes = value.length >= 2 && ((firstChar === '"' && lastChar === '"') || (firstChar === "'" && lastChar === "'"));
+
+      if (hasQuotes) {
+        value = value.slice(1, -1);
+      }
+
+      obj[key] = value;
     });
   return obj;
 }
