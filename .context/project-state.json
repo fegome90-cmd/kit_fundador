@@ -1,0 +1,120 @@
+{
+  "version": "2.0.0",
+  "last_updated": "2025-01-16T15:00:00Z",
+  "project_metadata": {
+    "name": "nombre-proyecto",
+    "domain": "dominio-negocio",
+    "stage": "foundation",
+    "tech_stack_hash": "typescript-node20-express-jest-esbuild"
+  },
+  "current_state": {
+    "active_bounded_contexts": [
+      {
+        "name": "Identity & Access",
+        "description": "Gestión de cuentas de usuario, credenciales y verificación de email",
+        "status": "documented",
+        "artifacts": [
+          "dev-docs/domain/ubiquitous-language.md#bounded-context-identity--access",
+          "dev-docs/domain/invariants.md"
+        ]
+      }
+    ],
+    "implemented_aggregates": [
+      {
+        "name": "IdentityAccess.UserAccount",
+        "status": "template",
+        "code": "src/domain/entities/User.ts",
+        "tests": ["tests/unit/User.test.ts", "tests/unit/Email.test.ts"]
+      }
+    ],
+    "pending_migrations": [],
+    "active_feature_flags": {},
+    "technical_debt_items": [
+      {
+        "id": "TD-SETUP-001",
+        "summary": "`scripts/setup.sh` tiene hallazgos críticos documentados en AUDITORIA_SETUP_SH.md",
+        "status": "in_progress",
+        "remediation_plan": "dev-docs/setup/setup-sh-remediation-plan.md",
+        "tasks": ["TASK-015"],
+        "notes": "Fases A y B completadas; C3.1 (harness) y C3.3 (utc_timestamp + warning docker-compose) ya están en main. La única mejora abierta es la observabilidad opcional (C3.2/TASK-015)."
+      },
+      {
+        "id": "TD-DB-001",
+        "summary": "Infraestructura de base de datos pendiente (TASK-003)",
+        "status": "planned",
+        "remediation_plan": "dev-docs/infrastructure/database-blueprint.md",
+        "tasks": ["TASK-003", "TASK-004"],
+        "notes": "El blueprint describe cómo crear docker-compose, migraciones y seeds sin añadir dependencias al starkit; queda a cargo del consumidor implementarlo."
+      },
+      {
+        "id": "TD-APP-001",
+        "summary": "Primer caso de uso completado (TASK-004)",
+        "status": "resolved",
+        "remediation_plan": "dev-docs/application/use-case-blueprint.md",
+        "tasks": ["TASK-004", "TASK-005"],
+        "notes": "RegisterUserAccount use case implementado con 100% coverage. TASK-005 pendiente para API endpoint."
+      }
+    ]
+  },
+  "ai_context": {
+    "last_session_summary": "TASK-004 (RegisterUserAccount use case) completado con 100% coverage. Se crearon tests unitarios e integration para todos los componentes. TASK-005 (API endpoint) listo para implementar.",
+    "next_recommended_tasks": ["TASK-003", "TASK-005", "TASK-015"],
+    "areas_needing_attention": [
+      "Seleccionar proveedor de base de datos y herramienta de migraciones usando el blueprint como guía",
+      "Decidir si se implementa la observabilidad opcional del setup (TASK-015)",
+      "Implementar API endpoint para RegisterUserAccount (TASK-005)"
+    ],
+    "recent_decisions": [
+      {
+        "id": "DEC-2025-01-16-STACK",
+        "summary": "Se fija TypeScript + Express como perfil predeterminado del starkit y se documenta en dev-docs/user-dd/tech-stack-decisions.md.",
+        "references": ["config/tech-stack.json", "dev-docs/user-dd/tech-stack-decisions.md"]
+      },
+      {
+        "id": "DEC-2025-01-16-SETUP-PLAN",
+        "summary": "La auditoría AUDITORIA_SETUP_SH.md se adopta y se crea un plan de remediación en dev-docs/setup/setup-sh-remediation-plan.md.",
+        "references": [
+          "document/informes_CC/AUDITORIA_SETUP_SH.md",
+          "dev-docs/setup/setup-sh-remediation-plan.md",
+          "dev-docs/plan.md"
+        ]
+      },
+      {
+        "id": "DEC-2025-01-16-SETUP-PHASE-C",
+        "summary": "Se completaron C3.1/C3.3 del setup.sh (harness + utc_timestamp/warnings) y se documentó que C3.2 queda como opt-in.",
+        "references": [
+          "scripts/setup.sh",
+          "tests/setup/setup_script.test.sh",
+          "dev-docs/setup/setup-sh-remediation-plan.md",
+          "dev-docs/setup/setup-sh-remediation-report.md"
+        ]
+      },
+      {
+        "id": "DEC-2025-01-16-DB-BLUEPRINT",
+        "summary": "Se documentó un blueprint agnóstico para TASK-003 que describe docker-compose, migraciones y seeds sin implementar código real.",
+        "references": [
+          "dev-docs/infrastructure/database-blueprint.md",
+          "README.md#🗄️-blueprint-de-base-de-datos-y-migraciones",
+          "dev-docs/task.md#task-003-setup-database-y-migrations",
+          "dev-docs/plan.md#fase-3-infrastructure"
+        ]
+      },
+      {
+        "id": "DEC-2025-01-16-APP-BLUEPRINT",
+        "summary": "Se publicó un blueprint para los casos de uso (TASK-004) que detalla contratos, puertos y pruebas sin añadir dependencias.",
+        "references": [
+          "dev-docs/application/use-case-blueprint.md",
+          "README.md#🧠-blueprint-de-casos-de-uso-y-handlers",
+          "dev-docs/task.md#task-004-implementar-primer-use-case",
+          "dev-docs/plan.md#fase-2-application-layer"
+        ]
+      }
+    ]
+  },
+  "metrics": {
+    "test_coverage": 0,
+    "cyclomatic_complexity_avg": 0,
+    "dependency_count": 0,
+    "last_build_time_ms": 0
+  }
+}

@@ -1,0 +1,356 @@
+{
+  "version": "2.5.0",
+  "description": "Reglas específicas para prevenir antipatrones de IA al codificar",
+  
+  "context_management": {
+    "mandatory_reads_before_coding": [
+      ".context/project-state.json",
+      "dev-docs/domain/ubiquitous-language.md",
+      "dev-docs/task.md (current task only)"
+    ],
+    "mandatory_updates_after_coding": [
+      ".context/project-state.json (ai_context.last_session_summary)",
+      "dev-docs/task.md (task status)",
+      ".context/decision-log.json (if architectural decision made)"
+    ],
+    "context_window_strategy": "Priorizar: 1) Reglas, 2) Domain model, 3) Current task, 4) Related code"
+  },
+
+  "anti_patterns_prevention": {
+    "over_engineering": {
+      "rules": [
+        "PROHIBIDO: Crear abstracción antes del 3er uso (Rule of Three)",
+        "PROHIBIDO: Interfaces con una sola implementación sin justificación en ADR",
+        "PROHIBIDO: Patrones de diseño sin problema concreto que resolver",
+        "OBLIGATORIO: YAGNI - implementar SOLO lo que la task actual requiere"
+      ],
+      "validation": "Cada abstracción debe tener comentario explicando por qué existe"
+    },
+    
+    "premature_optimization": {
+      "rules": [
+        "PROHIBIDO: Optimizaciones sin benchmark que demuestre problema",
+        "PROHIBIDO: Caching sin mediciones de performance",
+        "OBLIGATORIO: Make it work, make it right, make it fast (en ese orden)"
+      ],
+      "exceptions": "Big-O complexity puede considerarse en diseño inicial"
+    },
+
+    "context_loss": {
+      "rules": [
+        "OBLIGATORIO: Leer project-state.json antes de CADA sesión",
+        "OBLIGATORIO: Actualizar ai_context.last_session_summary al terminar",
+        "PROHIBIDO: Asumir conocimiento de sesiones anteriores sin verificar",
+        "OBLIGATORIO: Si duda sobre decisión anterior, consultar ADRs"
+      ],
+      "triggers": [
+        "Nueva sesión de IA → Leer .context/",
+        "Código existente contradice expectativas → Buscar en decision-log"
+      ]
+    },
+
+    "verbosity": {
+      "rules": [
+        "PROHIBIDO: Comentarios que repiten lo que el código dice",
+        "PROHIBIDO: Nombres de variables excesivamente largos (max 3 palabras)",
+        "OBLIGATORIO: Self-documenting code sobre comentarios",
+        "PERMITIDO: Comentarios que explican POR QUÉ, no QUÉ"
+      ],
+      "examples": {
+        "bad": "// Set user name to the name parameter\nuser.name = name;",
+        "good": "// Name must be set before validation per GDPR requirements\nuser.name = name;"
+      }
+    },
+
+    "copy_paste_coding": {
+      "rules": [
+        "PROHIBIDO: Duplicar lógica más de 2 veces sin refactor",
+        "OBLIGATORIO: DRY después del segundo uso",
+        "PROHIBIDO: Copiar código de internet sin entender",
+        "OBLIGATORIO: Adaptar código copiado al estilo del proyecto"
+      ]
+    },
+
+    "incomplete_error_handling": {
+      "rules": [
+        "PROHIBIDO: try-catch vacío o con solo console.log",
+        "OBLIGATORIO: Todo error debe tener: tipo específico, mensaje, contexto",
+        "OBLIGATORIO: Errores de dominio deben ser domain exceptions",
+        "PROHIBIDO: Excepciones genéricas para errores de negocio"
+      ]
+    },
+
+    "test_theater": {
+      "description": "Tests que dan coverage pero no validan comportamiento",
+      "rules": [
+        "PROHIBIDO: Tests que solo llaman métodos sin asserts significativos",
+        "PROHIBIDO: Tests con nombres genéricos (test1, testMethod)",
+        "OBLIGATORIO: Cada test debe fallar si se rompe comportamiento específico",
+        "OBLIGATORIO: Tests deben documentar comportamiento esperado"
+      ],
+      "red_flags": [
+        "100% coverage pero bugs en producción",
+        "Tests que nunca fallan incluso con bugs obvios",
+        "Mocks que devuelven siempre valores dummy"
+      ]
+    },
+
+    "god_objects": {
+      "rules": [
+        "PROHIBIDO: Clases con >7 responsabilidades (métodos públicos)",
+        "PROHIBIDO: Archivos con >300 líneas sin justificación",
+        "OBLIGATORIO: Single Responsibility Principle estricto",
+        "TRIGGER: Si clase tiene 'Manager', 'Handler', 'Service' → REVISAR responsabilidades"
+      ]
+    },
+
+    "anemic_domain": {
+      "rules": [
+        "PROHIBIDO: Entities que solo tienen getters/setters",
+        "OBLIGATORIO: Lógica de negocio DEBE estar en domain layer",
+        "OBLIGATORIO: Aggregates deben proteger invariantes",
+        "PROHIBIDO: Validaciones de negocio en application layer"
+      ]
+    }
+  },
+
+  "research_based_error_prevention": {
+    "description": "Reglas basadas en investigación empírica sobre errores de LLMs en generación de código",
+    "sources": [
+      "Chen et al (2024) - A Deep Dive Into Large Language Model Code Generation Mistakes",
+      "Liu et al (2024) - Lost in the Middle: How Language Models Use Long Contexts",
+      "Huang et al (2024) - AgentCoder: Multi-Agent-based Code Generation",
+      "Tornhill et al (2024) - ACE: Automated Technical Debt Remediation"
+    ],
+
+    "conditional_errors": {
+      "prevalence": "35% of all LLM code errors",
+      "source": "Chen et al 2024",
+      "description": "Errores en declaraciones condicionales - condiciones omitidas, mal interpretadas, o lógica defectuosa",
+      "rules": [
+        "OBLIGATORIO: Test de boundary para cada condicional",
+        "OBLIGATORIO: Expresiones booleanas explícitas (no coerción implícita)",
+        "OBLIGATORIO: Max profundidad de nesting = 3",
+        "RECOMENDADO: Extraer condiciones complejas a variables con nombre explicativo"
+      ],
+      "examples": {
+        "bad": "if (count > threshold) { ... }  // ¿Dónde está test para count=threshold?",
+        "good": "if (count > threshold) { ... }\n// Tests: count=threshold (false), count=threshold+1 (true)"
+      },
+      "required_tests": [
+        "Boundary value (threshold mismo)",
+        "Just above boundary (threshold + 1)",
+        "Just below boundary (threshold - 1)"
+      ]
+    },
+
+    "edge_case_oversight": {
+      "prevalence": "20% of errors",
+      "source": "Chen et al 2024 - EC category",
+      "description": "No considerar corner cases en el input",
+      "rules": [
+        "OBLIGATORIO: Listar ALL edge cases ANTES de implementar",
+        "OBLIGATORIO: Mínimo 5 edge cases identificados por función",
+        "OBLIGATORIO: Test para cada edge case identificado"
+      ],
+      "required_edge_cases": [
+        "Empty inputs ([], '', null, undefined)",
+        "Single element inputs",
+        "Boundary values (0, -1, MAX_INT, MIN_INT, Infinity)",
+        "Type mismatches (string when expecting number)",
+        "Invalid inputs (negative when expecting positive)",
+        "Very large inputs (performance considerations)"
+      ],
+      "prompt_addition": "You MUST consider ALL possible edge cases before implementing"
+    },
+
+    "math_logic_errors": {
+      "prevalence": "10-15% of errors",
+      "source": "Chen et al 2024 - MFLE category",
+      "description": "Fórmulas matemáticas incorrectas u operaciones lógicas defectuosas",
+      "rules": [
+        "OBLIGATORIO: Documentar fórmula en comentario ANTES de implementar",
+        "OBLIGATORIO: Verificar no hay off-by-one en fórmulas",
+        "RECOMENDADO: Property-based test para operaciones matemáticas"
+      ],
+      "examples": {
+        "bad": "const avg = (n + m + 1) / 2;  // ¿Por qué +1?",
+        "good": "// Formula: (a + b) / 2\nconst avg = (a + b) / 2;"
+      },
+      "property_tests": [
+        "avg(a, b) debe estar entre min(a,b) y max(a,b)",
+        "avg(n, n) debe ser igual a n",
+        "sum(a, b) debe ser conmutativo: sum(a,b) === sum(b,a)"
+      ]
+    },
+
+    "index_off_mistakes": {
+      "prevalence": "5-7% pero ALTO IMPACTO",
+      "source": "Chen et al 2024 - IOM category",
+      "description": "Cálculo incorrecto de índices en arrays/listas",
+      "rules": [
+        "OBLIGATORIO: Test para empty array (length = 0)",
+        "OBLIGATORIO: Test para single element (length = 1)",
+        "OBLIGATORIO: Test para first element (index = 0)",
+        "OBLIGATORIO: Test para last element (index = length - 1)",
+        "OBLIGATORIO: Verificar no hay off-by-one en slicing"
+      ],
+      "common_mistakes": [
+        "array[i-1:i-4:-1] cuando debería ser array[0:i]",
+        "loop que empieza en 1 en lugar de 0",
+        "usar length en lugar de length-1 para último elemento"
+      ]
+    },
+
+    "api_misuse": {
+      "prevalence": "8-12% of errors",
+      "source": "Chen et al 2024 - ITK (Incorrect Trained Knowledge)",
+      "description": "Uso incorrecto de APIs por confusión cross-language o malentendimiento",
+      "rules": [
+        "RECOMENDADO: Verificar documentación oficial antes de usar API",
+        "OBLIGATORIO: Documentar parámetros, return type, side effects",
+        "ADVERTENCIA: Watch for cross-language confusion"
+      ],
+      "known_confusions": [
+        {
+          "api": "split()",
+          "python": "NO acepta regex - usar re.split()",
+          "java": "SÍ acepta regex",
+          "javascript": "NO acepta regex para split string"
+        },
+        {
+          "api": "round()",
+          "python": "Banker's rounding (to nearest even)",
+          "java": "Rounds up when exactly halfway",
+          "javascript": "Rounds to nearest, half up"
+        }
+      ],
+      "validation_checklist": [
+        "¿Parámetros correctos?",
+        "¿Return type esperado?",
+        "¿Side effects documentados?",
+        "¿Diferente en otros lenguajes similares?"
+      ]
+    },
+
+    "output_format_errors": {
+      "prevalence": "15-20% en código de producción",
+      "source": "Chen et al 2024 - CoderEval dataset",
+      "description": "Output se desvía del formato requerido en tipo o formato",
+      "rules": [
+        "OBLIGATORIO: Return type debe match spec exactamente",
+        "OBLIGATORIO: Formato debe ser precisamente correcto",
+        "OBLIGATORIO: Test explícito de validación de formato"
+      ],
+      "common_issues": [
+        "Extra o missing slashes en paths (/test vs test)",
+        "Wrong type (string vs array)",
+        "Formato de fecha incorrecto",
+        "Quotes extras o faltantes"
+      ],
+      "validation": "Antes de marcar DONE, verificar formato exacto del output"
+    },
+
+    "garbage_code": {
+      "prevalence": "25-30% of errors",
+      "source": "Chen et al 2024 - GC category",
+      "description": "Código completamente desconectado del approach correcto",
+      "rules": [
+        "VALIDADOR: Verificar que approach general coincide con spec",
+        "Si garbage detectado → RECHAZAR completamente (no refinar)",
+        "Verificar que algoritmo tiene sentido para el problema"
+      ],
+      "detection_checklist": [
+        "¿El código usa las estructuras de datos correctas?",
+        "¿El algoritmo general es apropiado?",
+        "¿Hay confusión obvia entre operaciones (+ vs XOR, etc)?"
+      ],
+      "examples": {
+        "spec": "Perform XOR operation",
+        "garbage": "return a + b;  // Implementa suma, NO XOR!",
+        "correct": "return a ^ b;"
+      }
+    },
+
+    "spec_ambiguity_prevention": {
+      "prevalence": "48% of errors from unclear specs",
+      "source": "Chen et al 2024 - MCQS (Misleading Coding Question Specification)",
+      "description": "LLM se confunde por frases específicas o ambiguas en la especificación",
+      "rules": [
+        "EJECUTOR: Leer specification 2 veces antes de codificar",
+        "EJECUTOR: Identificar términos ambiguos y documentar interpretación",
+        "EJECUTOR: Si ambiguo → Request clarification (NO adivinar)",
+        "Evitar términos vagos: 'same', 'all', 'check', 'handle', 'process'"
+      ],
+      "ambiguous_terms": {
+        "same": "¿Idénticos o equivalentes? ¿Con misma frecuencia o solo conjunto?",
+        "all": "¿100% o mayoría? ¿Literalmente todos?",
+        "remove": "¿Eliminar completamente o solo filtrar/ocultar?",
+        "check": "¿Validar y lanzar error, o solo retornar boolean?"
+      },
+      "solution": "Documentar interpretación en comentario del código"
+    }
+  },
+
+  "incremental_development": {
+    "rules": [
+      "OBLIGATORIO: Commits cada 30 min o al completar subtarea",
+      "OBLIGATORIO: Cada commit debe dejar proyecto en estado funcional",
+      "PROHIBIDO: Commits con >500 líneas cambiadas",
+      "OBLIGATORIO: Feature flags para features incompletas en main"
+    ],
+    "commit_message_format": "type(scope): description\n\nBody explaining WHY\n\nRefs: TASK-XXX"
+  },
+
+  "code_generation_safety": {
+    "rules": [
+      "PROHIBIDO: Generar código de seguridad (auth, crypto) sin revisión humana",
+      "PROHIBIDO: Generar SQL dinámico sin prepared statements",
+      "PROHIBIDO: Generar código con secrets hardcodeados",
+      "OBLIGATORIO: TODO comments para código que requiere revisión humana"
+    ],
+    "human_review_required": [
+      "Authentication/Authorization logic",
+      "Cryptography implementation",
+      "Payment processing",
+      "Data deletion/privacy",
+      "Security-sensitive configurations"
+    ]
+  },
+
+  "refactoring_discipline": {
+    "when_to_refactor": [
+      "Después de hacer test pasar (Green phase de TDD)",
+      "Al encontrar código duplicado por 3ra vez",
+      "Cuando complejidad ciclomática > 10",
+      "Cuando test es difícil de escribir (señal de mal diseño)"
+    ],
+    "when_NOT_to_refactor": [
+      "Durante implementación de feature (finish first)",
+      "Sin tests que cubran el código",
+      "Código que cambiará pronto por otros motivos",
+      "Sin comprender el código actual"
+    ]
+  },
+
+  "ai_assistance_boundaries": {
+    "ai_can_autonomously": [
+      "Implementar tests para lógica nueva",
+      "Refactorizar código con tests existentes",
+      "Aplicar linting/formatting",
+      "Generar código boilerplate estándar"
+    ],
+    "ai_must_consult_human": [
+      "Cambios arquitectónicos significativos",
+      "Decisiones sobre tradeoffs de seguridad/performance",
+      "Modificación de contratos públicos/APIs",
+      "Interpretación de requisitos de negocio ambiguos"
+    ],
+    "ai_never_does": [
+      "Eliminar tests sin entender por qué fallan",
+      "Commentar código que no compila en lugar de arreglarlo",
+      "Cambiar reglas en config/ sin aprobación",
+      "Commit código con TODOs en lógica crítica"
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+# Production dependencies
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+psycopg[binary]>=3.1.0
+redis>=5.0.0
+structlog>=24.1.0
+
+# OpenTelemetry for observability
+opentelemetry-api>=1.38.0
+opentelemetry-sdk>=1.38.0
+opentelemetry-instrumentation-fastapi>=0.43b0
+# Exporters mantienen versión beta (<1.0). Ajusta si tu backend requiere otra señal.
+opentelemetry-exporter-prometheus>=0.59b0
+# Usa OTLP por defecto para enviar métricas/traces a cualquier backend compatible.
+opentelemetry-exporter-otlp>=1.38.0
+
+# Development dependencies
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.12.0
+mypy>=1.8.0
+ruff>=0.1.0
+black>=23.12.0
+pre-commit>=3.6.0

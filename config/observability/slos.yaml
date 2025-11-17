@@ -1,0 +1,44 @@
+version: "1.0.0"
+
+service_level_indicators:
+  availability:
+    description: Percentage of successful requests
+    type: ratio
+    good_events: "http_requests{status_code!~'5..'}"
+    total_events: "http_requests"
+    target: 0.999
+    
+  latency:
+    description: Percentage of requests faster than threshold
+    type: ratio
+    good_events: "http_request_duration_seconds{le='0.5'}"
+    total_events: "http_request_duration_seconds_count"
+    target: 0.95
+    
+  error_rate:
+    description: Percentage of non-error responses
+    type: ratio
+    good_events: "http_requests{status_code!~'4..|5..'}"
+    total_events: "http_requests"
+    target: 0.99
+
+service_level_objectives:
+  api_availability:
+    sli: availability
+    target: 99.9%
+    window: 30d
+    error_budget:
+      total_minutes: 43.2
+      burn_rate_alerts:
+        - rate: 14.4
+          window: 1h
+          severity: critical
+        - rate: 6
+          window: 6h
+          severity: high
+  
+  api_latency_p95:
+    sli: latency
+    target: 95%
+    threshold_ms: 500
+    window: 30d

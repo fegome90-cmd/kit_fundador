@@ -1,0 +1,108 @@
+{
+  "version": "1.1.0",
+  "default_language": "typescript",
+  "supported_languages": ["typescript", "python"],
+  "runtime": "node",
+  "node_version": "20",
+
+  "framework": {
+    "backend": "express",
+    "alternatives": ["fastify", "hono", "nestjs"],
+    "notes": "Express sigue siendo el baseline porque tiene menos magia y es ideal para que el consumidor del starkit reemplace rápidamente por su framework preferido."
+  },
+
+  "testing": {
+    "framework": "jest",
+    "coverage": "nyc",
+    "mocking": "jest",
+    "e2e": "playwright",
+    "load_testing": "k6",
+    "contract_testing": "pact",
+    "notes": "Los runners listados son de referencia; cada consumidor debe sustituirlos si su stack oficial difiere."
+  },
+
+  "linting": {
+    "tool": "eslint",
+    "config": ".eslintrc.json",
+    "plugins": ["@typescript-eslint"],
+    "notes": "Placeholder para el perfil TypeScript; ver dev-docs/user-dd/tooling-guide.md para extender a otros lenguajes."
+  },
+
+  "formatting": {
+    "tool": "prettier",
+    "config": ".prettierrc"
+  },
+
+  "build": {
+    "tool": "esbuild",
+    "output": "dist",
+    "notes": "Elección optimizada para cold starts; se puede reemplazar por tsup, swc o webpack según el stack final."
+  },
+
+  "database": {
+    "primary": "postgresql",
+    "orm": "prisma",
+    "migrations": "prisma-migrate",
+    "version": "16"
+  },
+
+  "cache": {
+    "tool": "redis",
+    "version": "7"
+  },
+
+  "observability": {
+    "metrics": "prometheus",
+    "tracing": "jaeger",
+    "logging": "winston",
+    "apm": "opentelemetry"
+  },
+
+  "ci_cd": {
+    "platform": "github_actions",
+    "pipeline": ".github/workflows"
+  },
+
+  "deployment": {
+    "container": "docker",
+    "orchestration": "kubernetes",
+    "registry": "ghcr.io"
+  },
+
+  "package_manager": "npm",
+
+  "git_hooks": "husky",
+
+  "documentation": {
+    "api": "openapi",
+    "site": "docusaurus"
+  },
+
+  "decisions": {
+    "language": {
+      "choice": "TypeScript + Node.js 20",
+      "status": "selected",
+      "rationale": "Equilibra seguridad de tipos y compatibilidad con la mayoría de integraciones IA."
+    },
+    "framework": {
+      "choice": "Express minimal + Domain/Application layers independientes",
+      "status": "selected",
+      "rationale": "Sencillo de extender o reemplazar por frameworks de opinión fuerte."
+    },
+    "testing": {
+      "choice": "Jest (unit) + Playwright (e2e) + Pact (contratos)",
+      "status": "selected",
+      "rationale": "Cubren pirámide de pruebas y sirven como referencia para otros lenguajes."
+    },
+    "lint_format": {
+      "choice": "ESLint + Prettier",
+      "status": "selected",
+      "rationale": "Compatibles con monorepos y fáciles de replicar en stacks alternativos."
+    },
+    "build": {
+      "choice": "esbuild",
+      "status": "selected",
+      "rationale": "Compila rápido el dominio de ejemplo sin imponer pipeline complejo."
+    }
+  }
+}
