@@ -26,8 +26,7 @@
         "code": "src/domain/entities/User.ts",
         "tests": [
           "tests/unit/User.test.ts",
-          "tests/unit/Email.test.ts",
-          "tests/unit/Password.test.ts"
+          "tests/unit/Email.test.ts"
         ],
         "completion_date": "2025-11-17"
       }
@@ -124,7 +123,7 @@
       },
       {
         "id": "DEC-2025-01-16-SETUP-PHASE-C",
-        "summary": "Se completaron C3.1/C3.3 del setup.sh (harness + utc_timestamp/warnings) y se dokumentó que C3.2 queda como opt-in.",
+        "summary": "Se completaron C3.1/C3.3 del setup.sh (harness + utc_timestamp/warnings) y se documentó que C3.2 queda como opt-in.",
         "references": [
           "scripts/setup.sh",
           "tests/setup/setup_script.test.sh",
