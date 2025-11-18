@@ -1,6 +1,6 @@
-import { UserAccountRepository } from '@application/ports/UserAccountRepository';
-import { User } from '@domain/entities/User';
-import { Email } from '@domain/value-objects/Email';
+import { UserAccountRepository } from '../../application/ports/UserAccountRepository';
+import { User } from '../../domain/entities/User';
+import { Email } from '../../domain/value-objects/Email';
 
 /**
  * Repositorio en memoria pensado para pruebas de integración y documentación.
