@@ -253,6 +253,70 @@ describe('Password Value Object', () => {
         delete process.env.PASSWORD_SALT_ROUNDS;
       }
     });
+
+    it('should reject non-numeric salt rounds', async () => {
+      const originalEnv = process.env.PASSWORD_SALT_ROUNDS;
+      process.env.PASSWORD_SALT_ROUNDS = 'not-a-number';
+
+      await expect(Password.create(VALID_PASSWORD)).rejects.toThrow(
+        'Invalid PASSWORD_SALT_ROUNDS: "not-a-number" is not a valid number'
+      );
+
+      // Restore env
+      if (originalEnv) {
+        process.env.PASSWORD_SALT_ROUNDS = originalEnv;
+      } else {
+        delete process.env.PASSWORD_SALT_ROUNDS;
+      }
+    });
+
+    it('should reject salt rounds below minimum (4)', async () => {
+      const originalEnv = process.env.PASSWORD_SALT_ROUNDS;
+      process.env.PASSWORD_SALT_ROUNDS = '3';
+
+      await expect(Password.create(VALID_PASSWORD)).rejects.toThrow(
+        'Invalid PASSWORD_SALT_ROUNDS: 3 must be between 4 and 31'
+      );
+
+      // Restore env
+      if (originalEnv) {
+        process.env.PASSWORD_SALT_ROUNDS = originalEnv;
+      } else {
+        delete process.env.PASSWORD_SALT_ROUNDS;
+      }
+    });
+
+    it('should reject salt rounds above maximum (31)', async () => {
+      const originalEnv = process.env.PASSWORD_SALT_ROUNDS;
+      process.env.PASSWORD_SALT_ROUNDS = '32';
+
+      await expect(Password.create(VALID_PASSWORD)).rejects.toThrow(
+        'Invalid PASSWORD_SALT_ROUNDS: 32 must be between 4 and 31'
+      );
+
+      // Restore env
+      if (originalEnv) {
+        process.env.PASSWORD_SALT_ROUNDS = originalEnv;
+      } else {
+        delete process.env.PASSWORD_SALT_ROUNDS;
+      }
+    });
+
+    it('should reject decimal salt rounds', async () => {
+      const originalEnv = process.env.PASSWORD_SALT_ROUNDS;
+      process.env.PASSWORD_SALT_ROUNDS = '12.5';
+
+      await expect(Password.create(VALID_PASSWORD)).rejects.toThrow(
+        'Invalid PASSWORD_SALT_ROUNDS: 12 must be an integer'
+      );
+
+      // Restore env
+      if (originalEnv) {
+        process.env.PASSWORD_SALT_ROUNDS = originalEnv;
+      } else {
+        delete process.env.PASSWORD_SALT_ROUNDS;
+      }
+    });
   });
 
   describe('Error Messages', () => {
