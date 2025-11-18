@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "last_updated": "2025-01-16T15:00:00Z",
+  "last_updated": "2025-11-17T17:15:00Z",
   "project_metadata": {
     "name": "nombre-proyecto",
     "domain": "dominio-negocio",
@@ -24,7 +24,12 @@
         "name": "IdentityAccess.UserAccount",
         "status": "completed",
         "code": "src/domain/entities/User.ts",
-        "tests": ["tests/unit/User.test.ts", "tests/unit/Email.test.ts"]
+        "tests": [
+          "tests/unit/User.test.ts",
+          "tests/unit/Email.test.ts",
+          "tests/unit/Password.test.ts"
+        ],
+        "completion_date": "2025-11-17"
       }
     ],
     "pending_migrations": [],
@@ -51,18 +56,38 @@
         "summary": "Primer caso de uso completado (TASK-004)",
         "status": "resolved",
         "remediation_plan": "dev-docs/application/use-case-blueprint.md",
-        "tasks": ["TASK-004", "TASK-005"],
-        "notes": "RegisterUserAccount use case implementado con 100% coverage. TASK-005 pendiente para API endpoint."
+        "tasks": [
+          "TASK-004"
+        ],
+        "notes": "`RegisterUserAccount` completado con 100% test coverage: DTOs (`RegisterUserAccountCommand.ts`), handler (`RegisterUserAccountHandler.ts`), repository stub (`InMemoryUserAccountRepository.ts`), unit tests, and integration tests. Ready for TASK-005 (API endpoint).",
+        "completion_date": "2025-11-17"
+      },
+      {
+        "id": "TD-DEP-001",
+        "summary": "Alertas de dependencias sin configuración de Dependabot",
+        "status": "planned",
+        "remediation_plan": "PLAN_EJECUCION_DEPENDABOT.md",
+        "tasks": [
+          "TASK-016",
+          "TASK-017"
+        ],
+        "notes": "El pipeline reporta 19 vulnerabilidades moderadas porque el package.json raíz usa ESLint 8/\"@typescript-eslint\" 6. Falta crear `.github/dependabot.yml` para npm (raíz + plantilla TS) y GitHub Actions."
       }
     ]
   },
   "ai_context": {
-    "last_session_summary": "TASK-004 (RegisterUserAccount use case) completado con 100% coverage. Se crearon tests unitarios e integration para todos los componentes. TASK-005 (API endpoint) listo para implementar.",
-    "next_recommended_tasks": ["TASK-003", "TASK-005", "TASK-015"],
+    "last_session_summary": "TASK-004 completed successfully with 100% test coverage. Implemented RegisterUserAccount use case with DTOs, handler, repository stub, and comprehensive test suite. Repository cleanup performed, temporary files removed, and documentation synchronized. Ready for TASK-005 (REST API endpoint). Quality gates all passing with 79.54% overall coverage.",
+    "next_recommended_tasks": [
+      "TASK-005",
+      "TASK-016",
+      "TASK-017",
+      "TASK-015"
+    ],
     "areas_needing_attention": [
-      "Seleccionar proveedor de base de datos y herramienta de migraciones usando el blueprint como guía",
-      "Decidir si se implementa la observabilidad opcional del setup (TASK-015)",
-      "Implementar API endpoint para RegisterUserAccount (TASK-005)"
+      "Implement REST API endpoint for RegisterUserAccount (TASK-005)",
+      "Execute Dependabot plan to eliminate 19 vulnerabilities (TASK-016/TASK-017)",
+      "Consider optional observability features for setup script (TASK-015)",
+      "Plan migration from SQL runner to node-pg-migrate/Prisma"
     ],
     "recent_decisions": [
       {
@@ -107,6 +132,53 @@
           "README.md#🧠-blueprint-de-casos-de-uso-y-handlers",
           "dev-docs/task.md#task-004-implementar-primer-use-case",
           "dev-docs/plan.md#fase-2-application-layer"
+        ]
+      },
+      {
+        "id": "DEC-2025-01-16-DEPENDABOT-PLAN",
+        "summary": "Se definió el plan de ejecución de Dependabot, se añadieron TASK-016/TASK-017 y se actualizó la documentación para priorizar la configuración de Dependabot y la actualización del package.json raíz.",
+        "references": [
+          "PLAN_EJECUCION_DEPENDABOT.md",
+          "README.md#🤖-plan-de-dependabot",
+          "dev-docs/tooling-guide.md#6-dependabot-y-mantenimiento-de-dependencias",
+          "dev-docs/task.md#task-016-configurar-dependabot-mínimo",
+          "dev-docs/task.md#task-017-actualizar-baseline-de-dependencias",
+          "dev-docs/plan.md#programa-de-ejecución-dependabot",
+          "dev-docs/context.md#estado-de-dependabot-y-escaneo-de-dependencias"
+        ]
+      },
+      {
+        "id": "DEC-2025-01-17-DB-STACK",
+        "summary": "Se seleccionó PostgreSQL 16 con runner SQL estilo node-pg-migrate; se añadieron `db` en docker-compose, scripts `npm run migrate:*`/`npm run seed` y pruebas de integración.",
+        "references": [
+          "docker-compose.dev.yml",
+          "Makefile",
+          "scripts/migrate.ts",
+          "scripts/seed.ts",
+          "db/migrations/README.md",
+          "tests/integration/db/connection.test.ts"
+        ]
+      },
+      {
+        "id": "DEC-2025-01-17-APP-UC1",
+        "summary": "Se eligió `RegisterUserAccount` como primer caso de uso para TASK-004, documentando el alcance en dev-docs/task.md y dev-docs/plan.md.",
+        "references": [
+          "dev-docs/task.md",
+          "dev-docs/plan.md",
+          ".context/decision-log.json#DEC-2025-01-17-APP-UC1"
+        ]
+      },
+      {
+        "id": "DEC-2025-11-17-TASK-004-COMPLETION",
+        "summary": "TASK-004 successfully completed with 100% test coverage. RegisterUserAccount use case fully implemented with DTOs, handler, repository pattern, and comprehensive testing.",
+        "references": [
+          "src/application/use-cases/register-user-account/RegisterUserAccountCommand.ts",
+          "src/application/use-cases/register-user-account/RegisterUserAccountHandler.ts",
+          "src/infrastructure/_stubs/InMemoryUserAccountRepository.ts",
+          "tests/unit/application/register-user-account/",
+          "tests/integration/application/register-user-account/",
+          "dev-docs/task.md",
+          "dev-docs/plan.md"
         ]
       }
     ]
