@@ -22,7 +22,7 @@
     "implemented_aggregates": [
       {
         "name": "IdentityAccess.UserAccount",
-        "status": "template",
+        "status": "completed",
         "code": "src/domain/entities/User.ts",
         "tests": ["tests/unit/User.test.ts", "tests/unit/Email.test.ts"]
       }
@@ -112,7 +112,7 @@
     ]
   },
   "metrics": {
-    "test_coverage": 0,
+    "test_coverage": 79.54,
     "cyclomatic_complexity_avg": 0,
     "dependency_count": 0,
     "last_build_time_ms": 0

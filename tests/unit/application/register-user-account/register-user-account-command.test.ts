@@ -3,18 +3,19 @@ import {
   RegisterUserAccountCommandProps,
 } from '@application/use-cases/register-user-account/RegisterUserAccountCommand';
 
+function buildPayload(
+  overrides: Partial<RegisterUserAccountCommandProps> = {}
+): RegisterUserAccountCommandProps {
+  return {
+    email: 'USER@example.com',
+    name: '  Ada Lovelace  ',
+    password: 'super-secure-pass',
+    role: 'user',
+    ...overrides,
+  };
+}
+
 describe('RegisterUserAccountCommand', () => {
-  function buildPayload(
-    overrides: Partial<RegisterUserAccountCommandProps> = {}
-  ): RegisterUserAccountCommandProps {
-    return {
-      email: 'USER@example.com',
-      name: '  Ada Lovelace  ',
-      password: 'super-secure-pass',
-      role: 'user',
-      ...overrides,
-    };
-  }
 
   it('normalizes whitespace, casing and defaults role to user', () => {
     const command = buildRegisterUserAccountCommand(
@@ -59,5 +60,27 @@ describe('RegisterUserAccountCommand', () => {
     expect(() =>
       buildRegisterUserAccountCommand(buildPayload({ role: 'manager' as any }))
     ).toThrow('role must be one of');
+  });
+
+  // MCQS Prevention: Test edge case for null/undefined values
+  it('throws when email is null', () => {
+    const payload = buildPayload();
+    // @ts-expect-error - Testing runtime validation
+    payload.email = null;
+    expect(() => buildRegisterUserAccountCommand(payload)).toThrow('email cannot be empty');
+  });
+
+  it('throws when name is null', () => {
+    const payload = buildPayload();
+    // @ts-expect-error - Testing runtime validation
+    payload.name = null;
+    expect(() => buildRegisterUserAccountCommand(payload)).toThrow('name cannot be empty');
+  });
+
+  it('throws when password is null', () => {
+    const payload = buildPayload();
+    // @ts-expect-error - Testing runtime validation
+    payload.password = null;
+    expect(() => buildRegisterUserAccountCommand(payload)).toThrow('password cannot be empty');
   });
 });

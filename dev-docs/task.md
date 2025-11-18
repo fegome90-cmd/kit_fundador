@@ -4,6 +4,22 @@
 
 _(sin tareas activas)_
 
+## Completados ✅
+
+### [TASK-004] Implementar primer use case (RegisterUserAccount)
+- **Prioridad**: Alta
+- **Estimación**: 3 horas
+- **Estado**: ✅ Completado (2025-11-17)
+- **Dependencias**: TASK-003
+- **Descripción**: Implementar caso de uso RegisterUserAccount con DTOs, handler, repository pattern y tests completos
+- **Criterios de Aceptación**:
+  - [x] DTOs definidos (RegisterUserAccountCommand)
+  - [x] Handler implementado con reglas de negocio
+  - [x] Repository port e implementación stub
+  - [x] Unit tests con 100% coverage
+  - [x] Integration tests end-to-end
+  - [x] Documentación actualizada
+
 ## Pendientes 📋
 
 ### [TASK-003] Setup database y migrations
