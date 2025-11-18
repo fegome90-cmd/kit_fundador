@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod +x /Users/felipe/Developer/kit_fundador-main/scripts/adr-helper.sh)",
+      "Bash(chmod +x /Users/felipe/Developer/kit_fundador-main/scripts/adr-reference-checker.sh)",
+      "Bash(./scripts/adr-helper.sh next-id)",
+      "Bash(./scripts/adr-helper.sh help)",
+      "Bash(shellcheck /Users/felipe/Developer/kit_fundador-main/scripts/adr-helper.sh)",
+      "Bash(chmod +x /Users/felipe/Developer/kit_fundador-main/scripts/adr-helper-test.sh)",
+      "Bash(./scripts/adr-helper-test.sh list)",
+      "Bash(./scripts/adr-reference-checker.sh help)",
+      "Bash(./scripts/adr-reference-checker.sh list)",
+      "Bash(./scripts/adr-reference-checker.sh check-keyword integration)",
+      "Bash(./scripts/adr-reference-checker.sh check-keyword \"usage\")",
+      "Bash(./scripts/adr-reference-checker.sh check-keyword \"system\")",
+      "Bash(./scripts/adr-reference-checker.sh suggest \"implement new feature\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://github.com/fegome90-cmd/kit_fundador)",
+      "Bash(curl -s \"https://api.github.com/repos/fegome90-cmd/kit_fundador/branches/feature/adr-system-integration\")",
+      "Bash(if [[ \"$PWD\" == *\"main\"* ]])",
+      "Bash(then echo \"MAIN\")",
+      "Bash(else echo \"GITHUB\")",
+      "Bash(fi)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
