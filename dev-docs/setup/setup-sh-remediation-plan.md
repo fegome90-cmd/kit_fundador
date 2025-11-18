@@ -36,7 +36,7 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 **Minitareas.**
 1. Elevar `eslint`, `@typescript-eslint/*`, `redis` y otras dependencias observadas en la auditoría.
 2. Regenerar `package-lock.json` dentro de `templates/typescript` para capturar el nuevo grafo.
-3. Actualizar `dev-docs/tooling-guide.md` y README con las versiones mínimas sugeridas.
+3. Actualizar `dev-docs/user-dd/tooling-guide.md` y README con las versiones mínimas sugeridas.
 
 **Revisión de código.**
 - Comparar `package.json` y `package-lock.json` para asegurar que las versiones coinciden.
@@ -83,7 +83,7 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 - Crear archivos dummy, ejecutar `./scripts/setup.sh` y elegir “No”: el script debe salir sin modificaciones.
 - Repetir con “Sí” y confirmar que los archivos se reemplazan según lo esperado.
 
-**Implementado en:** `scripts/setup.sh` (`confirm_overwrite` + flag `--force`), README (`Quick Start`), `dev-docs/tooling-guide.md` (tabla de prerequisitos) y `dev-docs/task.md` (cierre de TASK-012).
+**Implementado en:** `scripts/setup.sh` (`confirm_overwrite` + flag `--force`), README (`Quick Start`), `dev-docs/user-dd/tooling-guide.md` (tabla de prerequisitos) y `dev-docs/task.md` (cierre de TASK-012).
 
 **Testing:**
 - Simulaciones manuales creando archivos dummy y respondiendo `n`/`y` para verificar que el script se detiene o continúa según la selección.
@@ -94,7 +94,7 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 
 **Minitareas.**
 1. Crear `validate_prerequisites <mode>` que verifique `git`, `npm`, `python3`, `pip`, `docker-compose`, etc.
-2. Añadir tabla de requisitos por modo en `dev-docs/tooling-guide.md#setup-script`.
+2. Añadir tabla de requisitos por modo en `dev-docs/user-dd/tooling-guide.md#setup-script`.
 3. Mostrar mensajes de ayuda cuando falte algún binario.
 
 **Revisión de código.**
@@ -105,7 +105,7 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 - Simular ausencia de una herramienta (`PATH="" ./scripts/setup.sh"`) y verificar que el mensaje sea claro y el script termine.
 - Ejecutar normalmente para asegurar que los mensajes de éxito siguen apareciendo.
 
-**Implementado en:** `scripts/setup.sh` (`validate_prerequisites` + helper `has_compose`) y `dev-docs/tooling-guide.md#5-script-interactivo-scriptssetupsh`.
+**Implementado en:** `scripts/setup.sh` (`validate_prerequisites` + helper `has_compose`) y `dev-docs/user-dd/tooling-guide.md#5-script-interactivo-scriptssetupsh`.
 
 **Testing:**
 - Ejecución de `./scripts/setup.sh` en un entorno con herramientas instaladas para comprobar que continúa sin alertas.
@@ -145,7 +145,7 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 - Ejecutar `npm run test:setup` (o `make test:setup`) y revisar que retorna 0.
 - Verificar que el harness respeta `SETUP_SH_SKIP_INSTALLS=true` para omitir instalaciones reales en CI.
 
-**Implementado en:** `tests/setup/setup_script.test.sh`, `package.json` (`test:setup`), `Makefile` (`test:setup`), README y `dev-docs/tooling-guide.md`.
+**Implementado en:** `tests/setup/setup_script.test.sh`, `package.json` (`test:setup`), `Makefile` (`test:setup`), README y `dev-docs/user-dd/tooling-guide.md`.
 
 ### C3.2 – Observabilidad mínima
 **Estado:** ⏸️ Aplazada.
@@ -178,7 +178,7 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 
 **Minitareas.**
 1. Registrar en este plan el estado real de cada bloque.
-2. Actualizar README, `dev-docs/tooling-guide.md`, `dev-docs/post-adaptation-validation.md` y `dev-docs/setup/setup-sh-remediation-report.md` con el harness, la variable `SETUP_SH_SKIP_INSTALLS` y la advertencia de `docker-compose`.
+2. Actualizar README, `dev-docs/user-dd/tooling-guide.md`, `dev-docs/user-dd/post-adaptation-validation.md` y `dev-docs/setup/setup-sh-remediation-report.md` con el harness, la variable `SETUP_SH_SKIP_INSTALLS` y la advertencia de `docker-compose`.
 3. Sincronizar `dev-docs/task.md`, `.context/active-context.md`, `.context/project-state.json` y `document/informes_CC/AUDITORIA_SETUP_SH.md` para que apunten al nuevo estado y al backlog (TASK-015).
 
 **Revisión.**
@@ -198,7 +198,7 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 
 1. **Verificación manual guiada** (checklist ya incluida en la auditoría) tras cada fase.
 2. **Automatización**: integrar el test bash en `npm test` y como job del pipeline que los consumidores puedan activar.
-3. **Mediciones**: publicar en `dev-docs/post-adaptation-validation.md` un bloque dedicado al script (éxito de menú, `npm audit`, `pip install`).
+3. **Mediciones**: publicar en `dev-docs/user-dd/post-adaptation-validation.md` un bloque dedicado al script (éxito de menú, `npm audit`, `pip install`).
 
 ## Consideraciones para el starkit
 

@@ -2,9 +2,56 @@
 
 ## En Progreso 🔄
 
-_(Sin tareas activas; consulta la sección Pendientes para el siguiente foco.)_
+_(sin tareas activas)_
 
 ## Pendientes 📋
+
+### [TASK-003] Setup database y migrations
+- **Prioridad**: Media
+- **Estimación**: 3 horas
+- **Dependencias**: TASK-001
+- **Descripción**: Configurar base de datos y sistema de migraciones
+- **Blueprint**: `dev-docs/infrastructure/database-blueprint.md`
+- **ADR Reference**: Ninguna (implementación de infraestructura estándar)
+- **Criterios de Aceptación**:
+  - [ ] Docker compose con DB
+  - [ ] Migration framework configurado
+  - [ ] Primera migration funcional
+  - [ ] Seeds para desarrollo
+
+### [TASK-004] Implementar primer use case
+- **Prioridad**: Alta
+- **Estimación**: 3 horas
+- **Dependencias**: TASK-002, TASK-003
+- **Descripción**: Crear primer caso de uso end-to-end
+- **Blueprint**: `dev-docs/application/use-case-blueprint.md`
+- **ADR Reference**: Ninguna (implementación estándar según blueprint)
+- **Criterios de Aceptación**:
+  - [ ] Command handler implementado
+  - [ ] Repository interface definida
+  - [ ] Tests de integración pasando
+
+### [TASK-ADR-001] ADR Integration System
+- **Prioridad**: Alta
+- **Estimación**: Completado (Day 1: 4-6 horas)
+- **Dependencias**: Ninguna
+- **Descripción**: Integrar sistema de Architecture Decision Records en todo el proyecto
+- **Blueprint**: Internal development
+- **ADR Reference**: Ninguna (es la implementación del sistema ADR)
+- **Criterios de Aceptación**:
+  - [ ] ✅ Template y guía ADR creados
+  - [ ] ✅ Matriz de decisiones definida
+  - [ ] ✅ Workflow del ciclo de vida documentado
+  - [ ] ✅ Scripts de ayuda implementados
+  - [ ] ✅ Integración en CLAUDE.md completada
+  - [ ] ✅ Perfiles de agentes actualizados
+  - [ ] ✅ README.md actualizado con sección ADR
+- [ ] ✅ Enhanced README.md con herramientas completas
+- [ ] ✅ ADR-001 indexado y referenciado
+- [ ] ✅ ADR_INDEX.md mejorado con categorías y búsqueda
+- [ ] ✅ ADR_USAGE_GUIDE.md creado con workflow completo
+
+
 
 ### [TASK-005] API REST endpoint
 - **Prioridad**: Media
@@ -28,28 +75,6 @@ _(Sin tareas activas; consulta la sección Pendientes para el siguiente foco.)_
   - [ ] README/tooling guide explican cuándo habilitar la funcionalidad.
   - [ ] Tests cubren los nuevos caminos (`./scripts/setup.sh --verbose`, `--no-color`).
 
-### [TASK-016] Configurar Dependabot mínimo
-- **Prioridad**: Media
-- **Estimación**: 1 hora
-- **Dependencias**: Ninguna
-- **Descripción**: Crear `.github/dependabot.yml` siguiendo [`PLAN_EJECUCION_DEPENDABOT.md`](../PLAN_EJECUCION_DEPENDABOT.md) para que el starkit reciba PRs semanales de npm (raíz y plantilla TypeScript) y GitHub Actions.
-- **Criterios de Aceptación**:
-  - [ ] Archivo `.github/dependabot.yml` con tres `package-ecosystem` configurados y `open-pull-requests-limit` <= 5.
-  - [ ] README y `dev-docs/tooling-guide.md` explican cómo pausar o ajustar los intervalos.
-  - [ ] `.context/project-state.json` registra la deuda `TD-DEP-001` como "en progreso" o "resuelta" según corresponda.
-  - [ ] Se documenta en `dev-docs/task.md` qué equipos revisarán los PRs automáticos.
-
-### [TASK-017] Actualizar baseline de dependencias
-- **Prioridad**: Alta
-- **Estimación**: 2 horas
-- **Dependencias**: TASK-016
-- **Descripción**: Elevar las dependencias del `package.json` raíz para igualar las versiones auditadas en la plantilla TypeScript (ESLint 9, `@typescript-eslint` 8, `redis` 5, etc.) y eliminar las 19 vulnerabilidades reportadas por `npm ci`.
-- **Criterios de Aceptación**:
-  - [ ] `npm outdated` y `npm audit` ejecutados antes/después, con resultados documentados en `PLAN_EJECUCION_DEPENDABOT.md`.
-  - [ ] `package-lock.json` regenerado y committeado.
-  - [ ] `npm run lint`, `npm test` y `npm run test:setup` en verde con las nuevas versiones.
-  - [ ] README/plan/tooling guide reflejan la fecha del último baseline.
-
 
 
 ## Completadas ✅
@@ -59,10 +84,22 @@ _(Sin tareas activas; consulta la sección Pendientes para el siguiente foco.)_
 - **Duración real**: 30 min
 - **Notas**: Estructura base creada exitosamente
 
+### [TASK-004] Implementar primer use case
+- **Completado**: 2025-11-17
+- **Duración real**: 2.5 horas
+- **Notas**: RegisterUserAccount use case implementado con 100% coverage
+- **Criterios de Aceptación**:
+  - [x] Command handler implementado
+  - [x] Repository interface definida
+  - [x] Tests de integración pasando
+  - [x] Documentado en plan.md
+  - [x] 100% test coverage para nuevos archivos
+  - [x] Validación arquitectónica completada
+
 ### [TASK-006] Documentar responsabilidades del consumidor del starkit
 - **Completado**: 2025-01-15
 - **Duración real**: 40 min
-- **Notas**: README y `dev-docs/consumer-checklist.md` documentan la responsabilidad del equipo que adopta el kit.
+- **Notas**: README y `dev-docs/user-dd/consumer-checklist.md` documentan la responsabilidad del equipo que adopta el kit.
 - **Criterios de Aceptación**:
   - [x] README actualizado con sección "Post-clone checklist"
   - [x] dev-docs incluye recordatorio de importaciones (ej. `crypto`) y hashing
@@ -71,7 +108,7 @@ _(Sin tareas activas; consulta la sección Pendientes para el siguiente foco.)_
 ### [TASK-007] Ajustar guías de tooling y scripts
 - **Completado**: 2025-01-15
 - **Duración real**: 45 min
-- **Notas**: `package.json` expone stubs funcionales (`src/index.ts`, `scripts/seed.ts`), `dev-docs/tooling-guide.md` explica cómo alinear linters multi-lenguaje y README documenta suites opcionales.
+- **Notas**: `package.json` expone stubs funcionales (`src/index.ts`, `scripts/seed.ts`), `dev-docs/user-dd/tooling-guide.md` explica cómo alinear linters multi-lenguaje y README documenta suites opcionales.
 - **Criterios de Aceptación**:
   - [x] Scripts de npm apuntan a archivos reales editables por el consumidor
   - [x] lint-staged documentado para múltiples lenguajes
@@ -98,7 +135,7 @@ _(Sin tareas activas; consulta la sección Pendientes para el siguiente foco.)_
 ### [TASK-010] Añadir checklist de validación posterior
 - **Completado**: 2025-01-16
 - **Duración real**: 25 min
-- **Notas**: Se creó `dev-docs/post-adaptation-validation.md`, se añadió la sección "Validación post-adaptación" en el README y se referenció el checklist desde el plan.
+- **Notas**: Se creó `dev-docs/user-dd/post-adaptation-validation.md`, se añadió la sección "Validación post-adaptación" en el README y se referenció el checklist desde el plan.
 - **Criterios de Aceptación**:
   - [x] Sección "Post-adaptation validation" publicada
   - [x] Lista incluye lint/test/validate
@@ -117,7 +154,7 @@ _(Sin tareas activas; consulta la sección Pendientes para el siguiente foco.)_
 ### [TASK-001] Definir Tech Stack
 - **Completado**: 2025-01-16
 - **Duración real**: 30 min
-- **Notas**: `config/tech-stack.json` incluye el perfil TypeScript + Node.js 20, README señala el doc de decisiones y `dev-docs/context.md`/`dev-docs/tech-stack-decisions.md` detallan las elecciones.
+- **Notas**: `config/tech-stack.json` incluye el perfil TypeScript + Node.js 20, README señala el doc de decisiones y `dev-docs/context.md`/`dev-docs/user-dd/tech-stack-decisions.md` detallan las elecciones.
 - **Criterios de Aceptación**:
   - [x] Lenguaje principal definido
   - [x] Framework seleccionado
@@ -156,32 +193,12 @@ _(Sin tareas activas; consulta la sección Pendientes para el siguiente foco.)_
 ### [TASK-014] Documentar y cerrar la remediación
 - **Completado**: 2025-01-16
 - **Duración real**: 45 min
-- **Notas**: README, `dev-docs/plan.md`, `dev-docs/setup/setup-sh-remediation-plan.md`, `dev-docs/setup/setup-sh-remediation-report.md`, `dev-docs/post-adaptation-validation.md` y `.context/` reflejan el nuevo estado (Fases A/B + C3.1/C3.3 completas, C3.2 aplazada).
+- **Notas**: README, `dev-docs/plan.md`, `dev-docs/setup/setup-sh-remediation-plan.md`, `dev-docs/setup/setup-sh-remediation-report.md`, `dev-docs/user-dd/post-adaptation-validation.md` y `.context/` reflejan el nuevo estado (Fases A/B + C3.1/C3.3 completas, C3.2 aplazada).
 - **Criterios de Aceptación**:
   - [x] README enlaza la guía final, documenta `SETUP_SH_SKIP_INSTALLS` y expone el estado actual del setup.
   - [x] `dev-docs/task.md` y `plan.md` reflejan el cierre de cada fase y el backlog pendiente (TASK-015).
   - [x] `.context/project-state.json` y `.context/active-context.md` incluyen el resumen actualizado.
-- [x] La checklist de validación añade pasos específicos (`npm run test:setup`/`make test:setup`).
-
-### [TASK-003] Setup database y migrations
-- **Completado**: 2025-01-17
-- **Duración real**: 4 h
-- **Notas**: Se habilitó el servicio `db` (PostgreSQL 16) en `docker-compose.dev.yml`, `Makefile` expone `db:up/db:reset`, `scripts/migrate.ts` aplica archivos `db/migrations/` (`-- up/-- down`), `scripts/seed.ts` crea datos mínimos leyendo `.env` y `tests/integration/db/connection.test.ts` valida la conexión.
-- **Criterios de Aceptación**:
-  - [x] Docker compose con DB (`docker-compose.dev.yml` + volumen `db-data`).
-  - [x] Migration framework configurado (runner SQL compatible con node-pg-migrate).
-  - [x] Primera migration funcional (`000000000000__bootstrap.sql`).
-  - [x] Seeds para desarrollo (`scripts/seed.ts`).
-
-### [TASK-004] Implementar primer use case
-- **Completado**: 2025-01-18
-- **Duración real**: 3 h
-- **Notas**: Se eligió `RegisterUserAccount` (DEC-2025-01-17-APP-UC1), se crearon el command/helper y el puerto `UserAccountRepository`, se implementó `RegisterUserAccountHandler` con unit tests y se añadió el stub `src/infrastructure/_stubs/InMemoryUserAccountRepository.ts` más la suite `tests/integration/application/register-user-account/register-user-account.integration.test.ts`. README, dev-docs/plan.md, dev-docs/tooling-guide.md y dev-docs/post-adaptation-validation.md documentan el flujo.
-- **Criterios de Aceptación**:
-  - [x] Command handler implementado
-  - [x] Repository interface definida
-  - [x] Tests de integración pasando
-  - [x] Documentado en plan.md
+  - [x] La checklist de validación añade pasos específicos (`npm run test:setup`/`make test:setup`).
 
 ## Backlog 💭
 

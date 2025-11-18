@@ -15,14 +15,11 @@ services:
       - /app/node_modules
     environment:
       NODE_ENV: development
-      DB_USER: ${DB_USER:-dev}
-      DB_PASSWORD: ${DB_PASSWORD:-devpass}
-      DB_NAME: ${DB_NAME:-myapp_dev}
-      DATABASE_URL: "postgresql://${DB_USER:-dev}:${DB_PASSWORD:-devpass}@db:5432/${DB_NAME:-myapp_dev}"
+      DATABASE_URL: postgresql://dev:devpass@postgres:5432/myapp_dev
       REDIS_URL: redis://redis:6379
       LOG_LEVEL: debug
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -30,19 +27,19 @@ services:
     networks:
       - app-network
 
-  db:
+  postgres:
     image: postgres:16-alpine
-    container_name: myapp-db
+    container_name: myapp-postgres
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: ${DB_USER:-dev}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-devpass}
-      POSTGRES_DB: ${DB_NAME:-myapp_dev}
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: devpass
+      POSTGRES_DB: myapp_dev
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-dev}"]
+      test: ["CMD-SHELL", "pg_isready -U dev"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -101,7 +98,7 @@ services:
       - app-network
 
 volumes:
-  db-data:
+  postgres-data:
   redis-data:
   prometheus-data:
   grafana-data:
