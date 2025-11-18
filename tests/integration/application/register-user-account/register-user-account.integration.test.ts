@@ -52,7 +52,7 @@ describe('integration | RegisterUserAccount', () => {
     const existingUser = User.create({
       email: Email.create('ada@example.com'),
       name: 'Existing User',
-      password: Password.create('another-secure-pass'),
+      password: await Password.create('another-secure-pass'),
       role: 'user',
     });
     const { handler } = buildHandler([existingUser]);
