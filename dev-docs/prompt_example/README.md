@@ -660,7 +660,7 @@ Separación clara entre EVIDENCIA (hechos) y PROPUESTA (ideas), con tags `[K:]`,
 - **Agent Profiles**: [`dev-docs/agent-profiles/`](../agent-profiles/)
 - **Task Management**: [`dev-docs/task.md`](../task.md)
 - **Plan General**: [`dev-docs/plan.md`](../plan.md)
-- **Post-Adaptation Validation**: [`dev-docs/post-adaptation-validation.md`](../post-adaptation-validation.md)
+- **Post-Adaptation Validation**: [`dev-docs/user-dd/post-adaptation-validation.md`](../user-dd/post-adaptation-validation.md)
 
 ---
 

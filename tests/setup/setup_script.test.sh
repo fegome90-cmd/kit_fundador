@@ -35,16 +35,8 @@ expected = sys.argv[1]
 file_path = sys.argv[2]
 with open(file_path, 'r', encoding='utf-8') as fh:
     data = json.load(fh)
-
-legacy = data.get('language')
-if legacy:
-    if legacy != expected:
-        raise SystemExit(f"language mismatch: {legacy} != {expected}")
-else:
-    meta = data.get('project_metadata', {})
-    tech_hash = meta.get('tech_stack_hash', '')
-    if expected not in tech_hash:
-        raise SystemExit(f"tech_stack_hash mismatch: {tech_hash} != contains {expected}")
+if data.get('language') != expected:
+    raise SystemExit(f"language mismatch: {data.get('language')} != {expected}")
 PY
 }
 
