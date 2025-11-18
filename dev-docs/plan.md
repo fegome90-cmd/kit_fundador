@@ -1,48 +1,240 @@
 # Plan de Desarrollo
 
-## Roadmap
+## Roadmap Oficial: v2.1 → v3.0
 
-### Fase 0: Fundación ✅
-- [x] Estructura de carpetas
+### Metas Globales
+
+El Kit Fundador debe consolidarse como:
+1. **Starter kit profesional** - Calidad empresarial sin complejidad innecesaria
+2. **Agnóstico a lenguajes** - Soporta TypeScript, Python y otros sin inflarse
+3. **Fácil de extender** - Sin sobreabstracción ni capas vacías
+4. **TDD real** - No simulado, con ejemplos ejecutables
+5. **Compatible con agentes IA** - Guardrails formales y contextos controlados
+6. **Auditado por CI/CD** - Sin dependencias mágicas
+7. **Estable a largo plazo** - Sobrevive cambios de stack y herramientas
+
+### Principios del Roadmap
+
+Estos 6 principios son inamovibles:
+
+1. **Simplicidad antes que abstracción** - Nada entra si no reduce carga cognitiva
+2. **Opt-in para todo lo complejo** - Features avanzadas nunca son obligatorias
+3. **Infraestructura mínima y demostrativa** - El kit muestra cómo, no impone cómo
+4. **TDD/DDD antes que frameworks** - El propósito es enseñar arquitectura y calidad
+5. **El kit nunca compila contra frameworks externos** - Evita acoplamiento futuro
+6. **Compatibilidad IA nativa** - Plantillas claras, guías concretas, contextos controlables
+
+---
+
+### v2.1 - Estabilización y Correcciones Críticas ✅
+
+**Objetivo**: El kit debe instalarse, ejecutarse y testearse sin errores.
+
+**Trabajos completados**:
+- [x] Estructura de carpetas base
 - [x] Configuración de linting/formatting
-- [x] Setup de testing
-- [x] Documentación base
-- [x] CI/CD pipeline
+- [x] Setup de testing (Jest, pytest)
+- [x] Documentación base (README, dev-docs)
+- [x] CI/CD pipeline básico
 - [x] Development environment (Docker)
+- [x] Bounded contexts definidos → `dev-docs/domain/ubiquitous-language.md`
+- [x] Aggregates principales identificados → `UserAccount` como aggregate raíz
+- [x] Entidades core → `src/domain/entities/User.ts` + value objects
+- [x] Domain events definidos → `UserCreatedEvent` y eventos futuros
+- [x] Sistema de 24 templates de prompts estructurados
+- [x] Perfiles de agente (EJECUTOR, VALIDADOR, HANDOFF, PLANIFICADOR)
+- [x] GitHub Actions workflows (CI, CodeQL, Dependabot)
 
-### Fase 1: Core Domain
-- [x] Definir bounded contexts → `dev-docs/domain/ubiquitous-language.md#bounded-context-identity--access`.
-- [x] Identificar aggregates principales → `Identity & Access` documenta `UserAccount` como aggregate raíz.
-- [x] Implementar entidades core → `src/domain/entities/User.ts` + value objects asociados descritos en la guía.
-- [x] Definir domain events → `UserCreatedEvent` detallado y eventos futuros listados en el glosario.
-- [ ] Tests de domain layer (100% coverage) → pendiente de expandir cuando se añadan nuevos aggregates.
+**Trabajos pendientes**:
+- [ ] Corregir Domain Events rotos del template TypeScript
+- [ ] Implementar Password VO mínimo + tests completos
+- [ ] Completar Email VO tests exhaustivos
+- [ ] Fix real de requirements.txt Python (OpenTelemetry)
+- [ ] Corregir vulnerabilidades moderadas de TypeScript (npm audit)
+- [ ] Normalizar directorios y rutas (domain/application/infrastructure)
+- [ ] Tests de domain layer (100% coverage)
 
-### Fase 2: Application Layer
-- [ ] Implementar use cases → sigue el plan de [`dev-docs/application/use-case-blueprint.md`](application/use-case-blueprint.md)
-  - ✅ Use case seleccionado: `RegisterUserAccount` (bounded context Identity & Access). El objetivo es tomar un comando `RegisterUserAccountCommand`, crear el aggregate `User` y persistirlo mediante un `UserAccountRepository` abstracto. Documentado en `dev-docs/task.md` y `.context/decision-log.json` (DEC-2025-01-17-APP-UC1).
-  - ✅ Contratos definidos: `RegisterUserAccountCommand` + helper de normalización y el puerto `UserAccountRepository` viven en `src/application/`, con unit tests en `tests/unit/application/register-user-account/`.
-  - ✅ Handler implementado: `RegisterUserAccountHandler` expone `execute`, aplica las reglas del aggregate y cuenta con unit tests basados en un repositorio in-memory (`tests/unit/application/register-user-account/register-user-account-handler.test.ts`).
-  - ✅ Adapter temporal + integración: `src/infrastructure/_stubs/InMemoryUserAccountRepository.ts` y `tests/integration/application/register-user-account/register-user-account.integration.test.ts` validan el wiring end-to-end mientras llegan repositorios reales.
-- [ ] Command handlers
-- [ ] Query handlers
-- [ ] Application services
-- [ ] Integration tests
+**Duración estimada**: 1-2 días
 
-### Fase 3: Infrastructure
-- [x] Database setup y migrations → PostgreSQL 16 como servicio `db`, scripts `npm run migrate:*`/`npm run seed` y smoke tests `tests/integration/db`.
-- [ ] Repository implementations
-- [ ] API REST/GraphQL
-- [ ] Authentication/Authorization
-- [ ] Observability (logs, metrics, traces)
+**Criterios de aceptación**:
+- ✅ El kit compila sin errores
+- ✅ Los tests pasan al 100%
+- ✅ No hay imports rotos
+- ✅ No hay dependencias inexistentes
+- ✅ Setup.sh funciona sin errores
 
-> 🔎 Consulta [`dev-docs/infrastructure/database-blueprint.md`](infrastructure/database-blueprint.md) para extender el runner SQL (`scripts/migrate.ts`), añadir nuevas migraciones y mantener la documentación sincronizada cuando cambie el motor.
+---
 
-### Fase 4: Production Ready
-- [ ] Performance testing
-- [ ] Security audit
-- [ ] Load testing
-- [ ] Documentation completa
-- [ ] Deployment automation
+### v2.2 - Application Layer e Infraestructura Mínima
+
+**Objetivo**: Agregar lo mínimo indispensable para tener un sistema completo pero ligero.
+
+**Application Layer**:
+- [ ] Crear interfaces de Use Cases (`RegisterUser`, `DummyUseCase`)
+- [ ] Crear DTOs formales (Input/Output DTOs)
+- [ ] Crear comandos y queries básicos (CQRS pattern)
+- [ ] Implementar un único use case real: `RegisterUser`
+- [ ] Command handlers básicos
+- [ ] Query handlers básicos
+- [ ] Application services mínimos
+
+**Infrastructure Layer**:
+- [ ] Controlador HTTP vacío (ejemplo)
+- [ ] Repositorio in-memory (ejemplo funcional)
+- [ ] Adaptadores dummy (email, messaging)
+- [ ] Database setup y migrations (opcional)
+- [ ] Repository implementations (interfaces + in-memory)
+
+**Reglas estrictas**:
+- ❌ Ningún framework real dentro del domain
+- ✅ Todo ejemplo es opt-in
+- ❌ Ningún archivo funciona como "framework dentro de framework"
+- ✅ Infraestructura mínima y demostrativa
+
+**Duración estimada**: 2-3 días
+
+**Criterios de aceptación**:
+- ✅ Use case `RegisterUser` funciona end-to-end
+- ✅ Application layer desacoplada de domain
+- ✅ Infrastructure layer intercambiable
+- ✅ Ninguna dependencia a frameworks externos en domain
+
+---
+
+### v2.3 - Testing Completo y Herramientas Base
+
+**Objetivo**: Hacer del kit un entorno de TDD real, usable por equipos y agentes IA.
+
+**Testing Infrastructure**:
+- [ ] Unit tests completos (domain, value objects, entities)
+- [ ] Integration tests (application layer)
+- [ ] E2E tests básicos (flujos críticos)
+- [ ] Test builders (`UserBuilder`, `EmailBuilder`)
+- [ ] Test DB in-memory (SQLite/H2)
+- [ ] Fixtures y factories
+- [ ] Test utilities universales
+- [ ] Arquitectura de carpetas estándar para tests
+
+**CI/CD Workflows**:
+- [x] `.github/workflows/ci.yml` (lint, test, build)
+- [x] `.github/workflows/codeql.yml` (security)
+- [x] `.github/dependabot.yml` (dependency updates)
+- [ ] `.github/workflows/test-matrix.yml` (ts, py, config-only)
+- [ ] `.github/workflows/security-audit.yml` (OWASP, Snyk)
+
+**Herramientas de Calidad**:
+- [ ] Pre-commit hooks configurados
+- [ ] Coverage reports (Codecov/Coveralls)
+- [ ] Mutation testing (Stryker opcional)
+
+**Duración estimada**: 3-5 días
+
+**Criterios de aceptación**:
+- ✅ Cobertura de tests ≥ 80%
+- ✅ Tests ejecutables en CI
+- ✅ TDD workflow documentado
+- ✅ Test builders reutilizables
+
+---
+
+### v2.4 - Observabilidad Opcional y Ejemplos Reales
+
+**Objetivo**: Entregar herramientas de observabilidad de manera opcional, sin inflar el kit.
+
+**Observabilidad (Opcional)**:
+- [ ] Archivos ejemplo de Prometheus (no instalados por defecto)
+- [ ] Configuración mínima Jaeger (opcional)
+- [ ] Ejemplo de pruebas de latencia con k6 (documentado)
+- [ ] Dashboard Grafana exportado (JSON)
+- [ ] Ejemplos de structured logging con correlation ID
+- [ ] OpenTelemetry setup básico (opt-in)
+
+**Ejemplos Reales**:
+- [ ] API REST mínima (Express/FastAPI)
+- [ ] Authentication/Authorization básico (JWT)
+- [ ] Rate limiting (ejemplo)
+- [ ] Error handling patterns
+
+**Restricciones**:
+- ❌ Nada de esto se instala por defecto
+- ❌ No se agregan librerías invasivas
+- ✅ Todo es opt-in y documentado
+- ✅ Configuración en archivos separados
+
+**Duración estimada**: 2-4 días
+
+**Criterios de aceptación**:
+- ✅ Observabilidad completamente opcional
+- ✅ Ejemplos funcionan sin modificar core
+- ✅ Documentación clara de activación
+
+---
+
+### v2.5 - Preparación para IA-Asistida v3
+
+**Objetivo**: Convertir el proyecto en un entorno ideal para agentes IA.
+
+**Componentes IA-Ready**:
+- [ ] Plantillas de prompts mejoradas (templates 25-30)
+- [ ] Validadores de contexto automáticos
+- [ ] Handoff automation mínimo
+- [ ] Documentación sobre interacción limitada con LLMs
+- [ ] Matriz de decisiones para EJECUTOR y VALIDADOR
+- [ ] Guía de optimización de contexto
+- [ ] Nuevas reglas anti-hallucination
+- [ ] Estructuras de guardrails extendidas
+
+**Mejoras de Templates**:
+- [ ] Template 25: Context Validation Checklist
+- [ ] Template 26: AI Agent Performance Metrics
+- [ ] Template 27: Hallucination Prevention Protocol
+- [ ] Template 28: Code Generation Guardrails
+- [ ] Template 29: Automated Test Generation Strategy
+- [ ] Template 30: AI-Human Handoff Protocol
+
+**Duración estimada**: 2-4 días
+
+**Criterios de aceptación**:
+- ✅ Agentes IA pueden trabajar sin romper arquitectura
+- ✅ Guardrails previenen over-engineering
+- ✅ Context management controlado
+
+---
+
+### v3.0 - Framework IA-First Controlado
+
+**Objetivo**: Una versión donde humanos y agentes usan el kit como entorno seguro de desarrollo.
+
+**Componentes Finales**:
+- [ ] Ejecutor IA versión estable
+- [ ] Validador IA versión estable
+- [ ] Sistema de rutas de contexto
+- [ ] Context snapshots automáticos
+- [ ] Checklists automáticas integradas
+- [ ] Escenarios de TDD automatizados
+- [ ] Auditorías IA integradas (sin invadir código fuente)
+- [ ] Modo "project bootstrap" 100% estable
+
+**Límites Explícitos (v3.0 NO es)**:
+- ❌ No se convierte en Nest.js
+- ❌ No se convierte en FastAPI
+- ❌ No se convierte en un framework full stack
+- ❌ No adopta DI containers obligatorios
+- ❌ No incluye CLI pesada
+- ❌ No incluye generadores de código invasivos
+
+**v3.0 = Madurez, NO Complejidad**
+
+**Duración estimada**: 2-3 semanas
+
+**Criterios de aceptación**:
+- ✅ Performance testing automatizado
+- ✅ Security audit aprobado
+- ✅ Load testing con k6
+- ✅ Documentación completa
+- ✅ Deployment automation
+- ✅ IA puede usar el kit sin supervisión constante
+- ✅ Kit estable para producción
 
 ## Programa de endurecimiento post auditoría (commit 7f0912b)
 
@@ -50,15 +242,15 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 
 ### Fase 1 – Fundamentos del esqueleto
 
-1. ✅ Documentar en README/dev-docs qué responsabilidades recaen en el consumidor (entrypoint, importación de `crypto`, implementación real de hashing, etc.). → ver `README.md#🧭-post-clone-checklist` y `dev-docs/consumer-checklist.md`.
-2. ✅ Añadir checklist post-clonado que recuerde revisar dependencias implícitas y definir servicios concretos. → `dev-docs/consumer-checklist.md` sirve como lista marcable.
+1. ✅ Documentar en README/dev-docs qué responsabilidades recaen en el consumidor (entrypoint, importación de `crypto`, implementación real de hashing, etc.). → ver `README.md#🧭-post-clone-checklist` y `dev-docs/user-dd/consumer-checklist.md`.
+2. ✅ Añadir checklist post-clonado que recuerde revisar dependencias implícitas y definir servicios concretos. → `dev-docs/user-dd/consumer-checklist.md` sirve como lista marcable.
 3. ✅ Señalar explícitamente que las clases actuales son ejemplos ilustrativos y deben ser extendidas o reemplazadas. → se advierte en el README y en la checklist.
 
 ### Fase 2 – Tooling mínimo y scripts ✅
 
 1. ✅ Ajustar `package.json` para que los comandos apunten a stubs reales (`src/index.ts`, `dist/index.js`, `scripts/seed.ts`), evitando rutas inexistentes. → ver `package.json`.
-2. ✅ Proveer instrucciones para conectar linting/formatting y `lint-staged` a los lenguajes que el usuario habilite. → ver `dev-docs/tooling-guide.md` y `README.md#🧰-personaliza-scripts-y-linters`.
-3. ✅ Decidir si los tests Bash/Python permanecen como ejemplo y documentar cómo activarlos. → ver `dev-docs/tooling-guide.md#3-suites-de-pruebas-opcionales` y `README.md#🧪-suites-opcionales-multi-lenguaje`.
+2. ✅ Proveer instrucciones para conectar linting/formatting y `lint-staged` a los lenguajes que el usuario habilite. → ver `dev-docs/user-dd/tooling-guide.md` y `README.md#🧰-personaliza-scripts-y-linters`.
+3. ✅ Decidir si los tests Bash/Python permanecen como ejemplo y documentar cómo activarlos. → ver `dev-docs/user-dd/tooling-guide.md#3-suites-de-pruebas-opcionales` y `README.md#🧪-suites-opcionales-multi-lenguaje`.
 
 ### Fase 3 – Plantillas de dominio y eventos ✅
 
@@ -77,7 +269,7 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 
 ### Fase 5 – Validación posterior ✅
 
-1. ✅ Checklist publicada en `dev-docs/post-adaptation-validation.md` con lint/test/type-check y validaciones de arquitectura.
+1. ✅ Checklist publicada en `dev-docs/user-dd/post-adaptation-validation.md` con lint/test/type-check y validaciones de arquitectura.
 2. ✅ Preguntas guía incluidas en la misma guía para cubrir importaciones, servicios y hooks.
 3. ✅ `dev-docs/task.md` actualizado (TASK-010) para indicar qué artefactos deben tocar los consumidores tras aterrizar el kit.
 
@@ -90,24 +282,77 @@ antes de que un equipo adopte el script interactivo. Para mantener la trazabilid
 2. Registra el avance en `dev-docs/task.md` usando las TASK-011 a TASK-015.
 3. Actualiza `.context/project-state.json` una vez que cierres cada fase para que futuros agentes conozcan el estado real del setup.
 
-## Programa de ejecución Dependabot
+## Criterios de Admisión de Features
 
-El pipeline de GitHub Actions sigue reportando 19 vulnerabilidades moderadas porque el `package.json` raíz conserva dependencias antiguas (ESLint 8, `@typescript-eslint` 6, glob@7, rimraf@3). Además, el repositorio aún no expone `.github/dependabot.yml`. Para ordenar el trabajo:
+Una feature entra en el roadmap **solo si** responde afirmativamente a estas dos preguntas:
 
-1. Sigue [`PLAN_EJECUCION_DEPENDABOT.md`](../PLAN_EJECUCION_DEPENDABOT.md), que divide la remediación en tres fases.
-2. Registra el avance usando **TASK-016** (configuración) y **TASK-017** (baseline). Ninguna otra task se creó para auto-merge/logging porque se consideró sobre-ingeniería.
-3. Actualiza README, tooling guide, checklist del consumidor y guía de validación cuando cierres cada fase para mantener la trazabilidad.
+1. **¿Hace al kit más seguro, estable y usable para IA + humanos?**
+2. **¿Reduce trabajo real, no hipotético?**
 
-> 📌 El starkit sólo garantiza dependencias saludables por defecto; cualquier flujo adicional (auto-merge, alertas custom) queda documentado como opt-in para los consumidores del kit.
+Si la respuesta no es "sí" en ambos casos, **se descarta**.
 
-## Hitos
+### Checklist de Evaluación de Features
 
-| Hito | Fecha Objetivo | Estado | Notas |
-|------|----------------|--------|-------|
-| Fundación Completa | [Fecha] | ✅ | Kit Fundador aplicado |
-| MVP Domain Model | [Fecha] | 🟡 | En progreso |
-| API v1.0 | [Fecha] | ⚪ | Pendiente |
-| Production Deploy | [Fecha] | ⚪ | Pendiente |
+Antes de agregar cualquier feature, validar:
+
+- [ ] **No aumenta la complejidad innecesariamente** - La feature es simple de entender
+- [ ] **Es opt-in si no es crítica** - Puede desactivarse sin romper el core
+- [ ] **Está bien documentada** - Incluye ejemplos y guía de uso
+- [ ] **Tiene tests** - Cobertura ≥ 80% de la nueva funcionalidad
+- [ ] **No acopla el kit a frameworks externos** - Especialmente en domain layer
+- [ ] **Resuelve un problema real** - No es especulativa o "por si acaso"
+- [ ] **No duplica funcionalidad existente** - No hay overlap con otras features
+
+---
+
+## Reglas Anti-Drift para Agentes IA
+
+Los agentes IA tienen patrones naturales que pueden romper el kit:
+- Sobregeneralizar
+- Abstraer demasiado
+- Crear capas innecesarias
+- Introducir "patrones corporativos" que no aplican
+
+### Protocolo de Control para IA
+
+1. **Toda PR de IA debe ser revisada** con checklist VALIDADOR (Template 6)
+2. **Ningún agente puede crear templates nuevos** sin pasar por EJECUTOR
+3. **Todas las decisiones se documentan** en `dev-docs/task.md` o ADRs
+4. **Prohibido archivos con nombres genéricos** o vacíos (`utils.ts`, `helpers.ts`)
+5. **Prohibido agregar capas no validadas** por el roadmap oficial
+6. **Prohibido abstracciones especulativas** ("por si acaso necesitamos...")
+
+### Guardrails Técnicos
+
+```markdown
+PERMITIDO ✅:
+- Implementar features del roadmap oficial
+- Refactorizar con tests que pasen
+- Documentar decisiones en ADRs
+- Crear tests exhaustivos
+- Optimizar código existente sin cambiar comportamiento
+
+PROHIBIDO ❌:
+- Agregar frameworks no aprobados
+- Crear abstracciones sin uso concreto
+- Modificar arquitectura sin ADR
+- Saltarse tests
+- Crear dependencias circulares
+- Acoplar domain a infrastructure
+```
+
+---
+
+## Hitos del Roadmap
+
+| Versión | Hito | Fecha Objetivo | Estado | Duración | Notas |
+|---------|------|----------------|--------|----------|-------|
+| **v2.1** | Estabilización y Correcciones Críticas | [En progreso] | 🟡 | 1-2 días | Fundación completa, CI/CD, 24 templates |
+| **v2.2** | Application Layer + Infra Mínima | [Pendiente] | ⚪ | 2-3 días | Use cases, repositorios, adaptadores |
+| **v2.3** | Testing Completo | [Pendiente] | ⚪ | 3-5 días | Unit/Integration/E2E, builders, fixtures |
+| **v2.4** | Observabilidad Opcional | [Pendiente] | ⚪ | 2-4 días | Prometheus, Jaeger, k6, Grafana |
+| **v2.5** | IA-Ready | [Pendiente] | ⚪ | 2-4 días | Templates 25-30, context management |
+| **v3.0** | Framework IA-First | [Pendiente] | ⚪ | 2-3 semanas | Madurez sin complejidad |
 
 **Estados**: ✅ Completado | 🟡 En progreso | ⚪ Pendiente | 🔴 Bloqueado
 

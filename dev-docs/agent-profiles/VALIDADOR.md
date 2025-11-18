@@ -48,6 +48,38 @@ npm run build
 
 # 5. Arquitectura válida
 npm run validate:architecture
+
+# 6. ADR Check (decisiones arquitectónicas)
+```bash
+# Verificar sistema ADR está implementado:
+find dev-docs/ADR -name "ADR-*.md" | wc -l
+
+# Validar que decisiones importantes tienen ADRs:
+./scripts/adr-helper.sh check-required
+
+# Buscar ADRs relevantes:
+./scripts/adr-helper.sh list
+./scripts/adr-helper.sh search keyword
+
+# Validar formato de ADRs existentes:
+for adr in $(find dev-docs/ADR -name "ADR-*.md"); do
+    ./scripts/adr-helper.sh validate "$adr"
+done
+```
+
+**ADR Validation Criteria**:
+- [ ] **Decision Matrix Usage**: Se consultó ADR_DECISION_MATRIX.md
+- [ ] **Existing ADRs Checked**: Se buscaron ADRs relevantes
+- [ ] **Required ADRs Created**: Decisiones importantes tienen ADRs
+- [ ] **ADR References**: Código y commits referencian ADRs
+- [ ] **ADR Format Valid**: Todos los ADRs siguen template
+- [ ] **ADR Index Updated**: ADR_INDEX.md incluye nuevas decisiones
+
+**ADR Integration Evidence**:
+- [ ] **EJECUTOR Check**: Pre-implementation ADR check realizado
+- [ ] **Code References**: Comentarios y commits referencian ADRs
+- [ ] **Documentation Updates**: task.md y plan.md referencian ADRs
+- [ ] **Cross-file Consistency**: Todas las referencias son correctas
 ```
 
 **Si cualquiera falla** → ❌ REJECT inmediatamente con mensaje claro.
@@ -370,6 +402,8 @@ Basado en categorías de errores, decidir acción:
 - [ ] Aggregates protegen invariantes
 - [ ] No hay dependencias circulares
 - [ ] Interfaces definidas en capa correcta
+- [ ] **ADR Integration**: Decisiones arquitectónicas tienen ADRs
+- [ ] **ADR References**: ADRs relevantes están referenciados en código
 ```
 
 #### B. Tests

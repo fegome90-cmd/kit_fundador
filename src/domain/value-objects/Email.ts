@@ -45,6 +45,13 @@ export class Email {
       throw new Error('Invalid email format');
     }
 
+    // Basic email validation
+    // In production, use a proper library or more comprehensive regex
+    if (!EMAIL_REGEX.test(this._value)) {
+      throw new Error(`Invalid email format: ${this._value}`);
+    }
+
+    // Additional business rules
     if (this._value.length > MAX_EMAIL_LENGTH) {
       throw new Error('Email too long');
     }

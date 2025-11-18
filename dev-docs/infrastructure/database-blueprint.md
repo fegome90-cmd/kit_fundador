@@ -30,7 +30,7 @@ pila de persistencia sin romper la neutralidad del kit.
 1. **Definir proveedor y toolchain**
    - Elegir base de datos (Postgres recomendado).
    - Seleccionar herramienta de migraciones (Prisma Migrate, node-pg-migrate, Alembic, etc.).
-   - Registrar la decisión en `dev-docs/tech-stack-decisions.md` y `.context/decision-log.json`.
+   - Registrar la decisión en `dev-docs/user-dd/tech-stack-decisions.md` y `.context/decision-log.json`.
 
 2. **Extender `docker-compose.dev.yml`**
    - Añadir servicio `db` con imagen `postgres:16-alpine` o equivalente.

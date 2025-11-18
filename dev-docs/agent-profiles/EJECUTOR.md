@@ -50,6 +50,37 @@ Antes de codificar, escribir:
 - **Tests needed**: Qué tests voy a escribir
 ```
 
+### 4. ADR Check (OBLIGATORIO para decisiones arquitectónicas)
+```bash
+# Para decisiones importantes, verificar:
+1. Consultar ADR_DECISION_MATRIX.md
+2. Buscar ADRs existentes: find dev-docs/ADR -name "ADR-*.md"
+3. Crear ADR si es requerido: ./scripts/adr-helper.sh create
+4. Referenciar ADRs en implementación: commits, código, PRs
+```
+
+**Checklist ADR**:
+- [ ] ¿Esta decisión es arquitectónica? (Ver ADR_DECISION_MATRIX.md)
+- [ ] ¿Ya existe ADR relevante? (Buscar: `./scripts/adr-helper.sh search keyword`)
+- [ ] ¿Necesito crear nuevo ADR? (Seguir ADR_TEMPLATE_AND_GUIDE.md)
+- [ ] ¿Voy a referenciar ADRs en commits y código?
+- [ ] ¿He actualizado ADR_INDEX.md con nueva decisión?
+
+**ADR Workflow Commands**:
+```bash
+# Verificar si ADR es requerido:
+./scripts/adr-helper.sh check-required
+
+# Buscar ADRs existentes:
+./scripts/adr-helper.sh list
+
+# Crear nuevo ADR:
+./scripts/adr-helper.sh create
+
+# Validar formato ADR:
+./scripts/adr-helper.sh validate ADR-XXX-file.md
+```
+
 ---
 
 ## 📋 PRE-IMPLEMENTATION CHECKLIST (RESEARCH-BASED)

@@ -13,9 +13,7 @@ opentelemetry-sdk>=1.38.0
 opentelemetry-instrumentation-fastapi>=0.43b0
 # Exporters mantienen versión beta (<1.0). Ajusta si tu backend requiere otra señal.
 opentelemetry-exporter-prometheus>=0.59b0
-# Mantén Jaeger para flujos que aún no migran por completo a OTLP.
-opentelemetry-exporter-jaeger>=1.38.0
-# Usa OTLP por defecto para enviar métricas/traces a cualquier backend compatible (incluido Jaeger moderno).
+# Usa OTLP por defecto para enviar métricas/traces a cualquier backend compatible.
 opentelemetry-exporter-otlp>=1.38.0
 
 # Development dependencies
