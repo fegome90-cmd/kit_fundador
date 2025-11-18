@@ -2,11 +2,11 @@
   "name": "kit-fundador-project",
   "version": "1.0.0",
   "description": "Proyecto iniciado con Kit Fundador v2.0",
-  "main": "<build-output>",
+  "main": "dist/index.js",
   "scripts": {
-    "dev": "nodemon --watch src --exec ts-node <project-entrypoint>",
+    "dev": "nodemon --watch src --exec ts-node src/index.ts",
     "build": "tsc",
-    "start": "node <build-output>",
+    "start": "node dist/index.js",
     "test": "jest",
     "test:unit": "jest --testPathPattern=tests/unit",
     "test:integration": "jest --testPathPattern=tests/integration",
@@ -22,7 +22,7 @@
     "migrate:up": "node-pg-migrate up",
     "migrate:down": "node-pg-migrate down",
     "migrate:create": "node-pg-migrate create",
-    "seed:dev": "ts-node <seed-script>",
+    "seed:dev": "ts-node scripts/seed.ts",
     "prepare": "husky install"
   },
   "keywords": [
