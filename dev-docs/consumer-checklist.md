@@ -17,6 +17,7 @@ Este starkit entrega un cascarón mínimamente opinado. Cada equipo que lo adopt
 - [ ] Añadir gestión de secretos (dotenv, vault, AWS SM, etc.).
 - [ ] Configurar los linters/formatters apropiados (ESLint, Ruff, Prettier, Black…).
 - [ ] Activar escáneres de dependencias o tools de seguridad que use tu organización.
+- [ ] Decidir si adoptar la configuración propuesta en [`PLAN_EJECUCION_DEPENDABOT.md`](../PLAN_EJECUCION_DEPENDABOT.md) o documentar tu propia estrategia (Dependabot, Renovate, etc.).
 
 ## 4. Documentación viva
 - [ ] Completar `dev-docs/context.md` con el dominio real.

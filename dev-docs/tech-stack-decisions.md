@@ -11,6 +11,7 @@
 | Testing | Jest + Playwright + Pact + k6 | ✅ Seleccionado | Cubre unitarios, e2e, contratos y carga como guía. |
 | Linting/Formatting | ESLint (@typescript-eslint) + Prettier | ✅ Seleccionado | Stack estándar para repos TS multi-agente. |
 | Build | esbuild | ✅ Seleccionado | Compila rápido y no fuerza pipeline complejo. |
+| Base de datos / infraestructura | PostgreSQL 16 + runner SQL estilo node-pg-migrate | ✅ Seleccionado | `docker-compose.dev.yml` expone el servicio `db`, scripts `npm run migrate:*` y pruebas de humo aseguran que la migración bootstrap exista. |
 
 ## Detalle por categoría
 
@@ -43,7 +44,9 @@
 - **Motivo**: Responde rápido durante workshops; se puede cambiar por tsup, swc o webpack sin tocar dominio.
 
 ### Observabilidad, base de datos y despliegue
-- **DB**: PostgreSQL 16 + Prisma + prisma-migrate.
+- **DB**: PostgreSQL 16 expuesto como servicio `db` en `docker-compose.dev.yml` con volumen persistente y healthcheck `pg_isready`.
+- **Migraciones**: Runner SQL (`scripts/migrate.ts`) que sigue el formato `node-pg-migrate` (archivos `YYYYMMDDHHMM__descripcion.sql` con bloques `-- up/-- down`). Permite reemplazarlo por la herramienta oficial cuando el consumidor habilite su propio pipeline.
+- **Seeds**: `scripts/seed.ts` usa `pg` y las credenciales definidas en `.env` (`DATABASE_URL`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`).
 - **Cache**: Redis 7.
 - **Observabilidad**: Prometheus, Jaeger, OpenTelemetry, Winston.
 - **CI/CD**: GitHub Actions + GHCR + Kubernetes.

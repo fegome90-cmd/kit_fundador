@@ -36,7 +36,7 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 **Minitareas.**
 1. Elevar `eslint`, `@typescript-eslint/*`, `redis` y otras dependencias observadas en la auditoría.
 2. Regenerar `package-lock.json` dentro de `templates/typescript` para capturar el nuevo grafo.
-3. Actualizar `dev-docs/tooling-guide.md` y README con las versiones mínimas sugeridas.
+3. Actualizar `dev-docs/user-dd/tooling-guide.md` y README con las versiones mínimas sugeridas.
 
 **Revisión de código.**
 - Comparar `package.json` y `package-lock.json` para asegurar que las versiones coinciden.
@@ -83,7 +83,7 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 - Crear archivos dummy, ejecutar `./scripts/setup.sh` y elegir “No”: el script debe salir sin modificaciones.
 - Repetir con “Sí” y confirmar que los archivos se reemplazan según lo esperado.
 
-**Implementado en:** `scripts/setup.sh` (`confirm_overwrite` + flag `--force`), README (`Quick Start`), `dev-docs/tooling-guide.md` (tabla de prerequisitos) y `dev-docs/task.md` (cierre de TASK-012).
+**Implementado en:** `scripts/setup.sh` (`confirm_overwrite` + flag `--force`), README (`Quick Start`), `dev-docs/user-dd/tooling-guide.md` (tabla de prerequisitos) y `dev-docs/task.md` (cierre de TASK-012).
 
 **Testing:**
 - Simulaciones manuales creando archivos dummy y respondiendo `n`/`y` para verificar que el script se detiene o continúa según la selección.
@@ -94,7 +94,7 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 
 **Minitareas.**
 1. Crear `validate_prerequisites <mode>` que verifique `git`, `npm`, `python3`, `pip`, `docker-compose`, etc.
-2. Añadir tabla de requisitos por modo en `dev-docs/tooling-guide.md#setup-script`.
+2. Añadir tabla de requisitos por modo en `dev-docs/user-dd/tooling-guide.md#setup-script`.
 3. Mostrar mensajes de ayuda cuando falte algún binario.
 
 **Revisión de código.**
@@ -105,7 +105,7 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 - Simular ausencia de una herramienta (`PATH="" ./scripts/setup.sh"`) y verificar que el mensaje sea claro y el script termine.
 - Ejecutar normalmente para asegurar que los mensajes de éxito siguen apareciendo.
 
-**Implementado en:** `scripts/setup.sh` (`validate_prerequisites` + helper `has_compose`) y `dev-docs/tooling-guide.md#5-script-interactivo-scriptssetupsh`.
+**Implementado en:** `scripts/setup.sh` (`validate_prerequisites` + helper `has_compose`) y `dev-docs/user-dd/tooling-guide.md#5-script-interactivo-scriptssetupsh`.
 
 **Testing:**
 - Ejecución de `./scripts/setup.sh` en un entorno con herramientas instaladas para comprobar que continúa sin alertas.
@@ -128,6 +128,8 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 ## Fase C – Hardening y automatización (P3-P4)
 
 ### C3.1 – Test harness bash
+**Estado:** ✅ Completado el 2025-01-16.
+
 **Objetivo.** Automatizar la verificación de las tres opciones del menú.
 
 **Minitareas.**
@@ -140,50 +142,50 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 - Revisar que el script no dependa de rutas absolutas.
 
 **Testing.**
-- Ejecutar `./tests/setup/setup_script.test.sh` manualmente y revisar que retorna 0.
-- Asegurar que el comando se encadena dentro de `npm test` o `make test` según la guía.
+- Ejecutar `npm run test:setup` (o `make test:setup`) y revisar que retorna 0.
+- Verificar que el harness respeta `SETUP_SH_SKIP_INSTALLS=true` para omitir instalaciones reales en CI.
+
+**Implementado en:** `tests/setup/setup_script.test.sh`, `package.json` (`test:setup`), `Makefile` (`test:setup`), README y `dev-docs/user-dd/tooling-guide.md`.
 
 ### C3.2 – Observabilidad mínima
-**Objetivo.** Facilitar el debugging del setup.
+**Estado:** ⏸️ Aplazada.
 
-**Minitareas.**
-1. Añadir banderas `--verbose` y `--no-color` al parser inicial.
-2. Prefijar los mensajes con `[INFO]`, `[WARN]`, `[ERROR]` y permitir redirigirlos a un log file.
+**Motivo.** Mantener el script liviano y sin parser adicional. Las banderas `--verbose`, `--no-color` y `--log-file` quedan documentadas como mejora opcional para los equipos que adopten el starkit y necesiten más telemetría. Ver `TASK-015` en `dev-docs/task.md` para el seguimiento futuro.
 
-**Revisión de código.**
-- Confirmar que el color se desactiva correctamente cuando se usa `--no-color` o cuando `stdout` no es TTY.
+### C3.3 – Integridad de contextos y guardas Makefile
+**Estado:** ✅ Completada el 2025-01-16.
 
-**Testing.**
-- Ejecutar `./scripts/setup.sh --verbose` y validar que imprime los comandos antes de ejecutarlos.
-- Probar `./scripts/setup.sh --no-color | cat` para confirmar que no se ven secuencias ANSI.
-
-### C3.3 – Integridad de contextos
-**Objetivo.** Asegurar timestamps consistentes y centralizar la escritura de `.context/project-state.json`.
+**Objetivo.** Asegurar timestamps consistentes, centralizar la escritura de `.context/project-state.json` y advertir cuando falta `docker-compose.dev.yml`.
 
 **Minitareas.**
 1. Implementar `utc_timestamp` con fallback en Python cuando `date -u` no esté disponible.
 2. Centralizar la serialización JSON para evitar errores de formato.
+3. Añadir `warn_missing_compose_file` que muestre advertencia sin abortar el script cuando el archivo no exista.
 
 **Revisión de código.**
 - Revisar que la función maneje locales y que siempre emita ISO8601.
 
 **Testing.**
-- Ejecutar script en Linux/macOS (o simular con contenedores) y comparar el timestamp generado.
-- Utilizar `jq` para validar que el JSON resultante es válido (`jq empty .context/project-state.json`).
+- Ejecutar el script y validar `.context/project-state.json` con `python3 -m json.tool`.
+- Renombrar `docker-compose.dev.yml` y confirmar que aparece el warning.
 
-### C3.4 – Guardas para Makefile
-**Objetivo.** Prevenir fallos cuando `docker-compose.dev.yml` no existe.
+**Implementado en:** `scripts/setup.sh` (`utc_timestamp`, `update_context`, `warn_missing_compose_file`) y `tests/setup/setup_script.test.sh` (caso JSON que valida la advertencia).
+
+### C3.4 – Documentación y backlog
+**Estado:** ✅ Completada el 2025-01-16.
+
+**Objetivo.** Reflejar qué partes de la Fase C ya viven en main y dejar registrado que la observabilidad quedó como mejora opcional.
 
 **Minitareas.**
-1. Durante el setup, comprobar la existencia del archivo y mostrar advertencia si falta.
-2. Añadir nota en README sobre cómo crear el archivo antes de usar `make dev`.
+1. Registrar en este plan el estado real de cada bloque.
+2. Actualizar README, `dev-docs/user-dd/tooling-guide.md`, `dev-docs/user-dd/post-adaptation-validation.md` y `dev-docs/setup/setup-sh-remediation-report.md` con el harness, la variable `SETUP_SH_SKIP_INSTALLS` y la advertencia de `docker-compose`.
+3. Sincronizar `dev-docs/task.md`, `.context/active-context.md`, `.context/project-state.json` y `document/informes_CC/AUDITORIA_SETUP_SH.md` para que apunten al nuevo estado y al backlog (TASK-015).
 
-**Revisión de código.**
-- Confirmar que la advertencia no aborta el script (solo informativa).
+**Revisión.**
+- Confirmar enlaces cruzados y que los comandos documentados existan (`npm run test:setup`, `make test:setup`).
 
 **Testing.**
-- Renombrar temporalmente `docker-compose.dev.yml` y ejecutar el setup para observar la advertencia.
-- Restaurar el archivo y repetir para verificar que no aparece el mensaje.
+- N/A; cambios de documentación.
 
 ## Gobernanza y seguimiento
 
@@ -196,7 +198,7 @@ Este plan toma como insumo la auditoría publicada en `document/informes_CC/AUDI
 
 1. **Verificación manual guiada** (checklist ya incluida en la auditoría) tras cada fase.
 2. **Automatización**: integrar el test bash en `npm test` y como job del pipeline que los consumidores puedan activar.
-3. **Mediciones**: publicar en `dev-docs/post-adaptation-validation.md` un bloque dedicado al script (éxito de menú, `npm audit`, `pip install`).
+3. **Mediciones**: publicar en `dev-docs/user-dd/post-adaptation-validation.md` un bloque dedicado al script (éxito de menú, `npm audit`, `pip install`).
 
 ## Consideraciones para el starkit
 

@@ -242,15 +242,15 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 
 ### Fase 1 – Fundamentos del esqueleto
 
-1. ✅ Documentar en README/dev-docs qué responsabilidades recaen en el consumidor (entrypoint, importación de `crypto`, implementación real de hashing, etc.). → ver `README.md#🧭-post-clone-checklist` y `dev-docs/consumer-checklist.md`.
-2. ✅ Añadir checklist post-clonado que recuerde revisar dependencias implícitas y definir servicios concretos. → `dev-docs/consumer-checklist.md` sirve como lista marcable.
+1. ✅ Documentar en README/dev-docs qué responsabilidades recaen en el consumidor (entrypoint, importación de `crypto`, implementación real de hashing, etc.). → ver `README.md#🧭-post-clone-checklist` y `dev-docs/user-dd/consumer-checklist.md`.
+2. ✅ Añadir checklist post-clonado que recuerde revisar dependencias implícitas y definir servicios concretos. → `dev-docs/user-dd/consumer-checklist.md` sirve como lista marcable.
 3. ✅ Señalar explícitamente que las clases actuales son ejemplos ilustrativos y deben ser extendidas o reemplazadas. → se advierte en el README y en la checklist.
 
 ### Fase 2 – Tooling mínimo y scripts ✅
 
 1. ✅ Ajustar `package.json` para que los comandos apunten a stubs reales (`src/index.ts`, `dist/index.js`, `scripts/seed.ts`), evitando rutas inexistentes. → ver `package.json`.
-2. ✅ Proveer instrucciones para conectar linting/formatting y `lint-staged` a los lenguajes que el usuario habilite. → ver `dev-docs/tooling-guide.md` y `README.md#🧰-personaliza-scripts-y-linters`.
-3. ✅ Decidir si los tests Bash/Python permanecen como ejemplo y documentar cómo activarlos. → ver `dev-docs/tooling-guide.md#3-suites-de-pruebas-opcionales` y `README.md#🧪-suites-opcionales-multi-lenguaje`.
+2. ✅ Proveer instrucciones para conectar linting/formatting y `lint-staged` a los lenguajes que el usuario habilite. → ver `dev-docs/user-dd/tooling-guide.md` y `README.md#🧰-personaliza-scripts-y-linters`.
+3. ✅ Decidir si los tests Bash/Python permanecen como ejemplo y documentar cómo activarlos. → ver `dev-docs/user-dd/tooling-guide.md#3-suites-de-pruebas-opcionales` y `README.md#🧪-suites-opcionales-multi-lenguaje`.
 
 ### Fase 3 – Plantillas de dominio y eventos ✅
 
@@ -269,7 +269,7 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 
 ### Fase 5 – Validación posterior ✅
 
-1. ✅ Checklist publicada en `dev-docs/post-adaptation-validation.md` con lint/test/type-check y validaciones de arquitectura.
+1. ✅ Checklist publicada en `dev-docs/user-dd/post-adaptation-validation.md` con lint/test/type-check y validaciones de arquitectura.
 2. ✅ Preguntas guía incluidas en la misma guía para cubrir importaciones, servicios y hooks.
 3. ✅ `dev-docs/task.md` actualizado (TASK-010) para indicar qué artefactos deben tocar los consumidores tras aterrizar el kit.
 
@@ -278,10 +278,9 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 La auditoría detallada en `document/informes_CC/AUDITORIA_SETUP_SH.md` expone nueve hallazgos (uno crítico) que deben resolverse
 antes de que un equipo adopte el script interactivo. Para mantener la trazabilidad:
 
-1. Consulta el [plan de ejecución](setup/setup-sh-remediation-plan.md) y decide qué fases aplicarás (Fases A y B ✅ completadas en main; Fase C pendiente).
-2. Registra el avance en `dev-docs/task.md` usando las TASK-011 a TASK-014.
-3. Actualiza `.context/project-state.json` una vez que cierres cada fase para que futuros agentes conozcan el estado real del
-   setup.
+1. Consulta el [plan de ejecución](setup/setup-sh-remediation-plan.md) y decide qué fases aplicarás (Fases A/B y los bloques C3.1/C3.3 ✅ ya viven en main; la observabilidad C3.2 quedó como mejora opcional documentada en `TASK-015`).
+2. Registra el avance en `dev-docs/task.md` usando las TASK-011 a TASK-015.
+3. Actualiza `.context/project-state.json` una vez que cierres cada fase para que futuros agentes conozcan el estado real del setup.
 
 ## Criterios de Admisión de Features
 

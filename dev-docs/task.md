@@ -4,6 +4,38 @@
 
 _(sin tareas activas)_
 
+## Completados ✅
+
+### [TASK-004] Implementar primer use case (RegisterUserAccount)
+- **Prioridad**: Alta
+- **Estimación**: 3 horas
+- **Estado**: ✅ Completado (2025-11-17)
+- **Dependencias**: TASK-003
+- **Descripción**: Implementar caso de uso RegisterUserAccount con DTOs, handler, repository pattern y tests completos
+- **Criterios de Aceptación**:
+  - [x] DTOs definidos (RegisterUserAccountCommand)
+  - [x] Handler implementado con reglas de negocio
+  - [x] Repository port e implementación stub
+  - [x] Unit tests con 100% coverage
+  - [x] Integration tests end-to-end
+  - [x] Documentación actualizada
+
+## Completados ✅
+
+### [TASK-004] Implementar primer use case (RegisterUserAccount)
+- **Prioridad**: Alta
+- **Estimación**: 3 horas
+- **Estado**: ✅ Completado (2025-11-17)
+- **Dependencias**: TASK-003
+- **Descripción**: Implementar caso de uso RegisterUserAccount con DTOs, handler, repository pattern y tests completos
+- **Criterios de Aceptación**:
+  - [x] DTOs definidos (RegisterUserAccountCommand)
+  - [x] Handler implementado con reglas de negocio
+  - [x] Repository port e implementación stub
+  - [x] Unit tests con 100% coverage
+  - [x] Integration tests end-to-end
+  - [x] Documentación actualizada
+
 ## Pendientes 📋
 
 ### [TASK-003] Setup database y migrations
@@ -11,6 +43,8 @@ _(sin tareas activas)_
 - **Estimación**: 3 horas
 - **Dependencias**: TASK-001
 - **Descripción**: Configurar base de datos y sistema de migraciones
+- **Blueprint**: `dev-docs/infrastructure/database-blueprint.md`
+- **ADR Reference**: Ninguna (implementación de infraestructura estándar)
 - **Criterios de Aceptación**:
   - [ ] Docker compose con DB
   - [ ] Migration framework configurado
@@ -22,11 +56,34 @@ _(sin tareas activas)_
 - **Estimación**: 3 horas
 - **Dependencias**: TASK-002, TASK-003
 - **Descripción**: Crear primer caso de uso end-to-end
+- **Blueprint**: `dev-docs/application/use-case-blueprint.md`
+- **ADR Reference**: Ninguna (implementación estándar según blueprint)
 - **Criterios de Aceptación**:
   - [ ] Command handler implementado
   - [ ] Repository interface definida
   - [ ] Tests de integración pasando
-  - [ ] Documentado en plan.md
+
+### [TASK-ADR-001] ADR Integration System
+- **Prioridad**: Alta
+- **Estimación**: Completado (Day 1: 4-6 horas)
+- **Dependencias**: Ninguna
+- **Descripción**: Integrar sistema de Architecture Decision Records en todo el proyecto
+- **Blueprint**: Internal development
+- **ADR Reference**: Ninguna (es la implementación del sistema ADR)
+- **Criterios de Aceptación**:
+  - [ ] ✅ Template y guía ADR creados
+  - [ ] ✅ Matriz de decisiones definida
+  - [ ] ✅ Workflow del ciclo de vida documentado
+  - [ ] ✅ Scripts de ayuda implementados
+  - [ ] ✅ Integración en CLAUDE.md completada
+  - [ ] ✅ Perfiles de agentes actualizados
+  - [ ] ✅ README.md actualizado con sección ADR
+- [ ] ✅ Enhanced README.md con herramientas completas
+- [ ] ✅ ADR-001 indexado y referenciado
+- [ ] ✅ ADR_INDEX.md mejorado con categorías y búsqueda
+- [ ] ✅ ADR_USAGE_GUIDE.md creado con workflow completo
+
+
 
 ### [TASK-005] API REST endpoint
 - **Prioridad**: Media
@@ -39,27 +96,16 @@ _(sin tareas activas)_
   - [ ] Contract tests pasando
   - [ ] E2E test funcional
 
-### [TASK-013] Hardening y automatización del setup
-- **Prioridad**: Media
-- **Estimación**: 5 horas
-- **Dependencias**: TASK-012
-- **Descripción**: Implementar la Fase C: suite bash de pruebas, flags `--verbose/--no-color`, función para timestamps portables y alerta cuando falta `docker-compose.dev.yml`.
-- **Criterios de Aceptación**:
-  - [ ] Existe `tests/setup/setup_script.test.sh` y se documenta cómo ejecutarlo.
-  - [ ] Nuevas banderas documentadas y probadas.
-  - [ ] `update_context` usa helper portable para UTC.
-  - [ ] `setup.sh` advierte si no se encuentra `docker-compose.dev.yml`.
-
-### [TASK-014] Documentar y cerrar la remediación
+### [TASK-015] Observabilidad opcional del setup
 - **Prioridad**: Baja
-- **Estimación**: 1 hora
-- **Dependencias**: TASK-013
-- **Descripción**: Registrar en README, `dev-docs/plan.md`, `dev-docs/post-adaptation-validation.md` y `.context/` los resultados de la remediación y checklist post-fix.
+- **Estimación**: 2 horas
+- **Dependencias**: TASK-013, TASK-014
+- **Descripción**: Implementar (si el consumidor lo necesita) las banderas `--verbose`, `--no-color` y un mecanismo sencillo de logging/redirección para `scripts/setup.sh`, manteniendo la compatibilidad con CI.
 - **Criterios de Aceptación**:
-  - [ ] README enlaza la guía final y describe el estado del script.
-  - [ ] `dev-docs/task.md` y `plan.md` reflejan el cierre de cada fase.
-  - [ ] `.context/project-state.json` y `.context/active-context.md` incluyen el resumen.
-  - [ ] La checklist de validación añade pasos específicos para el setup.
+  - [ ] Parser actualizado con flags documentadas.
+  - [ ] Logs se pueden desactivar (no ANSI) cuando `stdout` no es TTY.
+  - [ ] README/tooling guide explican cuándo habilitar la funcionalidad.
+  - [ ] Tests cubren los nuevos caminos (`./scripts/setup.sh --verbose`, `--no-color`).
 
 
 
@@ -70,10 +116,22 @@ _(sin tareas activas)_
 - **Duración real**: 30 min
 - **Notas**: Estructura base creada exitosamente
 
+### [TASK-004] Implementar primer use case
+- **Completado**: 2025-11-17
+- **Duración real**: 2.5 horas
+- **Notas**: RegisterUserAccount use case implementado con 100% coverage
+- **Criterios de Aceptación**:
+  - [x] Command handler implementado
+  - [x] Repository interface definida
+  - [x] Tests de integración pasando
+  - [x] Documentado en plan.md
+  - [x] 100% test coverage para nuevos archivos
+  - [x] Validación arquitectónica completada
+
 ### [TASK-006] Documentar responsabilidades del consumidor del starkit
 - **Completado**: 2025-01-15
 - **Duración real**: 40 min
-- **Notas**: README y `dev-docs/consumer-checklist.md` documentan la responsabilidad del equipo que adopta el kit.
+- **Notas**: README y `dev-docs/user-dd/consumer-checklist.md` documentan la responsabilidad del equipo que adopta el kit.
 - **Criterios de Aceptación**:
   - [x] README actualizado con sección "Post-clone checklist"
   - [x] dev-docs incluye recordatorio de importaciones (ej. `crypto`) y hashing
@@ -82,7 +140,7 @@ _(sin tareas activas)_
 ### [TASK-007] Ajustar guías de tooling y scripts
 - **Completado**: 2025-01-15
 - **Duración real**: 45 min
-- **Notas**: `package.json` expone stubs funcionales (`src/index.ts`, `scripts/seed.ts`), `dev-docs/tooling-guide.md` explica cómo alinear linters multi-lenguaje y README documenta suites opcionales.
+- **Notas**: `package.json` expone stubs funcionales (`src/index.ts`, `scripts/seed.ts`), `dev-docs/user-dd/tooling-guide.md` explica cómo alinear linters multi-lenguaje y README documenta suites opcionales.
 - **Criterios de Aceptación**:
   - [x] Scripts de npm apuntan a archivos reales editables por el consumidor
   - [x] lint-staged documentado para múltiples lenguajes
@@ -109,7 +167,7 @@ _(sin tareas activas)_
 ### [TASK-010] Añadir checklist de validación posterior
 - **Completado**: 2025-01-16
 - **Duración real**: 25 min
-- **Notas**: Se creó `dev-docs/post-adaptation-validation.md`, se añadió la sección "Validación post-adaptación" en el README y se referenció el checklist desde el plan.
+- **Notas**: Se creó `dev-docs/user-dd/post-adaptation-validation.md`, se añadió la sección "Validación post-adaptación" en el README y se referenció el checklist desde el plan.
 - **Criterios de Aceptación**:
   - [x] Sección "Post-adaptation validation" publicada
   - [x] Lista incluye lint/test/validate
@@ -128,7 +186,7 @@ _(sin tareas activas)_
 ### [TASK-001] Definir Tech Stack
 - **Completado**: 2025-01-16
 - **Duración real**: 30 min
-- **Notas**: `config/tech-stack.json` incluye el perfil TypeScript + Node.js 20, README señala el doc de decisiones y `dev-docs/context.md`/`dev-docs/tech-stack-decisions.md` detallan las elecciones.
+- **Notas**: `config/tech-stack.json` incluye el perfil TypeScript + Node.js 20, README señala el doc de decisiones y `dev-docs/context.md`/`dev-docs/user-dd/tech-stack-decisions.md` detallan las elecciones.
 - **Criterios de Aceptación**:
   - [x] Lenguaje principal definido
   - [x] Framework seleccionado
@@ -154,6 +212,25 @@ _(sin tareas activas)_
   - [x] Script solicita confirmación o `--force` al detectar archivos existentes.
   - [x] Falta de `npm`, `python3` o `docker-compose` detiene la opción correspondiente con mensaje claro.
   - [x] README explica cómo conservar o eliminar `templates/` tras la ejecución.
+
+### [TASK-013] Hardening y automatización del setup
+- **Completado**: 2025-01-16
+- **Duración real**: 1 h 30 min
+- **Notas**: Se incorporó `tests/setup/setup_script.test.sh`, comandos `npm run test:setup`/`make test:setup`, la variable `SETUP_SH_SKIP_INSTALLS` y el helper `warn_missing_compose_file` para advertir cuando falta `docker-compose.dev.yml`.
+- **Criterios de Aceptación**:
+  - [x] Existe `tests/setup/setup_script.test.sh` y se documenta cómo ejecutarlo.
+  - [x] `update_context` usa helper portable (`utc_timestamp`) para generar los timestamps.
+  - [x] `setup.sh` advierte si no se encuentra `docker-compose.dev.yml`.
+
+### [TASK-014] Documentar y cerrar la remediación
+- **Completado**: 2025-01-16
+- **Duración real**: 45 min
+- **Notas**: README, `dev-docs/plan.md`, `dev-docs/setup/setup-sh-remediation-plan.md`, `dev-docs/setup/setup-sh-remediation-report.md`, `dev-docs/user-dd/post-adaptation-validation.md` y `.context/` reflejan el nuevo estado (Fases A/B + C3.1/C3.3 completas, C3.2 aplazada).
+- **Criterios de Aceptación**:
+  - [x] README enlaza la guía final, documenta `SETUP_SH_SKIP_INSTALLS` y expone el estado actual del setup.
+  - [x] `dev-docs/task.md` y `plan.md` reflejan el cierre de cada fase y el backlog pendiente (TASK-015).
+  - [x] `.context/project-state.json` y `.context/active-context.md` incluyen el resumen actualizado.
+  - [x] La checklist de validación añade pasos específicos (`npm run test:setup`/`make test:setup`).
 
 ## Backlog 💭
 

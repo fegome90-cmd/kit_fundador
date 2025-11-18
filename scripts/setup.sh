@@ -4,6 +4,8 @@
 
 set -e
 
+SKIP_INSTALLS=${SETUP_SH_SKIP_INSTALLS:-false}
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -20,6 +22,9 @@ Uso: ./scripts/setup.sh [opciones]
 Opciones:
   --force       Omite confirmaciones de sobrescritura y validaciones de prerequisitos.
   -h, --help    Muestra esta ayuda y termina.
+
+Variables de entorno:
+  SETUP_SH_SKIP_INSTALLS=true  Omite `npm install`/`pip install` (útil en CI o en el harness de tests).
 USAGE
 }
 
@@ -44,6 +49,25 @@ parse_args() {
 }
 
 parse_args "$@"
+
+utc_timestamp() {
+    if command -v date &> /dev/null; then
+        if ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2> /dev/null); then
+            echo "$ts"
+            return 0
+        fi
+    fi
+
+    if command -v python3 &> /dev/null; then
+        python3 - <<'PY'
+import datetime
+print(datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z")
+PY
+        return 0
+    fi
+
+    echo "1970-01-01T00:00:00Z"
+}
 
 has_compose() {
     if command -v docker-compose &> /dev/null; then
@@ -236,7 +260,9 @@ JSON_END
     echo -e "${GREEN}✓ Archivos TypeScript copiados${NC}"
 
     # Install dependencies
-    if command -v npm &> /dev/null; then
+    if [[ "$SKIP_INSTALLS" == true ]]; then
+        echo -e "${BLUE}ℹ SETUP_SH_SKIP_INSTALLS=true → omitiendo npm install.${NC}"
+    elif command -v npm &> /dev/null; then
         echo -e "${YELLOW}Instalando dependencias...${NC}"
         npm install
         echo -e "${GREEN}✓ Dependencias instaladas${NC}"
@@ -302,7 +328,9 @@ JSON_END
         echo -e "${YELLOW}Instalando dependencias...${NC}"
         # shellcheck disable=SC1091
         source venv/bin/activate
-        if pip install -r requirements.txt; then
+        if [[ "$SKIP_INSTALLS" == true ]]; then
+            echo -e "${BLUE}ℹ SETUP_SH_SKIP_INSTALLS=true → omitiendo pip install.${NC}"
+        elif pip install -r requirements.txt; then
             echo -e "${GREEN}✓ Dependencias instaladas${NC}"
         else
             echo -e "${RED}❌ Error al instalar dependencias${NC}"
@@ -405,25 +433,69 @@ cleanup_templates() {
     esac
 }
 
+warn_missing_compose_file() {
+    if [[ -f docker-compose.dev.yml ]]; then
+        return
+    fi
+
+    echo -e "${YELLOW}⚠ docker-compose.dev.yml no encontrado.${NC}"
+    echo -e "${BLUE}  Los comandos del Makefile que invocan Docker Compose (make dev/test/seed) fallarán hasta que crees uno.${NC}"
+    echo -e "${BLUE}  Copia el ejemplo desde templates/ o ajusta el Makefile a tus propios servicios antes de usarlo.${NC}"
+}
+
 # update_context writes .context/project-state.json recording initialization timestamp, selected language, phase, and a default last_session with suggested next steps.
 # Accepts a single argument `lang` that is stored as the project's language identifier (e.g., "typescript", "python", "generic").
 update_context() {
     local lang=$1
+    local timestamp=${2:-$(utc_timestamp)}
 
     echo -e "${YELLOW}Actualizando contexto del proyecto...${NC}"
 
-    # Update project-state.json
-    cat > .context/project-state.json << JSON_END
+    local summary="Project initialized with $lang stack"
+
+    if command -v python3 &> /dev/null; then
+        python3 - "$lang" "$timestamp" "$summary" <<'PY' > .context/project-state.json
+import json
+import sys
+
+lang = sys.argv[1]
+timestamp = sys.argv[2]
+summary = sys.argv[3]
+
+payload = {
+    "version": "1.0.0",
+    "initialized": timestamp,
+    "language": lang,
+    "phase": "setup",
+    "aggregates_implemented": [],
+    "bounded_contexts": [],
+    "last_session": {
+        "date": timestamp,
+        "summary": summary,
+        "next_steps": [
+            "Review dev-docs/context.md",
+            "Define domain model in dev-docs/domain/ubiquitous-language.md",
+            "Start implementing domain entities",
+            "Write tests following TDD"
+        ]
+    }
+}
+
+json.dump(payload, sys.stdout, indent=2)
+sys.stdout.write("\n")
+PY
+    else
+        cat > .context/project-state.json <<JSON_END
 {
   "version": "1.0.0",
-  "initialized": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+  "initialized": "$timestamp",
   "language": "$lang",
   "phase": "setup",
   "aggregates_implemented": [],
   "bounded_contexts": [],
   "last_session": {
-    "date": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
-    "summary": "Project initialized with $lang stack",
+    "date": "$timestamp",
+    "summary": "$summary",
     "next_steps": [
       "Review dev-docs/context.md",
       "Define domain model in dev-docs/domain/ubiquitous-language.md",
@@ -433,6 +505,7 @@ update_context() {
   }
 }
 JSON_END
+    fi
 
     echo -e "${GREEN}✓ Contexto actualizado${NC}"
 }
@@ -447,18 +520,21 @@ while true; do
             setup_typescript
             update_context "typescript"
             cleanup_templates
+            warn_missing_compose_file
             break
             ;;
         2)
             setup_python
             update_context "python"
             cleanup_templates
+            warn_missing_compose_file
             break
             ;;
         3)
             setup_json
             update_context "generic"
             cleanup_templates
+            warn_missing_compose_file
             break
             ;;
         q|Q)
