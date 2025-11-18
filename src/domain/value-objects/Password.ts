@@ -57,12 +57,20 @@ export class Password {
    */
   private static getSaltRounds(): number {
     const envValue = process.env.PASSWORD_SALT_ROUNDS;
-
     if (!envValue) {
       return DEFAULT_SALT_ROUNDS;
     }
 
-    // Check for decimal point before parsing
+    const saltRounds = this.validateSaltRoundsFormat(envValue);
+    this.validateSaltRoundsRange(saltRounds);
+    return saltRounds;
+  }
+
+  /**
+   * Validates salt rounds format and converts to number.
+   * @private
+   */
+  private static validateSaltRoundsFormat(envValue: string): number {
     if (envValue.includes('.')) {
       const parsed = parseFloat(envValue);
       throw new Error(
@@ -71,20 +79,25 @@ export class Password {
     }
 
     const saltRounds = parseInt(envValue, 10);
-
     if (isNaN(saltRounds)) {
       throw new Error(
         `Invalid PASSWORD_SALT_ROUNDS: "${envValue}" is not a valid number`
       );
     }
 
+    return saltRounds;
+  }
+
+  /**
+   * Validates salt rounds is within acceptable range.
+   * @private
+   */
+  private static validateSaltRoundsRange(saltRounds: number): void {
     if (saltRounds < MIN_SALT_ROUNDS || saltRounds > MAX_SALT_ROUNDS) {
       throw new Error(
         `Invalid PASSWORD_SALT_ROUNDS: ${saltRounds} must be between ${MIN_SALT_ROUNDS} and ${MAX_SALT_ROUNDS}`
       );
     }
-
-    return saltRounds;
   }
 
   /**
