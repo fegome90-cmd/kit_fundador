@@ -71,7 +71,7 @@ describe('RegisterUserAccountHandler', () => {
     const existingUser = User.create({
       email: Email.create('user@example.com'),
       name: 'Existing',
-      password: Password.create('another-secure-pass'),
+      password: await Password.create('another-secure-pass'),
       role: 'user',
     });
     repository.seed(existingUser);

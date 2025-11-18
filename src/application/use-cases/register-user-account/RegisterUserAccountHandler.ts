@@ -39,7 +39,7 @@ export class RegisterUserAccountHandler {
     command: RegisterUserAccountCommand
   ): Promise<RegisterUserAccountResult> {
     const email = await this.ensureEmailIsAvailable(command.email);
-    const user = this.buildUserAggregate(command, email);
+    const user = await this.buildUserAggregate(command, email);
 
     await this.deps.userAccountRepository.save(user);
 
@@ -67,11 +67,11 @@ export class RegisterUserAccountHandler {
     return email;
   }
 
-  private buildUserAggregate(
+  private async buildUserAggregate(
     command: RegisterUserAccountCommand,
     email: Email
-  ): User {
-    const password = Password.create(command.password);
+  ): Promise<User> {
+    const password = await Password.create(command.password);
 
     return User.create({
       email,
