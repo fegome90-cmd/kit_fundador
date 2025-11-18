@@ -85,8 +85,6 @@ target/
 .nuxt/
 .cache/
 .parcel-cache/
-scripts/**/*.d.ts
-scripts/**/*.d.ts.map
 
 # ============================================
 # TESTING

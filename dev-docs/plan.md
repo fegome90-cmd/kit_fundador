@@ -9,6 +9,20 @@
 - [x] Documentación base
 - [x] CI/CD pipeline
 - [x] Development environment (Docker)
+- [x] ADR System Integration (Day 1: 4-6 horas)
+
+#### ADR System Foundation
+- [x] Template y guía ADR creados (`ADR_TEMPLATE_AND_GUIDE.md`)
+- [x] Matriz de decisiones definida (`ADR_DECISION_MATRIX.md`)
+- [x] Workflow del ciclo de vida documentado (`ADR_WORKFLOW.md`)
+- [x] Índice y búsqueda implementados (`ADR_INDEX.md`)
+- [x] Scripts de ayuda creados (`adr-helper.sh`, `adr-reference-checker.sh`)
+- [x] Integración en CLAUDE.md completada (workflow completo)
+- [x] Perfiles de agentes actualizados (EJECUTOR.md, VALIDADOR.md)
+- [x] README.md mejorado con sección ADR completa
+- [x] ADR_USAGE_GUIDE.md creado con workflow completo
+- [x] ADR_INDEX.md mejorado con categorías y búsqueda
+- [x] ADR-001 creado y documentado (sistema ADR)
 
 ### Fase 1: Core Domain
 - [x] Definir bounded contexts → `dev-docs/domain/ubiquitous-language.md#bounded-context-identity--access`.
@@ -18,24 +32,21 @@
 - [ ] Tests de domain layer (100% coverage) → pendiente de expandir cuando se añadan nuevos aggregates.
 
 ### Fase 2: Application Layer
-- [ ] Implementar use cases → sigue el plan de [`dev-docs/application/use-case-blueprint.md`](application/use-case-blueprint.md)
-  - ✅ Use case seleccionado: `RegisterUserAccount` (bounded context Identity & Access). El objetivo es tomar un comando `RegisterUserAccountCommand`, crear el aggregate `User` y persistirlo mediante un `UserAccountRepository` abstracto. Documentado en `dev-docs/task.md` y `.context/decision-log.json` (DEC-2025-01-17-APP-UC1).
-  - ✅ Contratos definidos: `RegisterUserAccountCommand` + helper de normalización y el puerto `UserAccountRepository` viven en `src/application/`, con unit tests en `tests/unit/application/register-user-account/`.
-  - ✅ Handler implementado: `RegisterUserAccountHandler` expone `execute`, aplica las reglas del aggregate y cuenta con unit tests basados en un repositorio in-memory (`tests/unit/application/register-user-account/register-user-account-handler.test.ts`).
-  - ✅ Adapter temporal + integración: `src/infrastructure/_stubs/InMemoryUserAccountRepository.ts` y `tests/integration/application/register-user-account/register-user-account.integration.test.ts` validan el wiring end-to-end mientras llegan repositorios reales.
-- [ ] Command handlers
+- [x] Implementar use cases → sigue el plan de [`dev-docs/application/use-case-blueprint.md`](application/use-case-blueprint.md)
+- [x] Command handlers
 - [ ] Query handlers
 - [ ] Application services
-- [ ] Integration tests
+- [x] Integration tests
 
 ### Fase 3: Infrastructure
-- [x] Database setup y migrations → PostgreSQL 16 como servicio `db`, scripts `npm run migrate:*`/`npm run seed` y smoke tests `tests/integration/db`.
+- [ ] Database setup y migrations
 - [ ] Repository implementations
 - [ ] API REST/GraphQL
 - [ ] Authentication/Authorization
 - [ ] Observability (logs, metrics, traces)
 
-> 🔎 Consulta [`dev-docs/infrastructure/database-blueprint.md`](infrastructure/database-blueprint.md) para extender el runner SQL (`scripts/migrate.ts`), añadir nuevas migraciones y mantener la documentación sincronizada cuando cambie el motor.
+> 🔎 Consulta [`dev-docs/infrastructure/database-blueprint.md`](infrastructure/database-blueprint.md) antes de abordar TASK-003.
+> El documento desgrana minitareas, revisiones de código y pruebas para adaptar el starkit sin introducir dependencias nuevas.
 
 ### Fase 4: Production Ready
 - [ ] Performance testing
@@ -50,15 +61,15 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 
 ### Fase 1 – Fundamentos del esqueleto
 
-1. ✅ Documentar en README/dev-docs qué responsabilidades recaen en el consumidor (entrypoint, importación de `crypto`, implementación real de hashing, etc.). → ver `README.md#🧭-post-clone-checklist` y `dev-docs/consumer-checklist.md`.
-2. ✅ Añadir checklist post-clonado que recuerde revisar dependencias implícitas y definir servicios concretos. → `dev-docs/consumer-checklist.md` sirve como lista marcable.
+1. ✅ Documentar en README/dev-docs qué responsabilidades recaen en el consumidor (entrypoint, importación de `crypto`, implementación real de hashing, etc.). → ver `README.md#🧭-post-clone-checklist` y `dev-docs/user-dd/consumer-checklist.md`.
+2. ✅ Añadir checklist post-clonado que recuerde revisar dependencias implícitas y definir servicios concretos. → `dev-docs/user-dd/consumer-checklist.md` sirve como lista marcable.
 3. ✅ Señalar explícitamente que las clases actuales son ejemplos ilustrativos y deben ser extendidas o reemplazadas. → se advierte en el README y en la checklist.
 
 ### Fase 2 – Tooling mínimo y scripts ✅
 
 1. ✅ Ajustar `package.json` para que los comandos apunten a stubs reales (`src/index.ts`, `dist/index.js`, `scripts/seed.ts`), evitando rutas inexistentes. → ver `package.json`.
-2. ✅ Proveer instrucciones para conectar linting/formatting y `lint-staged` a los lenguajes que el usuario habilite. → ver `dev-docs/tooling-guide.md` y `README.md#🧰-personaliza-scripts-y-linters`.
-3. ✅ Decidir si los tests Bash/Python permanecen como ejemplo y documentar cómo activarlos. → ver `dev-docs/tooling-guide.md#3-suites-de-pruebas-opcionales` y `README.md#🧪-suites-opcionales-multi-lenguaje`.
+2. ✅ Proveer instrucciones para conectar linting/formatting y `lint-staged` a los lenguajes que el usuario habilite. → ver `dev-docs/user-dd/tooling-guide.md` y `README.md#🧰-personaliza-scripts-y-linters`.
+3. ✅ Decidir si los tests Bash/Python permanecen como ejemplo y documentar cómo activarlos. → ver `dev-docs/user-dd/tooling-guide.md#3-suites-de-pruebas-opcionales` y `README.md#🧪-suites-opcionales-multi-lenguaje`.
 
 ### Fase 3 – Plantillas de dominio y eventos ✅
 
@@ -77,7 +88,7 @@ El commit `7f0912b` incorporó mejoras generales de documentación y guías cont
 
 ### Fase 5 – Validación posterior ✅
 
-1. ✅ Checklist publicada en `dev-docs/post-adaptation-validation.md` con lint/test/type-check y validaciones de arquitectura.
+1. ✅ Checklist publicada en `dev-docs/user-dd/post-adaptation-validation.md` con lint/test/type-check y validaciones de arquitectura.
 2. ✅ Preguntas guía incluidas en la misma guía para cubrir importaciones, servicios y hooks.
 3. ✅ `dev-docs/task.md` actualizado (TASK-010) para indicar qué artefactos deben tocar los consumidores tras aterrizar el kit.
 
@@ -89,16 +100,6 @@ antes de que un equipo adopte el script interactivo. Para mantener la trazabilid
 1. Consulta el [plan de ejecución](setup/setup-sh-remediation-plan.md) y decide qué fases aplicarás (Fases A/B y los bloques C3.1/C3.3 ✅ ya viven en main; la observabilidad C3.2 quedó como mejora opcional documentada en `TASK-015`).
 2. Registra el avance en `dev-docs/task.md` usando las TASK-011 a TASK-015.
 3. Actualiza `.context/project-state.json` una vez que cierres cada fase para que futuros agentes conozcan el estado real del setup.
-
-## Programa de ejecución Dependabot
-
-El pipeline de GitHub Actions sigue reportando 19 vulnerabilidades moderadas porque el `package.json` raíz conserva dependencias antiguas (ESLint 8, `@typescript-eslint` 6, glob@7, rimraf@3). Además, el repositorio aún no expone `.github/dependabot.yml`. Para ordenar el trabajo:
-
-1. Sigue [`PLAN_EJECUCION_DEPENDABOT.md`](../PLAN_EJECUCION_DEPENDABOT.md), que divide la remediación en tres fases.
-2. Registra el avance usando **TASK-016** (configuración) y **TASK-017** (baseline). Ninguna otra task se creó para auto-merge/logging porque se consideró sobre-ingeniería.
-3. Actualiza README, tooling guide, checklist del consumidor y guía de validación cuando cierres cada fase para mantener la trazabilidad.
-
-> 📌 El starkit sólo garantiza dependencias saludables por defecto; cualquier flujo adicional (auto-merge, alertas custom) queda documentado como opt-in para los consumidores del kit.
 
 ## Hitos
 
