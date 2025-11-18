@@ -28,8 +28,8 @@ export class HttpServer {
   }
 
   private setupMiddleware(): void {
-    this.setupSecurityMiddleware();
     this.setupBodyParsing();
+    this.setupSecurityMiddleware();
     this.setupLogging();
   }
 
@@ -45,7 +45,12 @@ export class HttpServer {
   }
 
   private setupBodyParsing(): void {
-    this.app.use(express.json({ limit: '10mb' }));
+    // Enhanced JSON parsing with better error handling
+    this.app.use(express.json({
+      limit: '10mb',
+      strict: false,
+      type: ['application/json']
+    }));
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   }
 
