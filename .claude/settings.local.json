@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./scripts/setup.sh --help)"
+      "Bash(./scripts/setup.sh --help)",
+      "Bash(chmod +x /Users/felipe/Developer/kit_fundador-main/scripts/setup.sh)"
     ],
     "deny": [],
     "ask": []
