@@ -25,7 +25,7 @@
     "tool": "eslint",
     "config": ".eslintrc.json",
     "plugins": ["@typescript-eslint"],
-    "notes": "Placeholder para el perfil TypeScript; ver dev-docs/tooling-guide.md para extender a otros lenguajes."
+    "notes": "Placeholder para el perfil TypeScript; ver dev-docs/user-dd/tooling-guide.md para extender a otros lenguajes."
   },
 
   "formatting": {
@@ -41,8 +41,8 @@
 
   "database": {
     "primary": "postgresql",
-    "orm": "none",
-    "migrations": "sql-runner-node-pg-migrate-style",
+    "orm": "prisma",
+    "migrations": "prisma-migrate",
     "version": "16"
   },
 

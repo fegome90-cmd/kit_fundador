@@ -79,7 +79,7 @@ consumidor implemente su capa de aplicación cuando decida materializar el proye
 
 3. **Checklist de documentación**
    - Actualiza `README.md` (nueva sección “Blueprint de casos de uso”).
-   - Marca la mini-ejecución en `dev-docs/post-adaptation-validation.md` (ejecutar tests unitarios/integración del use case).
+   - Marca la mini-ejecución en `dev-docs/user-dd/post-adaptation-validation.md` (ejecutar tests unitarios/integración del use case).
    - Registra la decisión en `.context/decision-log.json` y el estado en `.context/project-state.json`.
 
 ## Revisiones de código
@@ -113,4 +113,4 @@ consumidor implemente su capa de aplicación cuando decida materializar el proye
 - `dev-docs/domain/invariants.md`
 - `dev-docs/task.md#task-004-implementar-primer-use-case`
 - `dev-docs/plan.md#fase-2-application-layer`
-- `dev-docs/post-adaptation-validation.md`
+- `dev-docs/user-dd/post-adaptation-validation.md`

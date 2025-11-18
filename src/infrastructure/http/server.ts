@@ -7,6 +7,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { createUserRoutes } from './routes/userRoutes';
+import { specs, swaggerUi } from './swagger';
 
 export interface ServerConfig {
   port: number;
@@ -21,6 +22,7 @@ export class HttpServer {
     this.config = config;
     this.app = express();
     this.setupMiddleware();
+    this.setupSwagger();
     this.setupRoutes();
     this.setupErrorHandling();
   }
@@ -29,6 +31,12 @@ export class HttpServer {
     this.setupSecurityMiddleware();
     this.setupBodyParsing();
     this.setupLogging();
+  }
+
+  private setupSwagger(): void {
+    // Serve Swagger UI at /api-docs and handle the redirect properly
+    this.app.get('/api-docs', swaggerUi.setup(specs));
+    this.app.use('/api-docs', swaggerUi.serve);
   }
 
   private setupSecurityMiddleware(): void {
@@ -42,7 +50,7 @@ export class HttpServer {
   }
 
   private setupLogging(): void {
-    this.app.use(this.requestLogger);
+    this.app.use((req, res, next) => this.requestLogger(req, res, next));
   }
 
   private setupRoutes(): void {
@@ -56,15 +64,15 @@ export class HttpServer {
   }
 
   private setupHealthCheck(): void {
-    this.app.get('/health', this.healthCheckHandler);
+    this.app.get('/health', (req, res) => this.healthCheckHandler(req, res));
   }
 
   private setup404Handler(): void {
-    this.app.use('*', this.notFoundHandler);
+    this.app.use('*', (req, res) => this.notFoundHandler(req, res));
   }
 
   private setupErrorHandling(): void {
-    this.app.use(this.errorHandler);
+    this.app.use((error: Error, req: express.Request, res: express.Response) => this.errorHandler(error, req, res));
   }
 
   private requestLogger(req: express.Request, _res: express.Response, next: express.NextFunction): void {

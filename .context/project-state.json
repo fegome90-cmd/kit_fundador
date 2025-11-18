@@ -5,7 +5,7 @@
     "name": "nombre-proyecto",
     "domain": "dominio-negocio",
     "stage": "foundation",
-    "tech_stack_hash": "typescript-node20-express-jest-esbuild-postgres16"
+    "tech_stack_hash": "typescript-node20-express-jest-esbuild"
   },
   "current_state": {
     "active_bounded_contexts": [
@@ -26,7 +26,8 @@
         "code": "src/domain/entities/User.ts",
         "tests": [
           "tests/unit/User.test.ts",
-          "tests/unit/Email.test.ts"
+          "tests/unit/Email.test.ts",
+          "tests/unit/Password.test.ts"
         ],
         "completion_date": "2025-11-17"
       }
@@ -39,31 +40,16 @@
         "summary": "`scripts/setup.sh` tiene hallazgos críticos documentados en AUDITORIA_SETUP_SH.md",
         "status": "in_progress",
         "remediation_plan": "dev-docs/setup/setup-sh-remediation-plan.md",
-        "tasks": [
-          "TASK-015"
-        ],
+        "tasks": ["TASK-015"],
         "notes": "Fases A y B completadas; C3.1 (harness) y C3.3 (utc_timestamp + warning docker-compose) ya están en main. La única mejora abierta es la observabilidad opcional (C3.2/TASK-015)."
       },
       {
         "id": "TD-DB-001",
         "summary": "Infraestructura de base de datos pendiente (TASK-003)",
-        "status": "resolved",
-        "remediation_plan": "dev-docs/infrastructure/database-blueprint.md",
-        "tasks": [
-          "TASK-003",
-          "TASK-004"
-        ],
-        "notes": "Servicio `db` + runner SQL (`scripts/migrate.ts`) están activos. El backlog ahora se enfoca en repositorios reales (TASK-004+)."
-      },
-      {
-        "id": "TD-DB-002",
-        "summary": "Adoptar herramienta de migraciones oficial o endurecer el runner SQL",
         "status": "planned",
         "remediation_plan": "dev-docs/infrastructure/database-blueprint.md",
-        "tasks": [
-          "TASK-004"
-        ],
-        "notes": "El runner actual ejecuta archivos `-- up/-- down` y registra en `kit_migrations`, pero carece de validaciones avanzadas (checksum, locking). Se recomienda migrar a node-pg-migrate/Prisma cuando el consumidor tenga acceso a su registry."
+        "tasks": ["TASK-003", "TASK-004"],
+        "notes": "El blueprint describe cómo crear docker-compose, migraciones y seeds sin añadir dependencias al starkit; queda a cargo del consumidor implementarlo."
       },
       {
         "id": "TD-APP-001",
@@ -106,11 +92,8 @@
     "recent_decisions": [
       {
         "id": "DEC-2025-01-16-STACK",
-        "summary": "Se fija TypeScript + Express como perfil predeterminado del starkit y se documenta en dev-docs/tech-stack-decisions.md.",
-        "references": [
-          "config/tech-stack.json",
-          "dev-docs/tech-stack-decisions.md"
-        ]
+        "summary": "Se fija TypeScript + Express como perfil predeterminado del starkit y se documenta en dev-docs/user-dd/tech-stack-decisions.md.",
+        "references": ["config/tech-stack.json", "dev-docs/user-dd/tech-stack-decisions.md"]
       },
       {
         "id": "DEC-2025-01-16-SETUP-PLAN",
