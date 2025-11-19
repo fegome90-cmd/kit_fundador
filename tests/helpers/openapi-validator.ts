@@ -4,17 +4,23 @@
  */
 
 export class OpenAPIValidator {
-  constructor() {
-    console.log('OpenAPI validator initialized (simplified mode)');
+  constructor(private debugMode: boolean = false) {
+    if (this.debugMode) {
+      console.log('OpenAPI validator initialized (simplified mode)');
+    }
   }
 
   /**
    * Validate user response against OpenAPI schema
    */
   validateUserResponse(data: any): { valid: boolean; errors?: string[] } {
-    // Simplified validation for now - focus on structure rather than full schema
+    // Enhanced validation with stricter type checking and email format validation
     const requiredFields = ['success', 'data'];
     const errors: string[] = [];
+
+    if (this.debugMode) {
+      console.log('OpenAPI validator: validating response', data);
+    }
 
     // Check required fields
     for (const field of requiredFields) {
@@ -23,7 +29,7 @@ export class OpenAPIValidator {
       }
     }
 
-    // Check data types
+    // Check data types with stricter validation
     if (typeof data.success !== 'boolean') {
       errors.push('success must be boolean');
     }
@@ -39,13 +45,28 @@ export class OpenAPIValidator {
       errors.push('timestamp must be string (in root or data.createdAt)');
     }
 
-    // Check data structure
-    if (data.data && !data.data.userId) {
-      errors.push('data.userId is required');
+    // Check data structure with enhanced validation
+    if (data.data) {
+      if (!data.data.userId) {
+        errors.push('data.userId is required');
+      }
+
+      if (!data.data.email) {
+        errors.push('data.email is required');
+      }
+
+      // Enhanced: Check email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (data.data.email && typeof data.data.email === 'string' && !emailRegex.test(data.data.email)) {
+        errors.push('data.email must be valid email format');
+      }
     }
 
-    if (data.data && !data.data.email) {
-      errors.push('data.email is required');
+    if (this.debugMode) {
+      console.log('OpenAPI validator: validation result', {
+        valid: errors.length === 0,
+        errors: errors.length > 0 ? errors : undefined
+      });
     }
 
     return {

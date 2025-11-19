@@ -139,7 +139,10 @@ export class HttpServer {
     const port = this.config.port;
 
     this.server = this.app.listen(port, () => {
-      this.logServerStart(port);
+      // Fix: Log actual bound port, not requested port
+      const address = this.server?.address();
+      const actualPort = (typeof address === 'string') ? port : address?.port || port;
+      this.logServerStart(actualPort);
     });
   }
 
@@ -148,6 +151,8 @@ export class HttpServer {
       if (this.server) {
         this.server.close(() => {
           console.log('Server stopped');
+          // Fix: Make stop() idempotent - clear server reference
+          this.server = undefined;
           resolve();
         });
       } else {
@@ -171,7 +176,16 @@ export class HttpServer {
   }
 }
 
-// Factory function for creating server instance
+/**
+ * Create an HttpServer instance using environment-derived defaults with optional overrides.
+ *
+ * The factory reads PORT and NODE_ENV from the process environment (defaulting to `3000` and
+ * `development` respectively), applies any fields provided in `config`, and returns a new
+ * HttpServer configured with the resulting values.
+ *
+ * @param config - Partial server configuration to override environment-derived defaults
+ * @returns An HttpServer configured with the resolved `port` and `environment`
+ */
 export function createServer(config?: Partial<ServerConfig>): HttpServer {
   const defaultConfig: ServerConfig = {
     port: Number.parseInt(process.env.PORT || '3000', 10),

@@ -8,7 +8,7 @@
 
 ---
 
-## �� Executive Summary
+## Executive Summary
 
 He completado la validación integral de **TASK-005 Phase 2 - Contract Tests + Documentation** utilizando el protocolo VALIDADOR v2.1 con énfasis en calidad empresarial y cumplimiento de estándares.
 
@@ -360,7 +360,7 @@ Start with:
 - ✅ Comprehensive documentation
 - ✅ Foundation solid para Phase 3
 
-**APROBADO PARA MERGEAR A MAIN**
+### **APROBADO PARA MERGEAR A MAIN**
 
 ---
 

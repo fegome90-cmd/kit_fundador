@@ -134,16 +134,9 @@
 
 
 
-### [TASK-005] API REST endpoint
-- **Prioridad**: Media
-- **Estimación**: 2 horas
-- **Dependencias**: TASK-004
-- **Descripción**: Exponer use case vía API REST
-- **Criterios de Aceptación**:
-  - [ ] Endpoint implementado
-  - [ ] OpenAPI schema definido
-  - [ ] Contract tests pasando
-  - [ ] E2E test funcional
+### [TASK-005] API REST endpoint (LEGACY - MOVED TO "En Progreso")
+- **Estado**: ⚠️ MOVIDO - Esta entrada está duplicada en "En Progreso" arriba
+- **Nota**: Ver sección "En Progreso 🔄" para TASK-005 actual con Phase 3 Foundation status
 
 ### [TASK-015] Observabilidad opcional del setup
 - **Prioridad**: Baja
