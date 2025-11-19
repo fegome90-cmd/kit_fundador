@@ -182,6 +182,19 @@ Validar SOLO esos fixes.
 
 ---
 
+## 🚀 Testing Workflow
+
+When writing tests:
+1. Read `dev-docs/testing/tools/test-data-factory.md`
+2. Apply patterns from tool
+3. Validate with `dev-docs/testing/tools/isolation-checker.md` checklist
+
+When reviewing test PRs:
+1. Run checklists from relevant tools in `dev-docs/testing/tools/`
+2. Reference tool name in review comments
+
+---
+
 ## 🔄 Prompts para Cambio de Rol
 
 ### De Ejecutor a Validador

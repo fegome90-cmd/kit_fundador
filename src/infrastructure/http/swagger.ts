@@ -32,28 +32,28 @@ const options = {
       `,
       contact: {
         name: 'Kit Fundador Team',
-        email: 'dev@kitfundador.com'
+        email: 'dev@kitfundador.com',
       },
       license: {
         name: 'MIT',
-        url: 'https://opensource.org/licenses/MIT'
-      }
+        url: 'https://opensource.org/licenses/MIT',
+      },
     },
     servers: [
       {
         url: 'http://localhost:3000',
-        description: 'Development server'
+        description: 'Development server',
       },
       {
         url: 'https://api.kitfundador.com',
-        description: 'Production server'
-      }
+        description: 'Production server',
+      },
     ],
     tags: [
       {
         name: 'User Registration',
-        description: 'Endpoints for user account creation and management'
-      }
+        description: 'Endpoints for user account creation and management',
+      },
     ],
     components: {
       securitySchemes: {
@@ -61,21 +61,21 @@ const options = {
           type: 'apiKey',
           in: 'header',
           name: 'X-API-Key',
-          description: 'API key for authentication (future use)'
-        }
-      }
+          description: 'API key for authentication (future use)',
+        },
+      },
     },
     security: [
       {
-        ApiKeyAuth: []
-      }
-    ]
+        ApiKeyAuth: [],
+      },
+    ],
   },
   apis: [
     './src/infrastructure/http/routes/*.ts',
     './src/infrastructure/http/controllers/*.ts',
-    './src/infrastructure/docs/api/openapi.yaml'
-  ]
+    './src/infrastructure/docs/api/openapi.yaml',
+  ],
 };
 
 const specs = swaggerJsdoc(options);

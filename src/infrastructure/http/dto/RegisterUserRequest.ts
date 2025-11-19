@@ -39,18 +39,20 @@ export class RegisterUserRequestValidator {
   }
 
   private static isValidObject(input: unknown): boolean {
-    return input !== null && input !== undefined && typeof input === 'object' && !Array.isArray(input);
+    return (
+      input !== null && input !== undefined && typeof input === 'object' && !Array.isArray(input)
+    );
   }
 
   private static collectValidationErrors(data: Record<string, unknown>): string[] {
     const errors: string[] = [];
     const fieldErrors = this.validateRequiredFields(data);
     errors.push(...fieldErrors);
-    
+
     if (fieldErrors.length === 0) {
       const typeErrors = this.validateFieldTypes(data);
       errors.push(...typeErrors);
-      
+
       if (typeErrors.length === 0) {
         const valueErrors = this.validateFieldValues(data);
         errors.push(...valueErrors);
@@ -75,14 +77,16 @@ export class RegisterUserRequestValidator {
     const errors: string[] = [];
     if (data.email && typeof data.email !== 'string') errors.push('Email must be a string');
     if (data.name && typeof data.name !== 'string') errors.push('Name must be a string');
-    if (data.password && typeof data.password !== 'string') errors.push('Password must be a string');
-    if (data.role !== undefined && typeof data.role !== 'string') errors.push('Role must be a string');
+    if (data.password && typeof data.password !== 'string')
+      errors.push('Password must be a string');
+    if (data.role !== undefined && typeof data.role !== 'string')
+      errors.push('Role must be a string');
     return errors;
   }
 
   private static validateFieldValues(data: Record<string, unknown>): string[] {
     const errors: string[] = [];
-    
+
     this.validateEmailField(data, errors);
     this.validateNameField(data, errors);
     this.validatePasswordField(data, errors);
@@ -122,7 +126,7 @@ export class RegisterUserRequestValidator {
   private static validateEmail(email: string): string[] {
     const errors: string[] = [];
     const trimmedEmail = email.trim().toLowerCase();
-    
+
     if (trimmedEmail.length === 0) {
       errors.push('Email cannot be empty');
     } else if (trimmedEmail.length > this.MAX_EMAIL_LENGTH) {
@@ -130,32 +134,32 @@ export class RegisterUserRequestValidator {
     } else if (!this.EMAIL_REGEX.test(trimmedEmail)) {
       errors.push('Email must be a valid email address');
     }
-    
+
     return errors;
   }
 
   private static validateName(name: string): string[] {
     const errors: string[] = [];
     const trimmedName = name.trim();
-    
+
     if (trimmedName.length === 0) {
       errors.push('Name cannot be empty');
     } else if (trimmedName.length > this.MAX_NAME_LENGTH) {
       errors.push(`Name must not exceed ${this.MAX_NAME_LENGTH} characters`);
     }
-    
+
     return errors;
   }
 
   private static validatePassword(password: string): string[] {
     const errors: string[] = [];
-    
+
     if (password.length < this.MIN_PASSWORD_LENGTH) {
       errors.push(`Password must be at least ${this.MIN_PASSWORD_LENGTH} characters long`);
     } else if (password.length > 128) {
       errors.push('Password must not exceed 128 characters');
     }
-    
+
     return errors;
   }
 
@@ -169,7 +173,7 @@ export class RegisterUserRequestValidator {
 
   private static validateUnexpectedFields(data: Record<string, unknown>): string[] {
     const errors: string[] = [];
-    const unexpectedFields = Object.keys(data).filter(key => !this.ALLOWED_FIELDS.includes(key));
+    const unexpectedFields = Object.keys(data).filter((key) => !this.ALLOWED_FIELDS.includes(key));
     if (unexpectedFields.length > 0) {
       errors.push(`Unexpected fields: ${unexpectedFields.join(', ')}`);
     }
@@ -181,7 +185,7 @@ export class RegisterUserRequestValidator {
       email: (data.email as string).trim().toLowerCase(),
       name: (data.name as string).trim(),
       password: data.password as string,
-      role: data.role ? (data.role as 'user' | 'admin') : 'user'
+      role: data.role ? (data.role as 'user' | 'admin') : 'user',
     };
   }
 
@@ -190,7 +194,7 @@ export class RegisterUserRequestValidator {
       email: input.email.trim().toLowerCase(),
       name: input.name.trim(),
       password: input.password,
-      role: input.role || 'user'
+      role: input.role || 'user',
     };
   }
 }

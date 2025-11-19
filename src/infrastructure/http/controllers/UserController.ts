@@ -25,19 +25,27 @@ export class UserController {
     try {
       const { email, name, password, role } = validation.data;
       const normalizedRole: UserRole = role === 'admin' ? 'admin' : 'user';
-      const command = buildRegisterUserAccountCommand({ email, name, password, role: normalizedRole });
+      const command = buildRegisterUserAccountCommand({
+        email,
+        name,
+        password,
+        role: normalizedRole,
+      });
       const result = await this.registerUserHandler.execute(command);
-      
-      this.sendSuccessResponse(res, result);
 
+      this.sendSuccessResponse(res, result);
     } catch (error) {
       this.handleError(res, error);
     }
   }
 
-  private validateRequest(body: unknown): { isValid: boolean; data?: { email: string; name: string; password: string; role: string }; errors?: string[] } {
+  private validateRequest(body: unknown): {
+    isValid: boolean;
+    data?: { email: string; name: string; password: string; role: string };
+    errors?: string[];
+  } {
     const validation = RegisterUserRequestValidator.validate(body);
-    
+
     if (!validation.isValid || !validation.data) {
       return { isValid: false, errors: validation.errors };
     }
@@ -48,23 +56,33 @@ export class UserController {
         email: validation.data.email,
         name: validation.data.name,
         password: validation.data.password,
-        role: validation.data.role || 'user'
-      }
+        role: validation.data.role || 'user',
+      },
     };
   }
 
-  private sendSuccessResponse(res: Response, result: { userSnapshot: { id: string; email: string; name: string; role: UserRole; emailVerified: boolean; createdAt: Date } }): void {
+  private sendSuccessResponse(
+    res: Response,
+    result: {
+      userSnapshot: {
+        id: string;
+        email: string;
+        name: string;
+        role: UserRole;
+        emailVerified: boolean;
+        createdAt: Date;
+      };
+    }
+  ): void {
     const role = result.userSnapshot.role === 'guest' ? 'user' : result.userSnapshot.role;
     const userData = {
       userId: result.userSnapshot.id,
       email: result.userSnapshot.email,
       name: result.userSnapshot.name,
-      role: role as 'user' | 'admin'
+      role: role as 'user' | 'admin',
     };
-    
-    res.status(201).json(
-      RegisterUserResponseBuilder.success(userData)
-    );
+
+    res.status(201).json(RegisterUserResponseBuilder.success(userData));
   }
 
   private handleError(res: Response, error: unknown): void {
@@ -85,9 +103,9 @@ export class UserController {
       timestamp: new Date().toISOString(),
       level: 'error',
       message,
-      type: error?.constructor?.name || 'UnknownError'
+      type: error?.constructor?.name || 'UnknownError',
     };
-    
+
     // Use process.stderr to avoid linting issues for error logging
     process.stderr.write(JSON.stringify(errorInfo) + '\n');
   }

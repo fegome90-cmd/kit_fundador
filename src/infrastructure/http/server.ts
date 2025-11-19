@@ -46,11 +46,13 @@ export class HttpServer {
 
   private setupBodyParsing(): void {
     // Enhanced JSON parsing with better error handling
-    this.app.use(express.json({
-      limit: '10mb',
-      strict: false,
-      type: ['application/json']
-    }));
+    this.app.use(
+      express.json({
+        limit: '10mb',
+        strict: false,
+        type: ['application/json'],
+      })
+    );
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   }
 
@@ -77,10 +79,16 @@ export class HttpServer {
   }
 
   private setupErrorHandling(): void {
-    this.app.use((error: Error, req: express.Request, res: express.Response) => this.errorHandler(error, req, res));
+    this.app.use((error: Error, req: express.Request, res: express.Response) =>
+      this.errorHandler(error, req, res)
+    );
   }
 
-  private requestLogger(req: express.Request, _res: express.Response, next: express.NextFunction): void {
+  private requestLogger(
+    req: express.Request,
+    _res: express.Response,
+    next: express.NextFunction
+  ): void {
     const timestamp = new Date().toISOString();
     process.stdout.write(`[${timestamp}] ${req.method} ${req.path} - ${req.ip}\n`);
     next();
@@ -90,7 +98,7 @@ export class HttpServer {
     res.status(200).json({
       status: 'ok',
       timestamp: new Date().toISOString(),
-      environment: this.config.environment
+      environment: this.config.environment,
     });
   }
 
@@ -98,18 +106,18 @@ export class HttpServer {
     res.status(404).json({
       success: false,
       message: 'Route not found',
-      path: req.originalUrl
+      path: req.originalUrl,
     });
   }
 
   private errorHandler(error: Error, req: express.Request, res: express.Response): void {
     const timestamp = new Date().toISOString();
-    
+
     this.logError(req, error, timestamp);
     res.status(500).json({
       success: false,
       message: 'Internal server error',
-      timestamp
+      timestamp,
     });
   }
 
@@ -119,15 +127,15 @@ export class HttpServer {
       method: req.method,
       path: req.path,
       error: error.message,
-      hasStack: !!error.stack
+      hasStack: !!error.stack,
     };
-    
+
     process.stderr.write(JSON.stringify(errorInfo) + '\n');
   }
 
   public start(): void {
     const port = this.config.port;
-    
+
     this.app.listen(port, () => {
       this.logServerStart(port);
     });
@@ -149,7 +157,7 @@ export function createServer(config?: Partial<ServerConfig>): HttpServer {
   const defaultConfig: ServerConfig = {
     port: parseInt(process.env.PORT || '3000', 10),
     environment: process.env.NODE_ENV || 'development',
-    ...config
+    ...config,
   };
 
   return new HttpServer(defaultConfig);

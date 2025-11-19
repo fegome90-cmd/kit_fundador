@@ -1,6 +1,6 @@
 /**
  * Example Domain Entity
- * 
+ *
  * RULES:
  * - No dependencies on infrastructure or application layers
  * - Business logic MUST be here
@@ -38,18 +38,11 @@ export class User {
   }
 
   // Factory method - preferred way to create entities
-  static create(params: {
-    email: Email;
-    name: string;
-    password: Password;
-    role?: UserRole;
-  }): User {
+  static create(params: { email: Email; name: string; password: Password; role?: UserRole }): User {
     const { props, occurredOn } = User.buildInitialProps(params);
     const user = new User(props);
 
-    user.addDomainEvent(
-      new UserCreatedEvent(user.id, user.email.value, occurredOn)
-    );
+    user.addDomainEvent(new UserCreatedEvent(user.id, user.email.value, occurredOn));
 
     return user;
   }

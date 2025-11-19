@@ -35,9 +35,7 @@ export interface RegisterUserAccountResult {
 export class RegisterUserAccountHandler {
   constructor(private readonly deps: RegisterUserAccountHandlerDeps) {}
 
-  async execute(
-    command: RegisterUserAccountCommand
-  ): Promise<RegisterUserAccountResult> {
+  async execute(command: RegisterUserAccountCommand): Promise<RegisterUserAccountResult> {
     const email = await this.ensureEmailIsAvailable(command.email);
     const user = await this.buildUserAggregate(command, email);
 

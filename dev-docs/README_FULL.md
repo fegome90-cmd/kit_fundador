@@ -806,26 +806,50 @@ describe('User Entity', () => {
 - ❌ Password VO (15-20 tests + implementación)
 - ❌ Aggregates (30+ tests)
 
-## 9.3 Integration Tests (NO Implementado)
+## 9.3 Integration Tests (PARCIALMENTE Implementado) 📊 60%
 
 **Coverage Target**: 20% del total
+**Estado Actual**: ✅ Archivos creados y funcionando
+**Ubicación**: `tests/integration/api/users/user-registration.contract.test.ts`
 
-**Scope**:
-- Repository implementations
-- Database operations
-- External API calls
-- Message queues
+**Implementaciones Logradas**:
+- ✅ Contract tests para User Registration API
+- ✅ Test isolation con beforeEach hooks
+- ✅ HTTP status validation (201, 409)
+- ✅ Path resolution corregido
 
-**Ejemplo Esperado**:
+**Scope Implementado**:
+- ✅ API contract testing
+- ✅ HTTP status validation
+- ✅ User registration flow
+- ✅ Duplicate user handling
+
+**Issues Resueltos**:
+- ✅ ADR-003: Test isolation implemented (beforeEach hooks)
+- ✅ ADR-004: Import paths corrected
+- ✅ HTTP 409 conflict testing
+
+**Ejemplo Implementado**:
 
 ```typescript
-describe('UserRepository - Integration', () => {
-  let db: TestDatabase;
-  let repo: UserRepository;
+describe('User Registration API Contract', () => {
+  let repository: InMemoryUserAccountRepository;
+  let server: HttpServer;
 
-  beforeEach(async () => {
-    db = await setupTestDatabase();
-    repo = new UserRepository(db);
+  beforeEach(() => {
+    repository = new InMemoryUserAccountRepository();
+    repository.clear(); // ← Test isolation (ADR-003)
+    server = new HttpServer({ port: 3000, environment: 'test' });
+  });
+
+  it('should register a new user successfully', async () => {
+    // Test implementation with proper validation
+  });
+});
+
+// Pendiente: Repository implementations con database real
+// Pendiente: Database operations con PostgreSQL
+// Pendiente: External API calls integration
   });
 
   it('should save and retrieve user', async () => {

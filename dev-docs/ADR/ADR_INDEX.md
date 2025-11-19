@@ -9,6 +9,10 @@
 ## By Number
 
 - [ADR-001](ADR-001-adr-integration-system.md) - ADR Integration System
+- [ADR-002](ADR-002-bcrypt-password-hashing.md) - Password Hashing Strategy
+- [ADR-003](ADR-003-test-isolation-strategy.md) - Test Isolation Strategy
+- [ADR-004](ADR-004-integration-test-structure-standards.md) - Integration Test Structure Standards
+- [ADR-005](ADR-005-documentation-accuracy-standards.md) - Documentation Accuracy Standards
 
 ---
 
@@ -18,94 +22,70 @@
 - [ADR-001](ADR-001-adr-integration-system.md) - ADR Integration System
 
 ### 🔧 Technology Stack
-*None yet*
+- [ADR-002](ADR-002-bcrypt-password-hashing.md) - Password Hashing Strategy
 
-### 🗄️ Infrastructure
-*None yet*
+### ⚙️ Implementation
+- [ADR-003](ADR-003-test-isolation-strategy.md) - Test Isolation Strategy
+- [ADR-004](ADR-004-integration-test-structure-standards.md) - Integration Test Structure Standards
+- [ADR-005](ADR-005-documentation-accuracy-standards.md) - Documentation Accuracy Standards
 
 ### 🛡️ Security
 *None yet*
 
-### ⚙️ Implementation
+### 🛠️ Infrastructure
 *None yet*
 
 ---
 
-## By Status
+## By Priority
 
-### ✅ Accepted
-- [ADR-001](ADR-001-adr-integration-system.md) - ADR Integration System
+### 🚨 Critical
+- [ADR-003](ADR-003-test-isolation-strategy.md) - Test Isolation Strategy
+- [ADR-004](ADR-004-integration-test-structure-standards.md) - Integration Test Structure Standards
 
-### 📋 Proposed
+### 🔥 High
+- [ADR-005](ADR-005-documentation-accuracy-standards.md) - Documentation Accuracy Standards
+
+### 📋 Medium
+- [ADR-002](ADR-002-bcrypt-password-hashing.md) - Password Hashing Strategy
+
+### 📅 Deprecated
 *None yet*
 
-### ⚠️ Deprecated
-*None yet*
-
-### 🔄 Superseded
+### ↪️ Superseded
 *None yet*
 
 ---
 
-## Quick Search
+## Search and Management
 
-### Keywords
-- **integration**: ADR-001 (ADR Integration System)
-- **system**: ADR-001 (ADR Integration System)
-- **workflow**: ADR-001 (ADR Integration System)
-- **documentation**: ADR-001 (ADR Integration System)
+### 🔍 Search Tags
+- `testing`: ADR-003, ADR-004, ADR-005
+- `isolation`: ADR-003
+- `integration`: ADR-004
+- `documentation`: ADR-005
+- `quality`: ADR-003, ADR-004, ADR-005
 
----
-
-## Tools Reference
-
-```bash
-# List all ADRs:
-./scripts/adr-reference-checker.sh list
-
-# Search by keyword:
-./scripts/adr-reference-checker.sh check-keyword <term>
-
-# Get ADR suggestions:
-./scripts/adr-reference-checker.sh suggest "<task>"
-
-# Create new ADR:
-./scripts/adr-helper.sh create
-
-# Validate ADR format:
-./scripts/adr-helper.sh validate <ADR-file.md>
-```
+### 📊 Statistics
+- **Total ADRs**: 5
+- **Accepted**: 2 (ADR-001, ADR-002)
+- **Required**: 3 (ADR-003, ADR-004, ADR-005)
+- **Critical**: 3 (ADR-003, ADR-004, ADR-005)
+- **High**: 1 (ADR-005)
+- **Medium**: 1 (ADR-002)
+- **Low**: 0
 
 ---
 
-## Statistics
+## Related Documents
 
-**Total ADRs**: 1
-**Accepted**: 1
-**Proposed**: 0
-**Deprecated**: 0
-**Superseded**: 0
-
-**Last Updated**: 2025-11-17
+- [ADR_TEMPLATE_AND_GUIDE.md](ADR_TEMPLATE_AND_GUIDE.md) - Template and Creation Guide
+- [ADR_WORKFLOW.md](ADR_WORKFLOW.md) - Workflow for ADR Management
+- [PROJECT_COMPLETION_SUMMARY.md](PROJECT_COMPLETION_SUMMARY.md) - Project Completion Standards
+- [dev-docs/README_FULL.md](../README_FULL.md) - Complete Project Documentation
+- [dev-docs/task.md](../task.md) - Task Management
 
 ---
 
-## Usage Guidelines
-
-### For EJECUTOR
-1. Search existing ADRs before making decisions
-2. Check ADR_DECISION_MATRIX.md for requirements
-3. Reference relevant ADRs in implementation
-4. Update ADR_INDEX.md after creating new ADRs
-
-### For VALIDADOR
-1. Verify ADRs exist for architectural changes
-2. Validate ADR format using scripts
-3. Check ADR references in code and documentation
-4. Ensure ADR_INDEX.md is updated
-
-### For All Team Members
-1. Use ADR system for all architectural decisions
-2. Follow ADR_TEMPLATE_AND_GUIDE.md for format
-3. Maintain ADR workflow consistency
-4. Contribute to ADR knowledge base
+*Last Updated: 2025-11-18*
+*ADR System Status: Operational*

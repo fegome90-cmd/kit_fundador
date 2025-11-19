@@ -38,8 +38,8 @@ export class RegisterUserResponseBuilder {
       message: 'User registered successfully',
       data: {
         ...userData,
-        createdAt: new Date().toISOString()
-      }
+        createdAt: new Date().toISOString(),
+      },
     };
   }
 
@@ -49,7 +49,7 @@ export class RegisterUserResponseBuilder {
       message: 'Validation failed',
       errors,
       timestamp: new Date().toISOString(),
-      path: '/api/users/register'
+      path: '/api/users/register',
     };
   }
 
@@ -59,7 +59,7 @@ export class RegisterUserResponseBuilder {
       message,
       errors: [message],
       timestamp: new Date().toISOString(),
-      path: '/api/users/register'
+      path: '/api/users/register',
     };
   }
 
@@ -69,7 +69,7 @@ export class RegisterUserResponseBuilder {
       message: 'Internal server error',
       errors: ['An unexpected error occurred'],
       timestamp: new Date().toISOString(),
-      path: '/api/users/register'
+      path: '/api/users/register',
     };
   }
 }

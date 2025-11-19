@@ -11,7 +11,7 @@ import { InMemoryUserAccountRepository } from '../../_stubs/InMemoryUserAccountR
 function createUserController(): UserController {
   const repository = new InMemoryUserAccountRepository();
   const registerUserHandler = new RegisterUserAccountHandler({
-    userAccountRepository: repository
+    userAccountRepository: repository,
   });
   return new UserController(registerUserHandler);
 }
@@ -19,7 +19,7 @@ function createUserController(): UserController {
 export function createUserRoutes(): Router {
   const router = Router();
   const userController = createUserController();
-  
+
   router.post('/register', (req, res) => userController.registerUser(req, res));
 
   return router;

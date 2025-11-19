@@ -12,7 +12,7 @@ moduleAlias.addAliases({
   '@': join(__dirname),
   '@domain': join(__dirname, 'domain'),
   '@application': join(__dirname, 'application'),
-  '@infrastructure': join(__dirname, 'infrastructure')
+  '@infrastructure': join(__dirname, 'infrastructure'),
 });
 
 import { createServer } from './infrastructure/http/server';
@@ -20,7 +20,7 @@ import { createServer } from './infrastructure/http/server';
 async function main(): Promise<void> {
   const server = createServer({
     port: Number.parseInt(process.env.PORT || '3000', 10),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
   });
 
   server.start();

@@ -8,10 +8,7 @@ declare module 'bcrypt' {
    * @param saltOrRounds - The salt or number of rounds
    * @returns Promise resolving to hashed string
    */
-  export function hash(
-    data: string | Buffer,
-    saltOrRounds: string | number
-  ): Promise<string>;
+  export function hash(data: string | Buffer, saltOrRounds: string | number): Promise<string>;
 
   /**
    * Compare data with an encrypted hash.
@@ -19,10 +16,7 @@ declare module 'bcrypt' {
    * @param encrypted - The encrypted hash to compare against
    * @returns Promise resolving to boolean indicating match
    */
-  export function compare(
-    data: string | Buffer,
-    encrypted: string
-  ): Promise<boolean>;
+  export function compare(data: string | Buffer, encrypted: string): Promise<boolean>;
 
   /**
    * Generate a salt.
