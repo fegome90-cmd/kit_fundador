@@ -40,7 +40,20 @@ Proveer un **starkit de Identity & Access** que incluya ejemplos autocontenidos 
 - La capa `application/` incluye únicamente stubs; el flujo real se documenta en [`dev-docs/application/use-case-blueprint.md`](application/use-case-blueprint.md).
 - El blueprint describe contratos (DTOs/ports), handlers, stubs temporales y el plan de pruebas para guiar la implementación sin
   acoplar infraestructura.
-- TASK-004 seguirá en “Pendiente” hasta que un consumidor adopte el blueprint y documente qué use case está construyendo.
+- TASK-004 seguirá en "Pendiente" hasta que un consumidor adopte el blueprint y documente qué use case está construyendo.
+
+## Estado de Phase 2 (TASK-005)
+- **Status**: ✅ COMPLETADO (2025-11-19)
+- **Implementaciones**:
+  - Contract tests con proper isolation (ADR-003)
+  - HTTP status validation y conflict handling (409)
+  - ADR documentation completa (ADR-003, ADR-004, ADR-005)
+  - Testing tools suite para validación continua
+- **Technical Improvements**:
+  - TypeScript ES2022 module configuration
+  - bcrypt security implementation (TD-SEC-001 resuelto)
+  - Enhanced HTTP server con readonly properties
+- **Next Steps**: Phase 3 (E2E tests) y Phase 4 (quality gates finales)
 
 ## Arquitectura
 

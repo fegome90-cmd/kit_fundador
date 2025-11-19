@@ -6,6 +6,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import { Server } from 'http';
 import { createUserRoutes } from './routes/userRoutes';
 import { specs, swaggerUi } from './swagger';
 
@@ -17,6 +18,7 @@ export interface ServerConfig {
 export class HttpServer {
   private readonly app: express.Application;
   private readonly config: ServerConfig;
+  private server?: Server;
 
   constructor(config: ServerConfig) {
     this.config = config;
@@ -34,7 +36,7 @@ export class HttpServer {
   }
 
   private setupSwagger(): void {
-    // Serve Swagger UI at /api-docs and handle the redirect properly
+    // Serve Swagger UI at /api-docs and handle redirect properly
     this.app.get('/api-docs', swaggerUi.setup(specs));
     this.app.use('/api-docs', swaggerUi.serve);
   }
@@ -136,19 +138,36 @@ export class HttpServer {
   public start(): void {
     const port = this.config.port;
 
-    this.app.listen(port, () => {
+    this.server = this.app.listen(port, () => {
       this.logServerStart(port);
     });
+  }
+
+  public stop(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.server) {
+        this.server.close(() => {
+          console.log('Server stopped');
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
+  }
+
+  public getApp(): express.Application {
+    return this.app;
+  }
+
+  public isRunning(): boolean {
+    return !!this.server && this.server.listening;
   }
 
   private logServerStart(port: number): void {
     process.stdout.write(`Server running on port ${port}\n`);
     process.stdout.write(`Environment: ${this.config.environment}\n`);
     process.stdout.write(`Health check: http://localhost:${port}/health\n`);
-  }
-
-  public getApp(): express.Application {
-    return this.app;
   }
 }
 
