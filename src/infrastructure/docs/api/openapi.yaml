@@ -1,0 +1,340 @@
+openapi: 3.1.0
+info:
+  title: Kit Fundador API
+  version: 1.0.0
+  description: |
+    User Registration API for the Kit Fundador project.
+    
+    This API provides endpoints for user account registration with comprehensive
+    validation, security features, and standardized error handling.
+    
+    ## Features
+    - User account creation with email validation
+    - Role-based access control (user/admin)
+    - Comprehensive input validation and sanitization
+    - Duplicate email prevention
+    - Security headers and middleware
+    - Structured error responses
+    
+    ## Authentication
+    Currently, no authentication is required for user registration.
+    Future versions will include authentication and authorization features.
+  contact:
+    name: Kit Fundador Team
+    email: dev@kitfundador.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: https://api.kitfundador.com
+    description: Production server
+
+tags:
+  - name: User Registration
+    description: Endpoints for user account creation and management
+
+paths:
+  /api/users/register:
+    post:
+      summary: Register a new user account
+      description: |
+        Creates a new user account with the provided email, name, password, and optional role.
+        
+        The endpoint performs comprehensive validation including:
+        - Email format and length validation
+        - Password strength requirements (minimum 8 characters)
+        - Name length validation (maximum 100 characters)
+        - Role validation (user/admin, defaults to user)
+        - Duplicate email checking
+        - Input sanitization and normalization
+        
+        On success, returns user creation confirmation with user details.
+      tags:
+        - User Registration
+      operationId: registerUser
+      requestBody:
+        required: true
+        description: User registration data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUserRequest'
+            examples:
+              validUserRegistration:
+                summary: Valid user registration
+                value:
+                  email: "user@example.com"
+                  name: "John Doe"
+                  password: "SecurePassword123!"
+                  role: "user"
+              adminRegistration:
+                summary: Admin user registration
+                value:
+                  email: "admin@example.com"
+                  name: "Admin User"
+                  password: "AdminPassword123!"
+                  role: "admin"
+              userWithoutRole:
+                summary: User registration with default role
+                value:
+                  email: "defaultuser@example.com"
+                  name: "Default User"
+                  password: "DefaultPassword123!"
+      responses:
+        '201':
+          description: User registered successfully
+          headers:
+            Location:
+              description: URL to retrieve the created user
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterUserResponse'
+              examples:
+                successfulRegistration:
+                  summary: Successful user registration
+                  value:
+                    success: true
+                    message: "User registered successfully"
+                    data:
+                      userId: "550e8400-e29b-41d4-a716-446655440000"
+                      email: "user@example.com"
+                      name: "John Doe"
+                      role: "user"
+                      createdAt: "2025-11-18T10:30:00.000Z"
+        '400':
+          description: Validation failed - Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidEmail:
+                  summary: Invalid email format
+                  value:
+                    success: false
+                    message: "Validation failed"
+                    errors: ["Email must be a valid email address"]
+                    timestamp: "2025-11-18T10:30:00.000Z"
+                    path: "/api/users/register"
+                missingFields:
+                  summary: Missing required fields
+                  value:
+                    success: false
+                    message: "Validation failed"
+                    errors: ["Email is required", "Name is required", "Password is required"]
+                    timestamp: "2025-11-18T10:30:00.000Z"
+                    path: "/api/users/register"
+                weakPassword:
+                  summary: Password too weak
+                  value:
+                    success: false
+                    message: "Validation failed"
+                    errors: ["Password must be at least 8 characters long"]
+                    timestamp: "2025-11-18T10:30:00.000Z"
+                    path: "/api/users/register"
+        '409':
+          description: Conflict - Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicateEmail:
+                  summary: Email address already registered
+                  value:
+                    success: false
+                    message: "User already exists"
+                    errors: ["User with this email already exists"]
+                    timestamp: "2025-11-18T10:30:00.000Z"
+                    path: "/api/users/register"
+        '415':
+          description: Unsupported Media Type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                wrongContentType:
+                  summary: Invalid Content-Type header
+                  value:
+                    success: false
+                    message: "Validation failed"
+                    errors: ["Content-Type must be application/json"]
+                    timestamp: "2025-11-18T10:30:00.000Z"
+                    path: "/api/users/register"
+        '413':
+          description: Payload too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                requestTooLarge:
+                  summary: Request payload exceeds size limit
+                  value:
+                    success: false
+                    message: "Validation failed"
+                    errors: ["Request payload too large"]
+                    timestamp: "2025-11-18T10:30:00.000Z"
+                    path: "/api/users/register"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalError:
+                  summary: Unexpected server error
+                  value:
+                    success: false
+                    message: "Internal server error"
+                    errors: ["An unexpected error occurred"]
+                    timestamp: "2025-11-18T10:30:00.000Z"
+                    path: "/api/users/register"
+
+components:
+  schemas:
+    RegisterUserRequest:
+      type: object
+      required:
+        - email
+        - name
+        - password
+      description: Request body for user registration
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          description: User's email address (must be unique)
+          example: "user@example.com"
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+          description: User's full name
+          example: "John Doe"
+        password:
+          type: string
+          minLength: 8
+          maxLength: 128
+          description: |
+            User's password. Must be at least 8 characters long.
+            For better security, use a combination of uppercase, lowercase,
+            numbers, and special characters.
+          example: "SecurePassword123!"
+        role:
+          type: string
+          enum: [user, admin]
+          default: user
+          description: User role (defaults to 'user' if not specified)
+          example: "user"
+
+    RegisterUserResponse:
+      type: object
+      description: Successful user registration response
+      properties:
+        success:
+          type: boolean
+          description: Indicates successful operation
+          example: true
+        message:
+          type: string
+          description: Success message
+          example: "User registered successfully"
+        data:
+          type: object
+          description: Created user information
+          properties:
+            userId:
+              type: string
+              format: uuid
+              description: Unique user identifier
+              example: "550e8400-e29b-41d4-a716-446655440000"
+            email:
+              type: string
+              format: email
+              description: User's email address
+              example: "user@example.com"
+            name:
+              type: string
+              description: User's full name
+              example: "John Doe"
+            role:
+              type: string
+              enum: [user, admin]
+              description: User's role
+              example: "user"
+            createdAt:
+              type: string
+              format: date-time
+              description: User creation timestamp
+              example: "2025-11-18T10:30:00.000Z"
+
+    ErrorResponse:
+      type: object
+      description: Standard error response format
+      properties:
+        success:
+          type: boolean
+          description: Indicates failed operation
+          example: false
+        message:
+          type: string
+          description: General error message
+          example: "Validation failed"
+        errors:
+          type: array
+          description: Array of specific error messages
+          items:
+            type: string
+          example: ["Email is required", "Name must be a string"]
+        timestamp:
+          type: string
+          format: date-time
+          description: Error occurrence timestamp
+          example: "2025-11-18T10:30:00.000Z"
+        path:
+          type: string
+          description: Request path that caused the error
+          example: "/api/users/register"
+
+    HealthCheckResponse:
+      type: object
+      description: Health check endpoint response
+      properties:
+        status:
+          type: string
+          description: Service status
+          example: "ok"
+        timestamp:
+          type: string
+          format: date-time
+          description: Check timestamp
+          example: "2025-11-18T10:30:00.000Z"
+        environment:
+          type: string
+          description: Running environment
+          example: "development"
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication (future use)
+
+security:
+  - ApiKeyAuth: []
+
+externalDocs:
+  description: Kit Fundador Documentation
+  url: https://github.com/fegome90-cmd/kit_fundador/blob/main/README.md

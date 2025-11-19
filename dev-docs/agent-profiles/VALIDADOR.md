@@ -416,20 +416,13 @@ Basado en categorías de errores, decidir acción:
 - [ ] Application layer: >90% coverage
 - [ ] Infrastructure: >70% coverage
 
-### Calidad
-- [ ] Tests tienen nombres descriptivos
-- [ ] Arrange-Act-Assert claro
-- [ ] No hay lógica en tests (no ifs, loops)
-- [ ] Tests son independientes (no orden)
-- [ ] Mocks usados apropiadamente
-- [ ] Edge cases cubiertos
-- [ ] Tests fallarían si código se rompe
+### Calidad y Aislamiento
+- [ ] **Aislamiento de Pruebas**: Validado usando `dev-docs/testing/tools/isolation-checker.md`.
+- [ ] **Limpieza de Recursos**: Validado usando `dev-docs/testing/tools/cleanup-validator.md`.
+- [ ] **Contratos de API**: Validado usando `dev-docs/testing/tools/contract-validator.md`.
+- [ ] **Datos de Prueba**: Creados siguiendo los patrones de `dev-docs/testing/tools/test-data-factory.md`.
+- [ ] **Dependencias**: `package.json` validado usando `dev-docs/testing/tools/dependency-classifier.md`.
 
-### Anti-patterns
-- [ ] No hay tests vacíos (expect(true).toBe(true))
-- [ ] No hay tests sin asserts
-- [ ] No hay tests comentados
-- [ ] No hay tests con nombres genéricos (test1, testMethod)
 ```
 
 #### C. Código

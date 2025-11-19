@@ -1,6 +1,10 @@
 {
   "permissions": {
     "allow": [
+<<<<<<< HEAD
+      "Bash(./scripts/setup.sh --help)",
+      "Bash(chmod +x /Users/felipe/Developer/kit_fundador-main/scripts/setup.sh)"
+=======
       "Bash(chmod +x /Users/felipe/Developer/kit_fundador-main/scripts/adr-helper.sh)",
       "Bash(chmod +x /Users/felipe/Developer/kit_fundador-main/scripts/adr-reference-checker.sh)",
       "Bash(./scripts/adr-helper.sh next-id)",
@@ -15,6 +19,7 @@
       "Bash(./scripts/adr-reference-checker.sh check-keyword \"system\")",
       "Bash(./scripts/adr-reference-checker.sh suggest \"implement new feature\")",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://github.com/fegome90-cmd/kit_fundador)"
+>>>>>>> origin/main
     ],
     "deny": [],
     "ask": []

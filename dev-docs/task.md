@@ -2,7 +2,20 @@
 
 ## En Progreso 🔄
 
-_(sin tareas activas)_
+### [TASK-005] API REST endpoint - Phase 1/4 (OpenAPI + HTTP Server)
+- **Prioridad**: Media
+- **Estimación**: 2 horas (Phase 1 completada)
+- **Estado**: 🔄 En Progreso - Phase 1 ✅ COMPLETADO (2025-11-18)
+- **Dependencias**: TASK-004 ✅
+- **Descripción**: Exponer use case vía API REST con OpenAPI documentation
+- **Progress**: 25% (Phase 1 de 4 fases)
+- **Criterios de Aceptación**:
+  - [x] Phase 1: Endpoint implementado + OpenAPI schema ✅ (60 min)
+  - [ ] Phase 2: Contract tests pasando (90 min estimated)
+  - [ ] Phase 3: E2E test funcional (75 min estimated)
+  - [ ] Phase 4: Quality gates finales (30 min estimated)
+- **Handoff Document**: `dev-docs/handoffs/HANDOFF-TASK-005-PHASE-1.md`
+- **Progress File**: `TASK-005-PROGRESS.md`
 
 ## Completados ✅
 
@@ -19,8 +32,6 @@ _(sin tareas activas)_
   - [x] Unit tests con 100% coverage
   - [x] Integration tests end-to-end
   - [x] Documentación actualizada
-
-## Completados ✅
 
 ### [TASK-004] Implementar primer use case (RegisterUserAccount)
 - **Prioridad**: Alta

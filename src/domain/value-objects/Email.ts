@@ -10,10 +10,7 @@
 
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const MAX_EMAIL_LENGTH = 255;
-export const BLOCKED_DOMAINS = Object.freeze([
-  'tempmail.com',
-  'throwaway.email',
-]);
+export const BLOCKED_DOMAINS = Object.freeze(['tempmail.com', 'throwaway.email']);
 
 export class Email {
   private readonly _value: string;

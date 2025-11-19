@@ -1,18 +1,36 @@
 /* eslint-disable no-console */
 /**
- * Entry point placeholder that keeps npm scripts runnable out of the box.
- * Replace the implementation with your own HTTP server, CLI, worker, etc.
+ * Application Entry Point
+ * Initializes and starts the HTTP server with all middleware, routes, and documentation
  */
+
+import moduleAlias from 'module-alias';
+import { join } from 'node:path';
+
+// Register module aliases for path resolution at runtime
+moduleAlias.addAliases({
+  '@': join(__dirname),
+  '@domain': join(__dirname, 'domain'),
+  '@application': join(__dirname, 'application'),
+  '@infrastructure': join(__dirname, 'infrastructure'),
+});
+
+import { createServer } from './infrastructure/http/server';
+
 async function main(): Promise<void> {
-  console.log('[Kit Fundador] src/index.ts está listo para que reemplaces este bootstrap.'); // eslint-disable-line no-console
-  console.log('Añade aquí la inicialización de tu aplicación (HTTP server, jobs, etc.).'); // eslint-disable-line no-console
+  const server = createServer({
+    port: Number.parseInt(process.env.PORT || '3000', 10),
+    environment: process.env.NODE_ENV || 'development',
+  });
+
+  server.start();
 }
 
-if (require.main === module) {
-  main().catch((error: Error) => {
-    console.error('Fallo al ejecutar el bootstrap de ejemplo:', error); // eslint-disable-line no-console
-    process.exit(1);
-  });
+try {
+  await main();
+} catch (error: unknown) {
+  console.error('Failed to start server:', error instanceof Error ? error.message : String(error));
+  process.exit(1);
 }
 
 export { main };

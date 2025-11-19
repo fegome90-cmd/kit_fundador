@@ -39,9 +39,7 @@ export class Password {
    */
   static async create(plainPassword: string): Promise<Password> {
     if (!plainPassword || plainPassword.trim().length < MIN_PASSWORD_LENGTH) {
-      throw new Error(
-        `Password must be at least ${MIN_PASSWORD_LENGTH} characters long`
-      );
+      throw new Error(`Password must be at least ${MIN_PASSWORD_LENGTH} characters long`);
     }
 
     const saltRounds = this.getSaltRounds();
@@ -73,16 +71,12 @@ export class Password {
   private static validateSaltRoundsFormat(envValue: string): number {
     if (envValue.includes('.')) {
       const parsed = parseFloat(envValue);
-      throw new Error(
-        `Invalid PASSWORD_SALT_ROUNDS: ${Math.floor(parsed)} must be an integer`
-      );
+      throw new Error(`Invalid PASSWORD_SALT_ROUNDS: ${Math.floor(parsed)} must be an integer`);
     }
 
     const saltRounds = parseInt(envValue, 10);
     if (isNaN(saltRounds)) {
-      throw new Error(
-        `Invalid PASSWORD_SALT_ROUNDS: "${envValue}" is not a valid number`
-      );
+      throw new Error(`Invalid PASSWORD_SALT_ROUNDS: "${envValue}" is not a valid number`);
     }
 
     return saltRounds;
@@ -115,9 +109,7 @@ export class Password {
     }
 
     if (!BCRYPT_HASH_REGEX.test(this._hashedValue)) {
-      throw new Error(
-        'Password must be hashed using bcrypt format ($2[aby]$rounds$...)'
-      );
+      throw new Error('Password must be hashed using bcrypt format ($2[aby]$rounds$...)');
     }
   }
 
