@@ -19,7 +19,7 @@ describe('InMemoryUserAccountRepository', () => {
   it('saves and retrieves users correctly', async () => {
     const repository = new InMemoryUserAccountRepository();
     const email = Email.create('test@example.com');
-    const password = Password.create('secure-password-123');
+    const password = await Password.create('secure-password-123');
     const user = User.create({
       email,
       name: 'Test User',
@@ -46,8 +46,8 @@ describe('InMemoryUserAccountRepository', () => {
   it('handles duplicate saves correctly', async () => {
     const repository = new InMemoryUserAccountRepository();
     const email = Email.create('duplicate@example.com');
-    const password = Password.create('secure-password-123');
-    
+    const password = await Password.create('secure-password-123');
+
     const user1 = User.create({
       email,
       name: 'User 1',
@@ -58,7 +58,7 @@ describe('InMemoryUserAccountRepository', () => {
     const user2 = User.create({
       email,
       name: 'User 2',
-      password: Password.create('another-password-123'),
+      password: await Password.create('another-password-123'),
       role: 'admin'
     });
 
@@ -70,9 +70,9 @@ describe('InMemoryUserAccountRepository', () => {
     expect(retrieved!.role).toBe('admin');
   });
 
-  it('seeds users correctly in constructor', () => {
+  it('seeds users correctly in constructor', async () => {
     const email = Email.create('seeded@example.com');
-    const password = Password.create('seeded-password-123');
+    const password = await Password.create('seeded-password-123');
     const seededUser = User.create({
       email,
       name: 'Seeded User',
@@ -86,9 +86,9 @@ describe('InMemoryUserAccountRepository', () => {
     expect(repository.list()[0].name).toBe('Seeded User');
   });
 
-  it('clears all users correctly', () => {
+  it('clears all users correctly', async () => {
     const email = Email.create('to-be-cleared@example.com');
-    const password = Password.create('password-123456');
+    const password = await Password.create('password-123456');
     const user = User.create({
       email,
       name: 'To Be Cleared',
