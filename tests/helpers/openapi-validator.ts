@@ -18,10 +18,6 @@ export class OpenAPIValidator {
     const requiredFields = ['success', 'data'];
     const errors: string[] = [];
 
-    if (this.debugMode) {
-      console.log('OpenAPI validator: validating response', data);
-    }
-
     // Check required fields
     for (const field of requiredFields) {
       if (!(field in data)) {
@@ -60,13 +56,6 @@ export class OpenAPIValidator {
       if (data.data.email && typeof data.data.email === 'string' && !emailRegex.test(data.data.email)) {
         errors.push('data.email must be valid email format');
       }
-    }
-
-    if (this.debugMode) {
-      console.log('OpenAPI validator: validation result', {
-        valid: errors.length === 0,
-        errors: errors.length > 0 ? errors : undefined
-      });
     }
 
     return {
