@@ -52,7 +52,8 @@ Estos 6 principios son inamovibles:
 
 **Trabajos pendientes**:
 - [ ] Corregir Domain Events rotos del template TypeScript
-- [ ] Phase 3 de TASK-005: E2E tests y quality gates finales
+- [x] Phase 2.5 de TASK-005: E2E testing foundation y BUGFIX-E2E-001 resolution
+- [ ] Phase 3 de TASK-005: Performance, Security, Integration tests
 - [ ] Phase 4 de TASK-005: Finalización de API endpoint y documentación
 - [ ] Completar Email VO tests exhaustivos
 - [ ] Fix real de requirements.txt Python (OpenTelemetry)
@@ -60,7 +61,7 @@ Estos 6 principios son inamovibles:
 - [ ] Normalizar directorios y rutas (domain/application/infrastructure)
 
 ### Próximos Hitos Inmediatos (Next 2-3 sesiones)
-1. **TASK-005 Phase 3**: Implementar E2E tests con Playwright
+1. **TASK-005 Phase 3**: Performance, Security, Integration tests (Foundation established)
 2. **TASK-005 Phase 4**: Quality gates finales y documentación completa
 3. **TASK-016**: Configurar Dependabot mínimo para el package.json raíz
 4. **TASK-017**: Actualizar baseline de dependencias (ESLint 8 → 9, TypeScript 6 → 5)
