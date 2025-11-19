@@ -1,28 +1,5 @@
-import { Book, FileText, Terminal, Video } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-
-const docs = [
-  {
-    title: "Getting Started",
-    description: "Installation guide and initial setup instructions.",
-    icon: Terminal,
-  },
-  {
-    title: "Architecture Guide",
-    description: "Deep dive into the DDD and Clean Architecture patterns.",
-    icon: Book,
-  },
-  {
-    title: "API Reference",
-    description: "Complete documentation of the backend API endpoints.",
-    icon: FileText,
-  },
-  {
-    title: "Video Tutorials",
-    description: "Step-by-step video guides for common tasks.",
-    icon: Video,
-  },
-]
+import { DOCS_DATA } from '@/data/landing-page'
 
 export function Docs() {
   return (
@@ -36,16 +13,26 @@ export function Docs() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {docs.map((doc, index) => (
-            <Card key={index} className="hover:border-primary/50 transition-colors cursor-pointer group">
+          {DOCS_DATA.map((doc, index) => (
+            <Card key={index} className="group relative overflow-hidden border-primary/10 bg-background/50 backdrop-blur-sm hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-pointer">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <CardHeader>
-                <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center mb-2 group-hover:bg-primary/10 transition-colors">
-                  <doc.icon className="w-5 h-5 text-foreground group-hover:text-primary transition-colors" />
+                <div className="flex items-start justify-between">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                    <doc.icon className="w-6 h-6" />
+                  </div>
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 -mr-2 -mt-2">
+                    <div className="p-2 rounded-full hover:bg-primary/10">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary">
+                        <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
                 </div>
-                <CardTitle className="text-lg">{doc.title}</CardTitle>
+                <CardTitle className="text-xl group-hover:text-primary transition-colors duration-300">{doc.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">
                   {doc.description}
                 </p>
               </CardContent>

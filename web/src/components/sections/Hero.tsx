@@ -23,7 +23,7 @@ export function Hero({ onGetStarted }: HeroProps) {
             </span>
             <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 text-foreground">
               Launch Your Next Big Idea <br/>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/50">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--chart-1))] to-[hsl(var(--chart-2))] pb-2 block">
                 in Minutes
               </span>
             </h1>

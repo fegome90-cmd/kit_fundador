@@ -1,27 +1,7 @@
 import { motion } from 'framer-motion'
 import { Star, Quote } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-
-const reviews = [
-  {
-    name: "Sarah Chen",
-    role: "CTO at TechStart",
-    content: "This kit saved us weeks of setup time. The architecture is solid and the frontend components are beautiful.",
-    rating: 5,
-  },
-  {
-    name: "Marcus Rodriguez",
-    role: "Indie Developer",
-    content: "Finally a starter kit that actually follows best practices. The DDD structure in the backend is a game changer.",
-    rating: 5,
-  },
-  {
-    name: "Emily Watson",
-    role: "Product Designer",
-    content: "The UI components are so easy to customize. I built our MVP landing page in just a few hours.",
-    rating: 4,
-  },
-]
+import { REVIEWS_DATA } from '@/data/landing-page'
 
 export function Reviews() {
   return (
@@ -35,7 +15,7 @@ export function Reviews() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {reviews.map((review, index) => (
+          {REVIEWS_DATA.map((review, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -43,23 +23,28 @@ export function Reviews() {
               transition={{ delay: index * 0.1 }}
               viewport={{ once: true }}
             >
-              <Card className="h-full relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <Quote className="w-24 h-24" />
+              <Card className="h-full relative overflow-hidden border-primary/10 bg-background/50 backdrop-blur-sm hover:border-primary/30 transition-colors duration-300">
+                <div className="absolute top-0 right-0 p-6 opacity-5">
+                  <Quote className="w-20 h-20 rotate-12" />
                 </div>
-                <CardContent className="pt-8">
-                  <div className="flex mb-4">
+                <CardContent className="pt-8 flex flex-col h-full">
+                  <div className="flex mb-6">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+                        className={`w-4 h-4 ${i < review.rating ? 'text-chart-4 fill-chart-4' : 'text-muted'}`}
                       />
                     ))}
                   </div>
-                  <p className="text-lg mb-6 italic relative z-10">"{review.content}"</p>
-                  <div>
-                    <h4 className="font-bold">{review.name}</h4>
-                    <p className="text-sm text-muted-foreground">{review.role}</p>
+                  <p className="text-lg mb-8 italic relative z-10 flex-grow text-muted-foreground">"{review.content}"</p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-chart-1 to-chart-2 flex items-center justify-center text-background font-bold text-sm">
+                      {review.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-foreground">{review.name}</h4>
+                      <p className="text-xs text-muted-foreground">{review.role}</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

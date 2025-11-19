@@ -1,46 +1,6 @@
 import { motion } from 'framer-motion'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
-import { 
-  Code2, 
-  Database, 
-  Layout, 
-  ShieldCheck, 
-  Zap, 
-  GitBranch 
-} from 'lucide-react'
-
-const features = [
-  {
-    title: "Modern Tech Stack",
-    description: "Built with React, TypeScript, Vite, and Tailwind CSS for maximum performance and developer experience.",
-    icon: Code2,
-  },
-  {
-    title: "Backend Ready",
-    description: "Includes a robust Node.js backend structure with Express, PostgreSQL, and clean architecture patterns.",
-    icon: Database,
-  },
-  {
-    title: "Beautiful UI",
-    description: "Pre-configured with shadcn/ui and Framer Motion for stunning, accessible, and animated interfaces.",
-    icon: Layout,
-  },
-  {
-    title: "Type Safe",
-    description: "End-to-end type safety with TypeScript, ensuring fewer bugs and better refactoring capabilities.",
-    icon: ShieldCheck,
-  },
-  {
-    title: "High Performance",
-    description: "Optimized build pipeline and best practices for core web vitals out of the box.",
-    icon: Zap,
-  },
-  {
-    title: "CI/CD Pipelines",
-    description: "Ready-to-use GitHub Actions workflows for testing, linting, and deployment.",
-    icon: GitBranch,
-  },
-]
+import { FEATURES_DATA } from '@/data/landing-page'
 
 export function Features() {
   const [parent] = useAutoAnimate()
@@ -56,7 +16,7 @@ export function Features() {
         </div>
 
         <div ref={parent} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
+          {FEATURES_DATA.map((feature, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
