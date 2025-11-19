@@ -15,8 +15,8 @@ export interface ServerConfig {
 }
 
 export class HttpServer {
-  private app: express.Application;
-  private config: ServerConfig;
+  private readonly app: express.Application;
+  private readonly config: ServerConfig;
 
   constructor(config: ServerConfig) {
     this.config = config;
@@ -155,7 +155,7 @@ export class HttpServer {
 // Factory function for creating server instance
 export function createServer(config?: Partial<ServerConfig>): HttpServer {
   const defaultConfig: ServerConfig = {
-    port: parseInt(process.env.PORT || '3000', 10),
+    port: Number.parseInt(process.env.PORT || '3000', 10),
     environment: process.env.NODE_ENV || 'development',
     ...config,
   };

@@ -1,4 +1,4 @@
-/* eslint-disable no-console, @typescript-eslint/no-floating-promises */
+/* eslint-disable no-console */
 /**
  * Application Entry Point
  * Initializes and starts the HTTP server with all middleware, routes, and documentation
@@ -26,9 +26,11 @@ async function main(): Promise<void> {
   server.start();
 }
 
-main().catch((error: Error) => {
-  console.error('Failed to start server:', error);
+try {
+  await main();
+} catch (error: unknown) {
+  console.error('Failed to start server:', error instanceof Error ? error.message : String(error));
   process.exit(1);
-});
+}
 
 export { main };
