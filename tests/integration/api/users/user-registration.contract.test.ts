@@ -12,7 +12,7 @@ describe('User Registration API Contract', () => {
     repository = new InMemoryUserAccountRepository(); // ← INSTANCIA REQUERIDA
     repository.clear(); // ← ESTADO LIMPIO ANTES DE CADA TEST
     server = new HttpServer({ port: 0, environment: 'test' }); // Puerto dinámico
-    await server.start(); // Iniciar server para cada test
+    server.start(); // Fixed: Remove await - server.start() is void
     validator = new OpenAPIValidator(); // ✅ Inicializar OpenAPI validator
   });
 

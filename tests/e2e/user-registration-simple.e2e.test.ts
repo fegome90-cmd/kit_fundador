@@ -12,7 +12,7 @@ describe('User Registration E2E Workflow', () => {
   beforeEach(async () => {
     // ✅ ADR-003 Compliance: Test isolation - Server only
     server = new HttpServer({ port: 0, environment: 'test' });
-    await server.start();
+    server.start();  // Fixed: Remove await - server.start() is void
   });
 
   afterEach(async () => {
