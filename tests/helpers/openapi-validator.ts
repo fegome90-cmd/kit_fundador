@@ -4,11 +4,7 @@
  */
 
 export class OpenAPIValidator {
-  constructor(private debugMode: boolean = false) {
-    if (this.debugMode) {
-      console.log('OpenAPI validator initialized (simplified mode)');
-    }
-  }
+  constructor(private debugMode: boolean = false) {}
 
   /**
    * Validate user response against OpenAPI schema
