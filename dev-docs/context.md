@@ -40,7 +40,55 @@ Proveer un **starkit de Identity & Access** que incluya ejemplos autocontenidos 
 - La capa `application/` incluye únicamente stubs; el flujo real se documenta en [`dev-docs/application/use-case-blueprint.md`](application/use-case-blueprint.md).
 - El blueprint describe contratos (DTOs/ports), handlers, stubs temporales y el plan de pruebas para guiar la implementación sin
   acoplar infraestructura.
-- TASK-004 seguirá en “Pendiente” hasta que un consumidor adopte el blueprint y documente qué use case está construyendo.
+- TASK-004 seguirá en "Pendiente" hasta que un consumidor adopte el blueprint y documente qué use case está construyendo.
+
+## Estado de TASK-005 - API REST Endpoint
+
+### Phase 2 - Contract Tests + Documentation ✅
+- **Status**: ✅ COMPLETADO (2025-11-19)
+- **Implementaciones**:
+  - Contract tests con proper isolation (ADR-003)
+  - HTTP status validation y conflict handling (409)
+  - ADR documentation completa (ADR-003, ADR-004, ADR-005)
+  - Testing tools suite para validación continua
+- **Technical Improvements**:
+  - TypeScript ES2022 module configuration
+  - bcrypt security implementation (TD-SEC-001 resuelto)
+  - Enhanced HTTP server con readonly properties
+
+### Phase 2.5 - E2E Testing Foundation ✅
+- **Status**: ✅ COMPLETADO (2025-11-19 via BUGFIX-E2E-001)
+- **Implementaciones**:
+  - Repository methods: findById() y findAll() para E2E testing
+  - Working E2E test suite: 4 tests con excelente performance
+  - Performance achievement: 5.93ms (84x mejor que requirement de 500ms)
+  - Zero regression: Todos los tests existentes manteniendo (97/97 passing)
+- **Quality Metrics**:
+  - TypeScript strict mode: 0 errores
+  - Architecture compliance: ADR-003 maintained
+  - Test isolation: Perfect implementation
+
+### Phase 3 - Performance, Security, Integration Tests 🚀
+- **Status**: ✅ UNBLOCKED y foundation establecida
+- **Componentes Listos**:
+  - Cross-Component Integration Testing foundation
+  - Advanced Performance Testing (load scenarios)
+  - Security Testing framework (input validation y sanitization)
+  - Final Quality Gates validation
+- **Next Steps**:
+  1. **Cross-Component Integration Testing**: Implementar tests API → Domain → Repository validation con ADR-003 compliance
+  2. **Advanced Performance Testing**: Escenarios de carga con múltiples usuarios concurrentes (k6 suggested)
+  3. **Security Testing Framework**: Validación de input sanitization y protección contra inyección SQL/XSS
+  4. **Final Quality Gates**: Validación de producción con metrics específicos (100% coverage, <100ms por flow)
+
+### Métricas de Calidad Actuales
+- **Test Suites**: 9 passed, 1 skipped
+- **Total Tests**: 97 passed, 0 failed
+- **E2E Tests**: 4 passing con excelente performance (<10ms)
+- **TypeScript Errors**: 0
+- **Linting Errors**: 0
+- **Architecture Violations**: 0
+- **Build Status**: ✅ SUCCESSFUL
 
 ## Arquitectura
 

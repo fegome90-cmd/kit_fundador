@@ -8,6 +8,7 @@ import { Email } from '../../domain/value-objects/Email';
  */
 export class InMemoryUserAccountRepository implements UserAccountRepository {
   private readonly store = new Map<string, User>();
+  private readonly usersById = new Map<string, User>();
 
   constructor(seed: Iterable<User> = []) {
     for (const user of seed) {
@@ -21,10 +22,22 @@ export class InMemoryUserAccountRepository implements UserAccountRepository {
 
   async save(user: User): Promise<void> {
     this.store.set(this.normalize(user.email.value), user);
+    this.usersById.set(user.id, user);
+  }
+
+  // ✅ NEW: Find user by ID for E2E testing
+  async findById(userId: string): Promise<User | null> {
+    return this.usersById.get(userId) ?? null;
+  }
+
+  // ✅ NEW: Find all users for E2E testing
+  async findAll(): Promise<User[]> {
+    return [...this.usersById.values()];
   }
 
   seed(user: User): void {
     this.store.set(this.normalize(user.email.value), user);
+    this.usersById.set(user.id, user);
   }
 
   list(): User[] {
@@ -33,6 +46,7 @@ export class InMemoryUserAccountRepository implements UserAccountRepository {
 
   clear(): void {
     this.store.clear();
+    this.usersById.clear();
   }
 
   private normalize(value: string): string {

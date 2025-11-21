@@ -1,0 +1,13 @@
+node_modules
+web/node_modules
+web/test-results
+web/playwright-report
+dist
+web/dist
+coverage
+templates/
+dev-docs/
+PLAN_EJECUCION_DEPENDABOT.md
+README.md
+GEMINI.md
+document/

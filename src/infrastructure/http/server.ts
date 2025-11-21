@@ -6,6 +6,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import { Server } from 'http';
 import { createUserRoutes } from './routes/userRoutes';
 import { specs, swaggerUi } from './swagger';
 
@@ -17,6 +18,7 @@ export interface ServerConfig {
 export class HttpServer {
   private readonly app: express.Application;
   private readonly config: ServerConfig;
+  private server?: Server;
 
   constructor(config: ServerConfig) {
     this.config = config;
@@ -34,7 +36,7 @@ export class HttpServer {
   }
 
   private setupSwagger(): void {
-    // Serve Swagger UI at /api-docs and handle the redirect properly
+    // Serve Swagger UI at /api-docs and handle redirect properly
     this.app.get('/api-docs', swaggerUi.setup(specs));
     this.app.use('/api-docs', swaggerUi.serve);
   }
@@ -136,9 +138,35 @@ export class HttpServer {
   public start(): void {
     const port = this.config.port;
 
-    this.app.listen(port, () => {
-      this.logServerStart(port);
+    this.server = this.app.listen(port, () => {
+      // Fix: Log actual bound port, not requested port
+      const address = this.server?.address();
+      const actualPort = (typeof address === 'string') ? port : address?.port || port;
+      this.logServerStart(actualPort);
     });
+  }
+
+  public stop(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.server) {
+        this.server.close(() => {
+          console.log('Server stopped');
+          // Fix: Make stop() idempotent - clear server reference
+          this.server = undefined;
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
+  }
+
+  public getApp(): express.Application {
+    return this.app;
+  }
+
+  public isRunning(): boolean {
+    return !!this.server && this.server.listening;
   }
 
   private logServerStart(port: number): void {
@@ -146,13 +174,18 @@ export class HttpServer {
     process.stdout.write(`Environment: ${this.config.environment}\n`);
     process.stdout.write(`Health check: http://localhost:${port}/health\n`);
   }
-
-  public getApp(): express.Application {
-    return this.app;
-  }
 }
 
-// Factory function for creating server instance
+/**
+ * Create an HttpServer instance using environment-derived defaults with optional overrides.
+ *
+ * The factory reads PORT and NODE_ENV from the process environment (defaulting to `3000` and
+ * `development` respectively), applies any fields provided in `config`, and returns a new
+ * HttpServer configured with the resulting values.
+ *
+ * @param config - Partial server configuration to override environment-derived defaults
+ * @returns An HttpServer configured with the resolved `port` and `environment`
+ */
 export function createServer(config?: Partial<ServerConfig>): HttpServer {
   const defaultConfig: ServerConfig = {
     port: Number.parseInt(process.env.PORT || '3000', 10),

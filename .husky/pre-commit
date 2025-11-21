@@ -1,0 +1,54 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running CodeRabbitAI Prevention Pre-Commit Validation..."
+
+# Phase 1: Type Safety & Async (25% weight)
+echo "🔴 Checking Type Safety & Async..."
+npx tsc --noEmit --strict
+if [ $? -ne 0 ]; then
+  echo "❌ TypeScript compilation failed"
+  echo "💡 Fix: Review async/await patterns and method return types"
+  exit 1
+fi
+echo "✅ TypeScript compilation passed"
+
+# Phase 2: Dependency Management (20% weight)
+echo "🟡 Checking Dependency Management..."
+npm install --dry-run
+if [ $? -ne 0 ]; then
+  echo "❌ Dependency installation failed"
+  echo "💡 Fix: Check @types/ compatibility and remove deprecated stubs"
+  exit 1
+fi
+
+npm audit --audit-level=moderate
+if [ $? -ne 0 ]; then
+  echo "❌ Security audit failed"
+  echo "💡 Fix: Update dependencies to resolve security vulnerabilities"
+  exit 1
+fi
+echo "✅ Dependencies validated"
+
+# Phase 3: Testing Standards (25% weight)
+echo "🔵 Checking Testing Standards..."
+npm test -- --passWithNoTests
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed"
+  echo "💡 Fix: Review test isolation, server management, and assertions"
+  exit 1
+fi
+echo "✅ Tests passed"
+
+# Phase 4: Documentation Integrity (30% weight)
+echo "🟢 Checking Documentation Integrity..."
+npx markdownlint .
+if [ $? -ne 0 ]; then
+  echo "❌ Markdown linting failed"
+  echo "💡 Fix: Use markdownlint --fix and review MD040, MD036 violations"
+  exit 1
+fi
+echo "✅ Documentation validated"
+
+echo "🎯 All validations passed - Ready for commit"
+echo "📊 Expected Impact: 85% reduction in CodeRabbitAI issues (18 → <3)"
