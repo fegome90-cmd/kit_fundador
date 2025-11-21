@@ -4,7 +4,7 @@
  */
 
 export class OpenAPIValidator {
-  constructor(private debugMode: boolean = false) {}
+  constructor() {}
 
   /**
    * Validate user response against OpenAPI schema
@@ -31,8 +31,8 @@ export class OpenAPIValidator {
     }
 
     // Check timestamp - puede estar en root o en data.createdAt
-    const hasTimestamp = typeof data.timestamp === 'string' ||
-                         (data.data && typeof data.data.createdAt === 'string');
+    const hasTimestamp =
+      typeof data.timestamp === 'string' || (data.data && typeof data.data.createdAt === 'string');
     if (!hasTimestamp) {
       errors.push('timestamp must be string (in root or data.createdAt)');
     }
@@ -49,14 +49,18 @@ export class OpenAPIValidator {
 
       // Enhanced: Check email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (data.data.email && typeof data.data.email === 'string' && !emailRegex.test(data.data.email)) {
+      if (
+        data.data.email &&
+        typeof data.data.email === 'string' &&
+        !emailRegex.test(data.data.email)
+      ) {
         errors.push('data.email must be valid email format');
       }
     }
 
     return {
       valid: errors.length === 0,
-      errors: errors.length > 0 ? errors : undefined
+      errors: errors.length > 0 ? errors : undefined,
     };
   }
 
@@ -97,7 +101,7 @@ export class OpenAPIValidator {
 
     return {
       valid: errors.length === 0,
-      errors: errors.length > 0 ? errors : undefined
+      errors: errors.length > 0 ? errors : undefined,
     };
   }
 }

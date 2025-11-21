@@ -242,7 +242,8 @@ grep -A2 -B2 "4 passing" . -r --include="*.md"
 4. **Quality Metrics**: 97/97 tests passing, zero regressions
 5. **Architecture**: ADR-003 compliance maintained throughout
 
-### Triggers for Documentation Updates:
+### Triggers for Documentation Updates
+
 - ✅ New bug fixes resolved
 - ✅ Phase completions
 - ✅ Performance achievements
@@ -250,7 +251,8 @@ grep -A2 -B2 "4 passing" . -r --include="*.md"
 - ✅ Architecture changes
 - ✅ Workflow improvements
 
-### Avoid These Common Mistakes:
+### Avoid These Common Mistakes
+
 - ❌ No actualizar cross-references entre documentos
 - ❌ Dejar JSON files con syntax errors
 - ❌ Referencias a archivos que no existen
