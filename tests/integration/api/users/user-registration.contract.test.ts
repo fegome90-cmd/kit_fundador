@@ -13,7 +13,7 @@ describe('User Registration API Contract', () => {
     repository.clear(); // ← ESTADO LIMPIO ANTES DE CADA TEST
     server = new HttpServer({ port: 0, environment: 'test' }); // Puerto dinámico
     server.start(); // Fixed: Remove await - server.start() is void
-    validator = new OpenAPIValidator(false); // ✅ Inicializar OpenAPI validator (debug mode off)
+    validator = new OpenAPIValidator(); // ✅ Inicializar OpenAPI validator
   });
 
   afterEach(async () => {
