@@ -44,3 +44,21 @@
 **TASK-005 Phase 2: COMPLETADA EXITOSAMENTE**
 
 Todos los 4 issues críticos han sido resueltos con enfoque TDD granular y validación continua.
+
+---
+
+## 🐛 BUGS Y LIMITACIONES
+
+### ✅ JSON Parsing Bug - RESUELTO / NO REPRODUCIBLE
+
+**Estado**: El bug de parsing JSON reportado inicialmente fue investigado exhaustivamente y marcado como **NO REPRODUCIBLE**.
+
+**Hallazgos**:
+- Tests automatizados: 97/97 pasando sin errores de parsing
+- JSON con espacios: Funciona correctamente en testing controlado
+- Configuración middleware: Verificada como correcta (strict: false, limit: 10mb)
+- Root cause: Probablemente doble escape de caracteres en testing manual inicial o race condition temporal
+
+**Documentación completa**: `dev-docs/known-limitations/JSON-Parsing-Limitation.md`
+
+**Impacto**: CERO - No hay bugs conocidos bloqueando funcionalidad

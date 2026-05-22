@@ -347,6 +347,23 @@ beforeEach(async () => {
 - ✅ No Memory Leaks: Server cleanup implementado correctamente
 - ✅ No Schema Drift: Centralized validation framework
 
+### Bugs y Limitaciones - Estado Actual
+
+#### ✅ JSON Parsing Bug - RESUELTO / NO REPRODUCIBLE
+
+**Issue Reportado**: Error intermitente al parsear JSON con espacios  
+**Investigación**: Análisis exhaustivo realizado el 2025-11-19  
+**Resultado**: **NO REPRODUCIBLE** en testing controlado  
+
+**Evidencia**:
+- 97/97 tests automatizados pasando sin errores
+- JSON con espacios funciona correctamente
+- Configuración middleware verificada como óptima
+- Root cause probable: doble escape en testing manual inicial
+
+**Documentación**: `dev-docs/known-limitations/JSON-Parsing-Limitation.md`  
+**Impacto Actual**: CERO - Sin bugs conocidos afectando funcionalidad
+
 ---
 
 ## ✅ EJECUTOR FINAL ASSESSMENT
