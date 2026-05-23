@@ -2,24 +2,39 @@
 # Dependencies
 node_modules/
 
-# Tests
-tests/
+# Build artifacts
+dist/
+build/
+target/
 
-# Performance testing artifacts
-tests/performance/results/
-tests/performance/reports/
-*.perf.results
-*.perf.report
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py.class
+venv/
+.venv/
+.env
+.env.local
+.env.*
+
+# TypeScript/JavaScript
+*.tsbuildinfo
+*.js.map
+*.jsx.map
+*.ts.map
 
 # Logs
 *.log
 
-# Environment
-.env
-.env.local
-*.env.*
+# Coverage
+coverage/
+.nyc_output/
+istanbul/
+.jest/
 
-# Editor/IDE
+# IDE
 .vscode/
 .idea/
 *.swp
@@ -30,56 +45,9 @@ tests/performance/reports/
 .DS_Store
 Thumbs.db
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# Build artifacts
-dist/
-build/
-target/
-*.out
-*.exe
-*.dll
-*.so
-*.a
-
-# Python specific
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.egg-info/
-.eggs/
-
-# Compiled
-*.class
-*.o
-*.obj
-
-# Compressed
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+# Testing
+.mypy_cache/
+.pytest_cache/
+.npm
+.yarn
 ```

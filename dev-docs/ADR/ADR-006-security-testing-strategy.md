@@ -37,7 +37,7 @@ Necesitamos implementar pruebas de seguridad en un proyecto con arquitectura Cle
 
 ### Arquitectura de Tests de Seguridad
 
-```
+```text
 tests/
 ├── e2e/
 │   └── security/

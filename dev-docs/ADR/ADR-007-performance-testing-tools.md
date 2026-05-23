@@ -140,7 +140,7 @@ import { monitorEventLoopDelay } from 'perf_hooks';
 
 ### Arquitectura de Tests de Performance
 
-```
+```text
 tests/
 ├── performance/
 │   ├── load-scenarios.perf.test.ts    # k6 scenarios

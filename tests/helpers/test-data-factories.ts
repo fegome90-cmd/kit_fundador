@@ -48,9 +48,10 @@ export function createMaliciousEmail(type: 'sql' | 'xss' | 'nosql'): string {
     case 'nosql':
       // Los emails NoSQL injection son objetos, no strings
       throw new Error('NoSQL injection requires object payload, not string email');
-    default:
+    default: {
       const randomId = Math.random().toString(36).substring(2, 10);
       return `user_${randomId}@example.com`;
+    }
   }
 }
 

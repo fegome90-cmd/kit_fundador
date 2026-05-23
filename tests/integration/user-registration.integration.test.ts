@@ -7,8 +7,6 @@ import request from 'supertest';
 import { HttpServer } from '../../../src/infrastructure/http/server';
 import { cleanupDatabase } from '../../helpers/test-setup';
 import { createValidUser, createEdgeCaseUser } from '../../helpers/test-data-factories';
-import { InMemoryUserRepository } from '../../../src/infrastructure/_stubs/repositories/in-memory-user-repository';
-import { User } from '../../../src/domain/entities/user';
 
 let server: HttpServer;
 
