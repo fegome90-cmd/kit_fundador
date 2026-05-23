@@ -29,6 +29,10 @@ export class HttpServer {
     this.setupErrorHandling();
   }
 
+  /**
+   * Returns the underlying Express application for testing purposes
+   */
+
   private setupMiddleware(): void {
     this.setupBodyParsing();
     this.setupSecurityMiddleware();
