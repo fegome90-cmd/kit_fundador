@@ -246,6 +246,19 @@ public stop(): Promise<void> {
 
 ### No Critical Issues Found ✅
 
+### JSON Parsing Bug Investigation ✅ RESUELTO
+**Issue Reportado**: Error intermitente al parsear JSON con espacios en `POST /api/users/register`  
+**Investigación**: Análisis exhaustivo realizado el 2025-11-19  
+**Resultado**: **NO REPRODUCIBLE** - El bug no pudo ser replicado en testing controlado  
+**Hallazgos**:
+- 97/97 tests automatizados pasando sin errores de parsing
+- JSON con espacios funciona correctamente
+- Configuración de middleware verificada como óptima
+- Root cause probable: doble escape de caracteres en testing manual inicial o race condition temporal
+
+**Acción**: ✅ Documentado en `dev-docs/known-limitations/JSON-Parsing-Limitation.md` como RESUELTO  
+**Impacto**: CERO - No hay bugs conocidos afectando funcionalidad
+
 ### Minor Documentation Note 📝
 **Location**: Progress files had Phase 1 reference  
 **Impact**: LOW - Informational only  

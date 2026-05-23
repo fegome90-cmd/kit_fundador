@@ -146,6 +146,12 @@ export class RegisterUserRequestValidator {
       errors.push('Name cannot be empty');
     } else if (trimmedName.length > this.MAX_NAME_LENGTH) {
       errors.push(`Name must not exceed ${this.MAX_NAME_LENGTH} characters`);
+    } else if (/[<>]/.test(trimmedName)) {
+      errors.push('Name cannot contain HTML/XML special characters (<, >)');
+    } else if (/script|onerror|onload|javascript:/i.test(trimmedName)) {
+      errors.push('Name cannot contain script patterns or event handlers');
+    } else if (/\.\.[\\/]/.test(trimmedName)) {
+      errors.push('Name cannot contain path traversal patterns');
     }
 
     return errors;

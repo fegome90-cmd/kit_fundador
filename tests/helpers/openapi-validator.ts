@@ -4,7 +4,7 @@
  */
 
 export class OpenAPIValidator {
-  constructor(private debugMode: boolean = false) {}
+  constructor() {}
 
   /**
    * Validate user response against OpenAPI schema
