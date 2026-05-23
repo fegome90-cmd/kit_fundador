@@ -4,21 +4,26 @@
  */
 
 import request from 'supertest';
-import { app } from '../../../src/infrastructure/http/app';
+import { HttpServer } from '../../../src/infrastructure/http/server';
 import { cleanupDatabase } from '../../helpers/test-setup';
 import { createValidUser, createEdgeCaseUser } from '../../helpers/test-data-factories';
 import { InMemoryUserRepository } from '../../../src/infrastructure/_stubs/repositories/in-memory-user-repository';
 import { User } from '../../../src/domain/entities/user';
 
+let server: HttpServer;
+
 describe('Integration: Full User Registration Flow', () => {
   const endpoint = '/api/users/register';
 
   beforeEach(async () => {
+    server = new HttpServer();
+    await server.start();
     await cleanupDatabase();
   });
 
   afterEach(async () => {
     await cleanupDatabase();
+    await server.stop();
   });
 
   describe('Complete Registration Flow', () => {

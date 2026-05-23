@@ -70,9 +70,9 @@ export function calculatePerformanceMetrics(
   const p50 = percentile(responseTimes, 50);
   const p95 = percentile(responseTimes, 95);
   const p99 = percentile(responseTimes, 99);
-  const avg = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length || 0;
-  const min = Math.min(...responseTimes);
-  const max = Math.max(...responseTimes);
+  const avg = responseTimes.length > 0 ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length : 0;
+  const min = responseTimes.length > 0 ? Math.min(...responseTimes) : 0;
+  const max = responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
 
   // Error metrics
   const errorRate = failedRequests / totalRequests || 0;

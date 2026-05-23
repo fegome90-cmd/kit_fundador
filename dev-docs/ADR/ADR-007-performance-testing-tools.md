@@ -1,7 +1,7 @@
 # ADR-007: Performance Testing Tools and Thresholds
 
 ## Status
-✅ Accepted (2024-01-XX)
+✅ Accepted (2025-01-22)
 
 ## Context
 Necesitamos establecer una estrategia de performance testing para el proyecto que:
