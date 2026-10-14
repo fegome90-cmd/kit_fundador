@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import difflib
 import hashlib
+import difflib
 import json
 import os
 import re
@@ -57,7 +58,7 @@ def safe_target(raw: str) -> str:
     parts = PurePosixPath(p).parts
     if not parts or any(x in ('..', '.', '') for x in p.split('/')):
         raise Rejected('Path traversal/empty segment: ' + raw)
-    if parts[0] in SKIP_DIRS or parts[0] in ('.github', '.git') or p.startswith('.env'):
+    if parts[0] in SKIP_DIRS or any(x.startswith('.') for x in parts) or p in ('package.json','pnpm-lock.yaml'):
         raise Rejected('Protected target: ' + raw)
     return p
 
@@ -221,10 +222,10 @@ def execute(args):
     if args.preview:
         print(json.dumps({'mode':'preview','items':[i['name'] for i in items], 'files':entries,'dependencies':sorted(set(d for x in items for d in x.get('dependencies',[]))),'devDependencies':sorted(set(d for x in items for d in x.get('devDependencies',[]))),'writes':0},indent=2))
         return 0
-    if not args.install:
-        raise Rejected('Choose --preview or --install')
+    if not (args.install or args.diff):
+        raise Rejected('Choose --preview, --diff or --install')
     if not args.shadcn_cli:
-        raise Rejected('--shadcn-cli required for installation')
+        raise Rejected('--shadcn-cli required for --diff or --install')
     cli=Path(args.shadcn_cli).resolve(strict=True)
     with tempfile.TemporaryDirectory(prefix='lego-stage-') as tmp:
         stage=Path(tmp)/'consumer'
@@ -251,6 +252,22 @@ def execute(args):
                 raise Rejected('Manifest/installed file hash mismatch: '+rel)
         if 'components.json' in after:
             raise Rejected('Installer unexpectedly added components.json')
+        if args.diff:
+            patches = []
+            for target, body in sorted(added.items()):
+                old = before.get(target, b'')
+                try:
+                    old_lines = old.decode('utf-8').splitlines(keepends=True)
+                    new_lines = body.decode('utf-8').splitlines(keepends=True)
+                    full = list(difflib.unified_diff(old_lines, new_lines, fromfile='a/'+target, tofile='b/'+target))
+                except UnicodeDecodeError:
+                    full = ['[binary change omitted]']
+                patches.append({'path': target, 'oldSha256': sha(old) if target in before else None,
+                                'newSha256': sha(body), 'diffLines': len(full),
+                                'unifiedDiffExcerpt': ''.join(full[:40]), 'truncated': len(full)>40})
+            print(json.dumps({'mode':'diff','items':[i['name'] for i in items],
+                              'patches':patches,'writes':0},indent=2))
+            return 0
         changed=commit_changes(root,before,after)
     print(json.dumps({'mode':'installed','items':[i['name'] for i in items],'changes':changed,'stageExit':0},indent=2))
     return 0
@@ -262,6 +279,7 @@ def main():
     p.add_argument('--items',nargs='+',required=True)
     mode=p.add_mutually_exclusive_group(required=True)
     mode.add_argument('--preview',action='store_true')
+    mode.add_argument('--diff',action='store_true')
     mode.add_argument('--install',action='store_true')
     p.add_argument('--shadcn-cli')
     p.add_argument('--allow-http-localhost',action='store_true')
