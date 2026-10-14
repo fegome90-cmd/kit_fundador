@@ -16,6 +16,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import lego_transaction
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit
 from urllib.request import urlopen
@@ -205,51 +206,18 @@ def planned_changes(root: Path, items: list[dict], existing: dict[str,bytes]):
             result.append({'item':item['name'],'target':target,'status':status})
     return result
 
-def commit_changes(root: Path, before: dict[str,bytes], after: dict[str,bytes]) -> list[str]:
-    removed = set(before)-set(after)
-    if removed:
-        raise Rejected('Installer attempted to delete consumer files: '+', '.join(sorted(removed)[:10]))
-    changes = {p:v for p,v in after.items() if before.get(p) != v}
-    # The caller validates the complete change set against manifest targets.
-    files = []
-    try:
-        for rel, body in sorted(changes.items()):
-            f = root / rel
-            if f.is_symlink() or any(d.is_symlink() for d in f.parents if d != root and root in d.parents):
-                raise Rejected('Symlink found at commit: ' + rel)
-            if f.exists() and (rel not in before or f.read_bytes() != before[rel]):
-                raise Rejected('Consumer changed during staging: '+rel)
-            if not f.exists() and rel in before:
-                raise Rejected('Consumer file disappeared during staging: '+rel)
-            f.parent.mkdir(parents=True, exist_ok=True)
-            with tempfile.NamedTemporaryFile(dir=f.parent, prefix='.lego-txn-', delete=False) as tmp:
-                tmp.write(body)
-                tmpname = tmp.name
-            os.replace(tmpname, f)
-            files.append(rel)
-            fail = os.environ.get('LEGO_TEST_FAIL_AFTER')
-            if fail and int(fail) == len(files):
-                raise RuntimeError('Injected staging-to-consumer commit failure')
-    except BaseException:
-        for rel in reversed(files):
-            f=root/rel
-            if rel in before:
-                f.write_bytes(before[rel])
-            else:
-                f.unlink(missing_ok=True)
-        for rel in sorted(files,reverse=True):
-            p=(root/rel).parent
-            while p != root and p.exists():
-                try: p.rmdir()
-                except OSError: break
-                p=p.parent
-        raise
-    return sorted(changes)
-
 def execute(args):
     root=Path(args.project).resolve()
     if not root.is_dir():
         raise Rejected('Project directory does not exist')
+    if args.recover:
+        restored=lego_transaction.recover(root)
+        print(json.dumps({'mode':'recovered','files':restored}))
+        return 0
+    if (root/lego_transaction.DIRNAME).exists():
+        raise Rejected('Unfinished or concurrent LEGO install; run --recover')
+    if not args.registry or not args.items:
+        raise Rejected('--registry and --items are required except for --recover')
     base=trusted_base(args.registry, allow_local=args.allow_http_localhost)
     names=[]
     for name in args.items:
@@ -273,72 +241,81 @@ def execute(args):
     if not args.shadcn_cli:
         raise Rejected('--shadcn-cli required for --diff or --install')
     cli=Path(args.shadcn_cli).resolve(strict=True)
-    with tempfile.TemporaryDirectory(prefix='lego-stage-') as tmp:
-        stage=Path(tmp)/'consumer'
-        stage.mkdir()
-        for rel,body in staged_before.items():
-            f=stage/rel
-            f.parent.mkdir(parents=True, exist_ok=True)
-            f.write_bytes(body)
-        # Keep user/application secrets out of installation subprocesses. This is
-        # environment hygiene, NOT a sandbox (the child still has user filesystem access).
-        allowed_env = {'PATH','HOME','TMPDIR','TMP','TEMP','CI','PNPM_HOME',
-                       'COREPACK_HOME','XDG_CACHE_HOME','HTTP_PROXY','HTTPS_PROXY',
-                       'NO_PROXY','no_proxy','npm_config_registry','NPM_CONFIG_REGISTRY',
-                       'SSL_CERT_FILE','NODE_EXTRA_CA_CERTS'}
-        env={k:v for k,v in os.environ.items() if k in allowed_env}
-        if args.allow_http_localhost:
-            env.pop('ALL_PROXY',None);env.pop('all_proxy',None)
-            env['NO_PROXY']='localhost,127.0.0.1';env['no_proxy']=env['NO_PROXY']
-        cmd=['node',str(cli),'add',*[url_for(base,x) for x in names],'--yes']
-        proc=subprocess.run(cmd,cwd=stage,env=env,capture_output=True,text=True,timeout=180)
-        if proc.returncode != 0:
-            raise Rejected('Installer staging failed with code '+str(proc.returncode)+': '+(proc.stdout+'\n'+proc.stderr)[-800:])
-        after=snapshot(stage)
-        check_staged_versions(current_versions,wanted_versions,after.get('package.json'))
-        added = {p:v for p,v in after.items() if staged_before.get(p)!=v}
-        unexpected=set(added)-set(targets)-ALLOW_CHANGE
-        if unexpected:
-            raise Rejected('Unexpected installed files: '+', '.join(sorted(unexpected)))
-        for rel in targets:
-            if rel not in after or sha(after[rel]) != targets[rel]:
-                raise Rejected('Manifest/installed file hash mismatch: '+rel)
-        if 'components.json' in after:
-            raise Rejected('Installer unexpectedly added components.json')
-        if args.diff:
-            patches = []
-            for target, body in sorted(added.items()):
-                old = staged_before.get(target, b'')
-                try:
-                    old_lines = old.decode('utf-8').splitlines(keepends=True)
-                    new_lines = body.decode('utf-8').splitlines(keepends=True)
-                    full = list(difflib.unified_diff(old_lines, new_lines, fromfile='a/'+target, tofile='b/'+target))
-                except UnicodeDecodeError:
-                    full = ['[binary change omitted]']
-                patches.append({'path': target, 'oldSha256': sha(old) if target in staged_before else None,
-                                'newSha256': sha(body), 'diffLines': len(full),
-                                'unifiedDiffExcerpt': ''.join(full[:40]), 'truncated': len(full)>40})
-            print(json.dumps({'mode':'diff','items':[i['name'] for i in items],
-                              'patches':patches,'writes':0},indent=2))
-            return 0
-        changed=commit_changes(root,staged_before,after)
+    if args.install:
+        lego_transaction.begin(root)
+    try:
+      with tempfile.TemporaryDirectory(prefix='lego-stage-') as tmp:
+          stage=Path(tmp)/'consumer'
+          stage.mkdir()
+          for rel,body in staged_before.items():
+              f=stage/rel
+              f.parent.mkdir(parents=True, exist_ok=True)
+              f.write_bytes(body)
+          # Keep user/application secrets out of installation subprocesses. This is
+          # environment hygiene, NOT a sandbox (the child still has user filesystem access).
+          allowed_env = {'PATH','HOME','TMPDIR','TMP','TEMP','CI','PNPM_HOME',
+                         'COREPACK_HOME','XDG_CACHE_HOME','HTTP_PROXY','HTTPS_PROXY',
+                         'NO_PROXY','no_proxy','npm_config_registry','NPM_CONFIG_REGISTRY',
+                         'SSL_CERT_FILE','NODE_EXTRA_CA_CERTS'}
+          env={k:v for k,v in os.environ.items() if k in allowed_env}
+          if args.allow_http_localhost:
+              env.pop('ALL_PROXY',None);env.pop('all_proxy',None)
+              env['NO_PROXY']='localhost,127.0.0.1';env['no_proxy']=env['NO_PROXY']
+          cmd=['node',str(cli),'add',*[url_for(base,x) for x in names],'--yes']
+          proc=subprocess.run(cmd,cwd=stage,env=env,capture_output=True,text=True,timeout=180)
+          if proc.returncode != 0:
+              raise Rejected('Installer staging failed with code '+str(proc.returncode)+': '+(proc.stdout+'\n'+proc.stderr)[-800:])
+          after=snapshot(stage)
+          check_staged_versions(current_versions,wanted_versions,after.get('package.json'))
+          added = {p:v for p,v in after.items() if staged_before.get(p)!=v}
+          unexpected=set(added)-set(targets)-ALLOW_CHANGE
+          if unexpected:
+              raise Rejected('Unexpected installed files: '+', '.join(sorted(unexpected)))
+          for rel in targets:
+              if rel not in after or sha(after[rel]) != targets[rel]:
+                  raise Rejected('Manifest/installed file hash mismatch: '+rel)
+          if 'components.json' in after:
+              raise Rejected('Installer unexpectedly added components.json')
+          if args.diff:
+              patches = []
+              for target, body in sorted(added.items()):
+                  old = staged_before.get(target, b'')
+                  try:
+                      old_lines = old.decode('utf-8').splitlines(keepends=True)
+                      new_lines = body.decode('utf-8').splitlines(keepends=True)
+                      full = list(difflib.unified_diff(old_lines, new_lines, fromfile='a/'+target, tofile='b/'+target))
+                  except UnicodeDecodeError:
+                      full = ['[binary change omitted]']
+                  patches.append({'path': target, 'oldSha256': sha(old) if target in staged_before else None,
+                                  'newSha256': sha(body), 'diffLines': len(full),
+                                  'unifiedDiffExcerpt': ''.join(full[:40]), 'truncated': len(full)>40})
+              print(json.dumps({'mode':'diff','items':[i['name'] for i in items],
+                                'patches':patches,'writes':0},indent=2))
+              return 0
+          changed=lego_transaction.commit(root,staged_before,after)
+    finally:
+        if args.install:
+            # Stage failures remove their empty exclusive lock. Crashed commits
+            # retain the durable manifest for explicit --recover.
+            lego_transaction.discard_empty(root)
     print(json.dumps({'mode':'installed','items':[i['name'] for i in items],'changes':changed,'stageExit':0},indent=2))
     return 0
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--project',required=True)
-    p.add_argument('--registry',required=True)
-    p.add_argument('--items',nargs='+',required=True)
+    p.add_argument('--registry')
+    p.add_argument('--items',nargs='+')
     mode=p.add_mutually_exclusive_group(required=True)
     mode.add_argument('--preview',action='store_true')
     mode.add_argument('--diff',action='store_true')
     mode.add_argument('--install',action='store_true')
+    mode.add_argument('--recover',action='store_true')
     p.add_argument('--shadcn-cli')
     p.add_argument('--allow-http-localhost',action='store_true')
     args=p.parse_args()
     try: return execute(args)
-    except (Rejected, OSError, subprocess.TimeoutExpired, RuntimeError) as e:
+    except (Rejected, lego_transaction.TransactionRejected, OSError, subprocess.TimeoutExpired, RuntimeError) as e:
         print('LEGO_REJECTED: '+str(e),file=sys.stderr)
         return 2
 
