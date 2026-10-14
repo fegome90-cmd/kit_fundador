@@ -15,13 +15,28 @@ def item(name,files,packages,requires=[]):
 items=[]
 items.append(item('core-fastify',[f('tsconfig.json'),f('pnpm-workspace.yaml')],['fastify','@fastify/cors']))
 items.append(item('api-docs',[f('src/docs.ts')],['@fastify/swagger','@fastify/swagger-ui'],['core-fastify']))
-items.append(item('db-postgres',[f('drizzle.config.ts')],['drizzle-orm','pg'],['core-fastify']))
+db_item=item('db-postgres',[f('drizzle.config.ts'),f('drizzle/0000_last_kat_farrell.sql'),
+    f('drizzle/meta/_journal.json'),f('drizzle/meta/0000_snapshot.json')],['drizzle-orm','pg'],['core-fastify'])
+db_item['devDependencies']=['drizzle-kit@'+dev['drizzle-kit']]
+(reg/'db-postgres.json').write_text(json.dumps(db_item,indent=2)+'\n')
+items.append(db_item)
 items.append(item('auth-better-auth',[f('src/auth.ts'),f('src/auth-schema.ts')],['better-auth','@better-auth/drizzle-adapter'],['db-postgres']))
-baseA="import { withBackend, createPostgresBackend } from 'bullmq';\nexport const { Queue, Worker }=withBackend(createPostgresBackend);\nexport const connection={host:'127.0.0.1',port:55432,user:'lab',database:'legolab'};\n"
-baseB="export { Queue, Worker } from 'bullmq';\nexport const connection={host:'127.0.0.1',port:56379,maxRetriesPerRequest:null};\n"
+baseA="import { withBackend, createPostgresBackend } from 'bullmq';\nexport const { Queue, Worker }=withBackend(createPostgresBackend);\nexport const connection={connectionString:process.env.DATABASE_URL,schema:'bullmq',max:4};\n"
+baseB="export { Queue, Worker } from 'bullmq';\nconst u=process.env.QUEUE_URL?new URL(process.env.QUEUE_URL):undefined;\nexport const connection={host:u?.hostname??'127.0.0.1',port:Number(u?.port??56379),password:u?.password||undefined,maxRetriesPerRequest:null};\n"
 def jobfile(content):return {'path':'src/backend.ts','type':'registry:file','target':'~/src/backend.ts','content':content}
-items.append(item('jobs-postgres',[jobfile(baseA)],['bullmq'],['db-postgres']))
-items.append(item('jobs-valkey',[jobfile(baseB)],['bullmq','ioredis'],['core-fastify']))
+worker = """import { Worker, connection } from './backend.js';
+const worker=new Worker('registry-probe',async job=>{
+  const value=job.data?.value;
+  if(typeof value!=='number'||!Number.isFinite(value))throw new Error('Invalid value');
+  return value*2;
+},{connection,concurrency:4});
+worker.on('error',e=>console.error('worker failed: '+e.message));
+await worker.waitUntilReady();console.log('ASSEMBLED_WORKER_READY');
+process.on('SIGTERM',async()=>{await worker.close();process.exit(0)});
+"""
+workerfile={'path':'src/worker.ts','type':'registry:file','target':'~/src/worker.ts','content':worker}
+items.append(item('jobs-postgres',[jobfile(baseA),workerfile],['bullmq'],['db-postgres']))
+items.append(item('jobs-valkey',[jobfile(baseB),workerfile],['bullmq','ioredis'],['core-fastify']))
 for v,backend in [('a','jobs-postgres'),('b','jobs-valkey')]:
     server=f('src/server.ts');server['content']="import { Queue, connection } from './backend.js';\n"+server['content']+"\nconst queue=new Queue('registry-compile-probe',{connection});await queue.close();\n"
     # The backend constructor above is exercised only when full services are available.
