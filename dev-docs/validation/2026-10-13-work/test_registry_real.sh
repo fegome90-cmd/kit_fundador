@@ -42,9 +42,26 @@ d=json.load(open(sys.argv[1]))
 assert d["writes"]==0 and d["mode"]=="preview"
 print("SAFE_PREVIEW_PASS",d["items"],len(d["files"]))
 PY
+  python3 lego_safe.py --project "$CONSUMER" --registry "$BASE" --items "lego-full-$variant" --diff --allow-http-localhost --shadcn-cli "$CLI" > "$LAB/diff-$variant.json"
+  python3 - "$LAB/diff-$variant.json" <<'PY'
+import json,sys
+d=json.load(open(sys.argv[1]))
+assert d['mode']=='diff' and d['writes']==0
+paths={p['path'] for p in d['patches']}
+assert {'package.json','pnpm-lock.yaml','src/server.ts'}.issubset(paths),paths
+print('SAFE_STAGED_DIFF_PASS',len(paths))
+PY
+  after=$(sha256sum "$CONSUMER/package.json" | cut -d' ' -f1)
+  test "$before" = "$after"
   python3 lego_safe.py --project "$CONSUMER" --registry "$BASE" --items "lego-full-$variant" --install --allow-http-localhost --shadcn-cli "$CLI" > "$LAB/install-$variant.json"
   (cd "$CONSUMER" && pnpm install --frozen-lockfile --strict-peer-dependencies && pnpm exec tsc --noEmit --skipLibCheck && pnpm exec tsc --skipLibCheck)
   node smoke.mjs "$CONSUMER" off off
+  # Reinstall the same recipe; it must not rewrite consumer-owned content.
+  before=$(sha256sum "$CONSUMER/package.json" "$CONSUMER/pnpm-lock.yaml" "$CONSUMER/src/server.ts" | sha256sum | cut -d' ' -f1)
+  python3 lego_safe.py --project "$CONSUMER" --registry "$BASE" --items "lego-full-$variant" --install --allow-http-localhost --shadcn-cli "$CLI" > "$LAB/repeat-$variant.json"
+  after=$(sha256sum "$CONSUMER/package.json" "$CONSUMER/pnpm-lock.yaml" "$CONSUMER/src/server.ts" | sha256sum | cut -d' ' -f1)
+  test "$before" = "$after"
+  echo "SAFE_IDEMPOTENCE_PASS $variant"
   echo "SAFE_REAL_SHADCN_PASS $variant"
 done
 
@@ -75,6 +92,8 @@ echo "SAFE_ROLLBACK_PASS (injected synchronous failure)"
 
 cp "$LAB/preview-a.json" "$ROOT/registry-safety-preview-a.json"
 cp "$LAB/preview-b.json" "$ROOT/registry-safety-preview-b.json"
+cp "$LAB/diff-a.json" "$ROOT/registry-safety-diff-a.json"
+cp "$LAB/diff-b.json" "$ROOT/registry-safety-diff-b.json"
 cp "$LAB/install-a.json" "$ROOT/registry-safety-install-a.json"
 cp "$LAB/install-b.json" "$ROOT/registry-safety-install-b.json"
 echo "SAFE_REGISTRY_END_TO_END_PASS"
