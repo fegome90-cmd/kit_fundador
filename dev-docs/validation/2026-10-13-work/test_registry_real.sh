@@ -69,6 +69,17 @@ PY
   test "$before" = "$after"
   echo "SAFE_IDEMPOTENCE_PASS $variant"
   echo "SAFE_REAL_SHADCN_PASS $variant"
+  # Assess actual production installation without optional/dev dependencies.
+  # This is a deployment-mode experiment, not an exception to the full audit.
+  (cd "$CONSUMER" && pnpm install --prod --no-optional --frozen-lockfile --strict-peer-dependencies)
+  node smoke.mjs "$CONSUMER" off off
+  if (cd "$CONSUMER" && pnpm audit --prod --no-optional --json > "$LAB/audit-pruned-$variant.json"); then
+    echo "SAFE_PRUNED_RUNTIME_AUDIT_PASS $variant"
+  else
+    echo "SAFE_PRUNED_RUNTIME_AUDIT_FAIL $variant"
+    exit 1
+  fi
+
 done
 
 CONFLICT="$LAB/conflict"
@@ -129,4 +140,6 @@ cp "$LAB/install-a.json" "$ROOT/registry-safety-install-a.json"
 cp "$LAB/install-b.json" "$ROOT/registry-safety-install-b.json"
 cp "$LAB/audit-prod-a.json" "$ROOT/registry-safety-audit-prod-a.json"
 cp "$LAB/audit-prod-b.json" "$ROOT/registry-safety-audit-prod-b.json"
+cp "$LAB/audit-pruned-a.json" "$ROOT/registry-safety-audit-pruned-a.json"
+cp "$LAB/audit-pruned-b.json" "$ROOT/registry-safety-audit-pruned-b.json"
 echo "SAFE_REGISTRY_END_TO_END_PASS"
