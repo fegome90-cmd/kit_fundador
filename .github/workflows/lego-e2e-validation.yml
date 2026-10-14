@@ -1,0 +1,120 @@
+name: LEGO E2E Validation (experimental)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/fastify-lego-foundation
+    paths:
+      - '.github/workflows/lego-e2e-validation.yml'
+      - 'dev-docs/validation/2026-10-13-work/prototype/ci/**'
+      - 'dev-docs/validation/2026-10-13-work/prototype/src/**'
+      - 'dev-docs/validation/2026-10-13-work/prototype/drizzle/**'
+      - 'dev-docs/validation/2026-10-13-work/ui6/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lego-e2e-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  postgres-auth-queue:
+    name: PostgreSQL + Better Auth + BullMQ A/B
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16.15
+        env:
+          POSTGRES_USER: lego_ci
+          POSTGRES_PASSWORD: lego_ci_ephemeral_only
+          POSTGRES_DB: legolab
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U lego_ci -d legolab"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+      valkey:
+        image: valkey/valkey:8.1.4
+        ports:
+          - 56379:6379
+        options: >-
+          --health-cmd "valkey-cli ping"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    defaults:
+      run:
+        shell: bash
+        working-directory: dev-docs/validation/2026-10-13-work/prototype
+    env:
+      DATABASE_URL: postgresql://lego_ci:lego_ci_ephemeral_only@127.0.0.1:55432/legolab
+      AUTH_URL: http://127.0.0.1:4310
+      CI: 'true'
+    steps:
+      - name: Checkout validation branch
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Select security-patched Swagger UI fixture and install exact lockfile
+        run: |
+          cp ../ui6/package.json ./package.json
+          cp ../ui6/pnpm-lock.yaml ./pnpm-lock.yaml
+          cp ../ui6/pnpm-workspace.yaml ./pnpm-workspace.yaml
+          pnpm install --frozen-lockfile --strict-peer-dependencies
+      - name: Confirm service versions
+        run: |
+          node --version
+          pnpm --version
+          node -e 'console.log("Fastify version", require("fastify/package.json").version)'
+          node -e 'console.log("BullMQ version", require("bullmq/package.json").version)'
+      - name: Compile fixture (application strict; known upstream declarations skipped)
+        run: pnpm exec tsc --skipLibCheck
+      - name: Recheck standalone Fastify and OpenAPI
+        run: node --test tests/http.test.mjs
+      - name: Apply Drizzle migrations against live PostgreSQL (twice for idempotence)
+        run: |
+          pnpm exec drizzle-kit migrate
+          pnpm exec drizzle-kit migrate
+      - name: Apply BullMQ PostgreSQL migrations against live PostgreSQL (twice)
+        run: |
+          node --input-type=module <<'NODE'
+          import pg from 'pg';
+          import { runMigrations } from 'bullmq';
+          const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+          try {
+            for (let i = 1; i <= 2; i++) {
+              const client = await pool.connect();
+              try { await runMigrations(client); console.log('BULLMQ_PG_MIGRATION_PASS', i); }
+              finally { client.release(); }
+            }
+          } finally { await pool.end(); }
+          NODE
+      - name: Integration — real PostgreSQL, Better Auth sessions, BullMQ PG worker
+        run: node --test ci/full-pg.test.mjs
+      - name: Regression — BullMQ Valkey worker behaviors
+        run: node --test tests/jobs.test.mjs
+      - name: Record dependency advisory status (non-blocking until triaged)
+        if: always()
+        continue-on-error: true
+        run: pnpm audit --json > ci-audit.json
+      - name: Upload isolated experiment artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lego-e2e-${{ github.run_id }}
+          path: |
+            dev-docs/validation/2026-10-13-work/prototype/ci-audit.json
+          if-no-files-found: ignore
+          retention-days: 7
