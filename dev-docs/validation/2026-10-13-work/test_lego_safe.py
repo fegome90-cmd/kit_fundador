@@ -49,6 +49,7 @@ class LegoSafeTests(unittest.TestCase):
         self.items={}
         self.base=f'http://127.0.0.1:{self.http.server_port}'
         self.add('core-fastify',{'src/core.ts':'export const core=true;\n'})
+        core=json.loads((self.reg/'core-fastify.json').read_text());core['dependencies']=['fake-dep@1.0.0'];(self.reg/'core-fastify.json').write_text(json.dumps(core))
         self.add('api-docs',{'src/docs.ts':'export const docs=true;\n'},requires=['core-fastify'])
         self.add('jobs-postgres',{'src/backend.ts':'export const jobs="pg";\n'},requires=['core-fastify'])
         self.add('jobs-valkey',{'src/backend.ts':'export const jobs="valkey";\n'},requires=['core-fastify'])
@@ -107,6 +108,30 @@ class LegoSafeTests(unittest.TestCase):
         self.add('poison',{'package.json':'{}'})
         r=self.cmd('poison');self.assertEqual(r.returncode,2)
         self.assertIn('Protected target',r.stderr)
+    def test_mismatched_existing_package_rejected(self):
+        package=json.loads((self.consumer/'package.json').read_text())
+        package['dependencies']={'fake-dep':'0.9.0'}
+        (self.consumer/'package.json').write_text(json.dumps(package))
+        before=self.checksum()
+        result=self.cmd('api-docs',action='--install')
+        self.assertEqual(result.returncode,2)
+        self.assertIn('Consumer dependency mismatch',result.stderr)
+        self.assertEqual(before,self.checksum())
+    def test_installer_undeclared_dependency_rejected(self):
+        # Fake CLI always adds fake-dep, but these two items don't declare it.
+        self.add('standalone',{'src/standalone.ts':'ok'})
+        before=self.checksum()
+        result=self.cmd('standalone',action='--install')
+        self.assertEqual(result.returncode,2)
+        self.assertIn('Undeclared dependencies installed',result.stderr)
+        self.assertEqual(before,self.checksum())
+    def test_invalid_package_name_rejected(self):
+        d=self.add('badpackage',{'src/bad.ts':'ok'})
+        d['dependencies']=['../evil@1.0.0']
+        (self.reg/'badpackage.json').write_text(json.dumps(d))
+        result=self.cmd('badpackage')
+        self.assertEqual(result.returncode,2)
+        self.assertIn('Unpinned/invalid version',result.stderr)
     def test_hidden_npmrc_rejected(self):
         self.add('npmrc',{'.npmrc':'ignore-scripts=false'})
         r=self.cmd('npmrc');self.assertEqual(r.returncode,2)
