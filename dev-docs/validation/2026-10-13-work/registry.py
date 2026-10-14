@@ -3,7 +3,8 @@ import json
 root=Path(__file__).resolve().parent
 src=root/'prototype'
 reg=root/'registry';reg.mkdir(exist_ok=True)
-package=json.loads((src/'package.json').read_text());deps=package['dependencies'];dev=package['devDependencies']
+# Pin to independently tested Swagger UI 6.1.2 lockfile; 5.2.6 has known advisories.
+package=json.loads((root/'ui6'/'package.json').read_text());deps=package['dependencies'];dev=package['devDependencies']
 def f(path): return {'path':path,'type':'registry:file','target':'~/'+path,'content':(src/path).read_text()}
 def item(name,files,packages,requires=[]):
     d={'$schema':'https://ui.shadcn.com/schema/registry-item.json','name':name,'type':'registry:item','title':name,'description':'Isolated validation fixture; not a published Kit item','files':files,'dependencies':[p+'@'+deps[p] for p in packages], 'registryDependencies':['http://127.0.0.1:4380/'+r+'.json' for r in requires]}
