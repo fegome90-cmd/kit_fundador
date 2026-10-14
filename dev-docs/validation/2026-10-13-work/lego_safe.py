@@ -258,6 +258,15 @@ def execute(args):
                          'NO_PROXY','no_proxy','npm_config_registry','NPM_CONFIG_REGISTRY',
                          'SSL_CERT_FILE','NODE_EXTRA_CA_CERTS'}
           env={k:v for k,v in os.environ.items() if k in allowed_env}
+          # Isolate default CLI/npm credential/config discovery from the real HOME.
+          # This reduces ambient access but does NOT prevent absolute-path reads:
+          # only run with trusted registries, ideally inside an OS sandbox.
+          sandbox_home=Path(tmp)/'installer-home'
+          sandbox_home.mkdir(mode=0o700)
+          env['HOME']=str(sandbox_home)
+          env['XDG_CACHE_HOME']=str(sandbox_home/'cache')
+          env['XDG_CONFIG_HOME']=str(sandbox_home/'config')
+          env['npm_config_userconfig']=str(sandbox_home/'.npmrc')
           if args.allow_http_localhost:
               env.pop('ALL_PROXY',None);env.pop('all_proxy',None)
               env['NO_PROXY']='localhost,127.0.0.1';env['no_proxy']=env['NO_PROXY']
