@@ -7,11 +7,11 @@ Recovery requires --recover after abrupt termination. Do not claim ACID.
 from __future__ import annotations
 
 import base64
+import binascii
 import hashlib
 import json
 import os
 import re
-import shutil
 import signal
 import stat
 import tempfile
@@ -20,7 +20,6 @@ from pathlib import Path, PurePosixPath
 DIRNAME = '.lego-install-txn'
 MANIFEST = 'manifest.json'
 MAX_BACKUP_BYTES = 24 * 1024 * 1024
-ALLOWED_EXACT = {'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml'}
 HEX = re.compile(r'^[0-9a-f]{64}$')
 
 class TransactionRejected(ValueError):
@@ -123,7 +122,7 @@ def _read_manifest(root: Path) -> list[dict]:
         data = json.loads(path.read_text('utf-8'))
     except (OSError, UnicodeError, ValueError) as e:
         raise TransactionRejected('Unreadable transaction journal') from e
-    if data.get('version') != 1 or not isinstance(data.get('files'), list):
+    if not isinstance(data, dict) or data.get('version') != 1 or not isinstance(data.get('files'), list):
         raise TransactionRejected('Invalid transaction journal structure')
     entries = data['files']
     if len(entries) > 200:
@@ -149,12 +148,12 @@ def _read_manifest(root: Path) -> list[dict]:
         else:
             try:
                 old = base64.b64decode(old64, validate=True)
-            except (ValueError, Exception) as e:
+            except (ValueError, binascii.Error) as e:
                 raise TransactionRejected('Invalid transaction backup') from e
             if digest(old) != expected:
                 raise TransactionRejected('Backup checksum mismatch')
         mode = entry.get('oldMode')
-        if mode is not None and (not isinstance(mode, int) or mode < 0 or mode > 0o777):
+        if mode is not None and (type(mode) is not int or mode < 0 or mode > 0o777):
             raise TransactionRejected('Invalid backup mode')
     return entries
 
@@ -198,7 +197,7 @@ def recover(root: Path) -> list[str]:
                 cursor = cursor.parent
         else:
             if not path.exists() or digest(path.read_bytes()) != entry['oldSha256']:
-                _atomic(path, old, entry.get('oldMode') or 0o644)
+                _atomic(path, old, entry['oldMode'] if entry.get('oldMode') is not None else 0o644)
         restored.append(entry['path'])
     txn = _transaction_folder(root)
     (txn / MANIFEST).unlink()
