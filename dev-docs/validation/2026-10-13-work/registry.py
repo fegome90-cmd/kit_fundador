@@ -20,7 +20,23 @@ db_item=item('db-postgres',[f('drizzle.config.ts'),f('drizzle/0000_last_kat_farr
 db_item['devDependencies']=['drizzle-kit@'+dev['drizzle-kit']]
 (reg/'db-postgres.json').write_text(json.dumps(db_item,indent=2)+'\n')
 items.append(db_item)
-items.append(item('auth-better-auth',[f('src/auth.ts'),f('src/auth-schema.ts')],['better-auth','@better-auth/drizzle-adapter'],['db-postgres']))
+# The upstream fixture is a lab example. Guard activated auth against its insecure
+# default secret/authority before distributing it to independent consumers.
+auth_file=f('src/auth.ts')
+auth_file['content'] = (
+    "import { randomBytes } from 'node:crypto';\\n"
+    "const configuredSecret=process.env.BETTER_AUTH_SECRET ?? process.env.LAB_AUTH_SECRET;\\n"
+    "if(process.env.AUTH==='on' && (!configuredSecret||configuredSecret.length<32))throw new Error('BETTER_AUTH_SECRET must be >=32 characters');\\n"
+    "if(process.env.AUTH==='on' && !process.env.AUTH_URL)throw new Error('AUTH_URL required when AUTH=on');\\n"
+    +auth_file['content'].replace(
+        "secret: process.env.LAB_AUTH_SECRET ?? 'isolated-lab-only-secret-000000000000000000000000000000',",
+        "secret: configuredSecret ?? randomBytes(32).toString('hex'),"
+    ).replace(
+        "trustedOrigins: ['http://127.0.0.1:4310','http://localhost:3000'],",
+        "trustedOrigins: [process.env.AUTH_URL ?? 'http://127.0.0.1:4310','http://localhost:3000'],"
+    )
+)
+items.append(item('auth-better-auth',[auth_file,f('src/auth-schema.ts')],['better-auth','@better-auth/drizzle-adapter'],['db-postgres']))
 baseA="import { withBackend, createPostgresBackend } from 'bullmq';\nexport const { Queue, Worker }=withBackend(createPostgresBackend);\nexport const connection={connectionString:process.env.DATABASE_URL,schema:'bullmq',max:4};\n"
 baseB="export { Queue, Worker } from 'bullmq';\nconst u=process.env.QUEUE_URL?new URL(process.env.QUEUE_URL):undefined;\nexport const connection={host:u?.hostname??'127.0.0.1',port:Number(u?.port??56379),password:u?.password||undefined,maxRetriesPerRequest:null};\n"
 def jobfile(content):return {'path':'src/backend.ts','type':'registry:file','target':'~/src/backend.ts','content':content}
