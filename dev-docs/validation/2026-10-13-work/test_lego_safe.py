@@ -1,0 +1,112 @@
+import hashlib
+import http.server
+import json
+import os
+import pathlib
+import subprocess
+import sys
+import tempfile
+import threading
+import unittest
+
+sys.path.insert(0,str(pathlib.Path(__file__).parent))
+import lego_safe
+
+ROOT=pathlib.Path(__file__).parent
+FAKE=ROOT/'fake_cli.mjs'
+FAKE.write_text('''
+import { writeFileSync,mkdirSync,readFileSync } from 'node:fs';
+import { dirname } from 'node:path';
+if (process.env.FAKE_INSTALL_FAIL) process.exit(9);
+const urls=process.argv.slice(2).filter(x=>x.startsWith('http:'));
+const done=new Set();
+async function visit(url) {
+  if(done.has(url))return;done.add(url);
+  const d=await(await fetch(url)).json();
+  for(const dep of d.registryDependencies||[])await visit(dep);
+  for(const f of d.files||[]) {const path=f.target.replace(/^~\\//,'');mkdirSync(dirname(path),{recursive:true});writeFileSync(path,f.content);}
+}
+for(const url of urls) await visit(url);
+const pkg=JSON.parse(readFileSync('package.json','utf8'));
+pkg.dependencies={...pkg.dependencies,'fake-dep':'1.0.0'};
+writeFileSync('package.json',JSON.stringify(pkg,null,2)+'\\n');
+writeFileSync('pnpm-lock.yaml','lockfileVersion: fake\\n');
+''')
+
+class Handler(http.server.SimpleHTTPRequestHandler):
+    def log_message(self,*args):pass
+    def __init__(self,*args,directory,**kwargs):super().__init__(*args,directory=directory,**kwargs)
+
+class LegoSafeTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp=tempfile.TemporaryDirectory(prefix='lego-test-')
+        self.dir=pathlib.Path(self.tmp.name)
+        self.reg=self.dir/'registry';self.reg.mkdir()
+        self.consumer=self.dir/'consumer';self.consumer.mkdir()
+        (self.consumer/'package.json').write_text('{"name":"consumer","version":"1.0.0","private":true,"packageManager":"pnpm@11.25.0"}\n')
+        self.http=http.server.ThreadingHTTPServer(('127.0.0.1',0),lambda *a,**k:Handler(*a,directory=str(self.reg),**k))
+        self.thread=threading.Thread(target=self.http.serve_forever,daemon=True);self.thread.start()
+        self.items={}
+        self.base=f'http://127.0.0.1:{self.http.server_port}'
+        self.add('core-fastify',{'src/core.ts':'export const core=true;\n'})
+        self.add('api-docs',{'src/docs.ts':'export const docs=true;\n'},requires=['core-fastify'])
+        self.add('jobs-postgres',{'src/backend.ts':'export const jobs="pg";\n'},requires=['core-fastify'])
+        self.add('jobs-valkey',{'src/backend.ts':'export const jobs="valkey";\n'},requires=['core-fastify'])
+    def tearDown(self):
+        self.http.shutdown();self.http.server_close();self.tmp.cleanup()
+    def add(self,name,files,requires=()):
+        item={'name':name,'type':'registry:item','files':[{'type':'registry:file','target':'~/'+k,'path':k,'content':v} for k,v in files.items()], 'registryDependencies':[f'{self.base}/{x}.json' for x in requires], 'dependencies':[]}
+        (self.reg/(name+'.json')).write_text(json.dumps(item))
+        return item
+    def cmd(self,*items,action='--preview',env=None):
+        args=[sys.executable,str(ROOT/'lego_safe.py'),'--registry',self.base,'--project',str(self.consumer),'--items',*items,action,'--allow-http-localhost']
+        if action=='--install':args+=['--shadcn-cli',str(FAKE)]
+        return subprocess.run(args,capture_output=True,text=True,env={**os.environ,**(env or {})})
+    def checksum(self):
+        return {x.relative_to(self.consumer).as_posix():hashlib.sha256(x.read_bytes()).hexdigest() for x in self.consumer.rglob('*') if x.is_file()}
+
+    def test_preview_readonly_and_dependency_closure(self):
+        before=self.checksum();r=self.cmd('api-docs');self.assertEqual(r.returncode,0,r.stderr)
+        self.assertEqual(before,self.checksum())
+        d=json.loads(r.stdout);self.assertEqual(d['writes'],0)
+        self.assertEqual(d['items'],['core-fastify','api-docs'])
+    def test_preflight_rejects_mutually_exclusive(self):
+        before=self.checksum();r=self.cmd('jobs-postgres','jobs-valkey',action='--install')
+        self.assertEqual(r.returncode,2);self.assertIn('Conflicting target',r.stderr);self.assertEqual(before,self.checksum())
+    def test_preflight_rejects_conflicting_jobs_even_without_file_overlap(self):
+        self.add('jobs-valkey',{'src/valkey-backend.ts':'other\n'},requires=['core-fastify'])
+        r=self.cmd('jobs-postgres','jobs-valkey');self.assertEqual(r.returncode,2)
+        self.assertIn('Mutually exclusive',r.stderr)
+    def test_reject_path_traversal(self):
+        self.add('attack',{'../victim':'hack'})
+        r=self.cmd('attack');self.assertEqual(r.returncode,2);self.assertIn('Path traversal',r.stderr)
+    def test_reject_untrusted_dependency_url(self):
+        item=self.add('evil',{'src/evil.ts':'evil'})
+        item['registryDependencies']=['http://10.0.0.1:8080/x.json'];(self.reg/'evil.json').write_text(json.dumps(item))
+        r=self.cmd('evil');self.assertEqual(r.returncode,2);self.assertIn('Out-of-origin',r.stderr)
+    def test_reject_existing_consumer_modified_file(self):
+        d=self.consumer/'src';d.mkdir();(d/'docs.ts').write_text('consumer-owned\n')
+        before=self.checksum();r=self.cmd('api-docs',action='--install')
+        self.assertEqual(r.returncode,2);self.assertEqual(before,self.checksum())
+    def test_install_from_stage(self):
+        r=self.cmd('api-docs',action='--install');self.assertEqual(r.returncode,0,r.stderr)
+        self.assertTrue((self.consumer/'src'/'docs.ts').is_file())
+        self.assertIn('fake-dep',(self.consumer/'package.json').read_text())
+        self.assertTrue((self.consumer/'pnpm-lock.yaml').is_file())
+    def test_failure_in_stage_does_not_mutate(self):
+        before=self.checksum();r=self.cmd('api-docs',action='--install',env={'FAKE_INSTALL_FAIL':'1'})
+        self.assertEqual(r.returncode,2);self.assertEqual(before,self.checksum())
+    def test_commit_failure_rolls_back(self):
+        before=self.checksum();r=self.cmd('api-docs',action='--install',env={'LEGO_TEST_FAIL_AFTER':'2'})
+        self.assertEqual(r.returncode,2);self.assertEqual(before,self.checksum(),r.stderr)
+    def test_unknown_name_rejected(self):
+        r=self.cmd('missing');self.assertEqual(r.returncode,2)
+    def test_symlinks_rejected(self):
+        (self.consumer/'evil').symlink_to(self.dir,target_is_directory=True)
+        r=self.cmd('api-docs');self.assertEqual(r.returncode,2);self.assertIn('Symlink',r.stderr)
+    def test_bad_dep_conflict_versions(self):
+        a=self.add('p-one',{'src/one.ts':'one'});a['dependencies']=['pkg@1.0.0'];(self.reg/'p-one.json').write_text(json.dumps(a))
+        b=self.add('p-two',{'src/two.ts':'two'});b['dependencies']=['pkg@2.0.0'];(self.reg/'p-two.json').write_text(json.dumps(b))
+        r=self.cmd('p-one','p-two');self.assertEqual(r.returncode,2);self.assertIn('Dependency version conflict',r.stderr)
+
+if __name__=='__main__':unittest.main(verbosity=2)
