@@ -1,0 +1,54 @@
+name: LEGO registry safety (experimental)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/fastify-lego-foundation
+    paths:
+      - .github/workflows/lego-registry-safety.yml
+      - dev-docs/validation/2026-10-13-work/lego_safe.py
+      - dev-docs/validation/2026-10-13-work/test_lego_safe.py
+      - dev-docs/validation/2026-10-13-work/test_registry_real.sh
+      - dev-docs/validation/2026-10-13-work/registry.py
+
+permissions:
+  contents: read
+
+jobs:
+  safe-install:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: bash
+        working-directory: dev-docs/validation/2026-10-13-work
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Offline unit and failure-injection tests
+        run: python3 -m unittest test_lego_safe -v
+      - name: Install pinned shadcn CLI from tested lockfile
+        run: |
+          cp ui6/package.json prototype/package.json
+          cp ui6/pnpm-lock.yaml prototype/pnpm-lock.yaml
+          cp ui6/pnpm-workspace.yaml prototype/pnpm-workspace.yaml
+          cd prototype
+          pnpm install --frozen-lockfile --strict-peer-dependencies
+      - name: Real registry staging, preview and negative contracts
+        run: bash test_registry_real.sh
+      - name: Upload audit JSON evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lego-registry-safety
+          retention-days: 7
+          if-no-files-found: ignore
+          path: |
+            dev-docs/validation/2026-10-13-work/registry-safety-*.json
