@@ -24,10 +24,10 @@ items.append(db_item)
 # default secret/authority before distributing it to independent consumers.
 auth_file=f('src/auth.ts')
 auth_file['content'] = (
-    "import { randomBytes } from 'node:crypto';\\n"
-    "const configuredSecret=process.env.BETTER_AUTH_SECRET ?? process.env.LAB_AUTH_SECRET;\\n"
-    "if(process.env.AUTH==='on' && (!configuredSecret||configuredSecret.length<32))throw new Error('BETTER_AUTH_SECRET must be >=32 characters');\\n"
-    "if(process.env.AUTH==='on' && !process.env.AUTH_URL)throw new Error('AUTH_URL required when AUTH=on');\\n"
+    "import { randomBytes } from 'node:crypto';\n"
+    "const configuredSecret=process.env.BETTER_AUTH_SECRET ?? process.env.LAB_AUTH_SECRET;\n"
+    "if(process.env.AUTH==='on' && (!configuredSecret||configuredSecret.length<32))throw new Error('BETTER_AUTH_SECRET must be >=32 characters');\n"
+    "if(process.env.AUTH==='on' && !process.env.AUTH_URL)throw new Error('AUTH_URL required when AUTH=on');\n"
     +auth_file['content'].replace(
         "secret: process.env.LAB_AUTH_SECRET ?? 'isolated-lab-only-secret-000000000000000000000000000000',",
         "secret: configuredSecret ?? randomBytes(32).toString('hex'),"
