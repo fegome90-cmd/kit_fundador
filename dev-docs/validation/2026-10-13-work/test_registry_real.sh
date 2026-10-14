@@ -56,6 +56,12 @@ PY
   python3 lego_safe.py --project "$CONSUMER" --registry "$BASE" --items "lego-full-$variant" --install --allow-http-localhost --shadcn-cli "$CLI" > "$LAB/install-$variant.json"
   (cd "$CONSUMER" && pnpm install --frozen-lockfile --strict-peer-dependencies && pnpm exec tsc --noEmit --skipLibCheck && pnpm exec tsc --skipLibCheck)
   node smoke.mjs "$CONSUMER" off off
+  # Security findings are retained as evidence; no false green gate while upstream advisories remain.
+  if (cd "$CONSUMER" && pnpm audit --prod --json > "$LAB/audit-prod-$variant.json"); then
+    echo "SAFE_PROD_AUDIT_PASS $variant"
+  else
+    echo "SAFE_PROD_AUDIT_HAS_ADVISORIES $variant"
+  fi
   # Reinstall the same recipe; it must not rewrite consumer-owned content.
   before=$(sha256sum "$CONSUMER/package.json" "$CONSUMER/pnpm-lock.yaml" "$CONSUMER/src/server.ts" | sha256sum | cut -d' ' -f1)
   python3 lego_safe.py --project "$CONSUMER" --registry "$BASE" --items "lego-full-$variant" --install --allow-http-localhost --shadcn-cli "$CLI" > "$LAB/repeat-$variant.json"
@@ -96,4 +102,6 @@ cp "$LAB/diff-a.json" "$ROOT/registry-safety-diff-a.json"
 cp "$LAB/diff-b.json" "$ROOT/registry-safety-diff-b.json"
 cp "$LAB/install-a.json" "$ROOT/registry-safety-install-a.json"
 cp "$LAB/install-b.json" "$ROOT/registry-safety-install-b.json"
+cp "$LAB/audit-prod-a.json" "$ROOT/registry-safety-audit-prod-a.json"
+cp "$LAB/audit-prod-b.json" "$ROOT/registry-safety-audit-prod-b.json"
 echo "SAFE_REGISTRY_END_TO_END_PASS"
