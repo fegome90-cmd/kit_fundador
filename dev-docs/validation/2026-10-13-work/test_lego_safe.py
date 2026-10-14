@@ -207,6 +207,26 @@ class LegoSafeTests(unittest.TestCase):
         self.assertEqual(recover.returncode,0,recover.stderr)
         self.assertFalse(txn.exists())
 
+    def test_corrupt_recovery_journal_rejected_without_writes(self):
+        txn=self.consumer/'.lego-install-txn'
+        txn.mkdir()
+        (txn/'manifest.json').write_text('{"version":1,"files":[{"path":"src/unknown.ts"}]}')
+        baseline=self.checksum()
+        failure=self.recover()
+        self.assertEqual(failure.returncode,2)
+        self.assertEqual(self.checksum(),baseline)
+        self.assertTrue((txn/'manifest.json').exists())
+
+    def test_recovery_rejects_traversal_record(self):
+        txn=self.consumer/'.lego-install-txn'
+        txn.mkdir()
+        (txn/'manifest.json').write_text('{"version":1,"files":[{"path":"../escape","oldSha256":null,"oldBase64":null,"newSha256":"'+'0'*64+'"}]}')
+        baseline=self.checksum()
+        failure=self.recover()
+        self.assertEqual(failure.returncode,2)
+        self.assertIn('Unsafe transaction path',failure.stderr)
+        self.assertEqual(self.checksum(),baseline)
+
     def test_failure_in_stage_does_not_mutate(self):
         before=self.checksum();r=self.cmd('api-docs',action='--install',env={'FAKE_INSTALL_FAIL':'1'})
         self.assertEqual(r.returncode,2);self.assertEqual(before,self.checksum())
