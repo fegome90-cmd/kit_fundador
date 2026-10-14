@@ -277,7 +277,13 @@ def execute(args):
             f=stage/rel
             f.parent.mkdir(parents=True, exist_ok=True)
             f.write_bytes(body)
-        env=os.environ.copy()
+        # Keep user/application secrets out of installation subprocesses. This is
+        # environment hygiene, NOT a sandbox (the child still has user filesystem access).
+        allowed_env = {'PATH','HOME','TMPDIR','TMP','TEMP','CI','PNPM_HOME',
+                       'COREPACK_HOME','XDG_CACHE_HOME','HTTP_PROXY','HTTPS_PROXY',
+                       'NO_PROXY','no_proxy','npm_config_registry','NPM_CONFIG_REGISTRY',
+                       'SSL_CERT_FILE','NODE_EXTRA_CA_CERTS'}
+        env={k:v for k,v in os.environ.items() if k in allowed_env}
         if args.allow_http_localhost:
             env.pop('ALL_PROXY',None);env.pop('all_proxy',None)
             env['NO_PROXY']='localhost,127.0.0.1';env['no_proxy']=env['NO_PROXY']
