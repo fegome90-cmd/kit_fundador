@@ -96,6 +96,31 @@ test ! -e "$ROLLBACK/src/docs.ts"
 test ! -e "$ROLLBACK/pnpm-lock.yaml"
 echo "SAFE_ROLLBACK_PASS (injected synchronous failure)"
 
+
+# Real shadcn stages the transaction; SIGKILL interrupts project commit.
+# The durable journal must recover the exact original project manifest/lock.
+CRASH="$LAB/crash-consumer"
+bootstrap "$CRASH" lego-crash-recovery
+old_pkg=$(sha256sum "$CRASH/package.json" | cut -d' ' -f1)
+old_workspace=$(sha256sum "$CRASH/pnpm-workspace.yaml" | cut -d' ' -f1)
+if LEGO_TEST_KILL_AFTER=2 python3 lego_safe.py --project "$CRASH" --registry "$BASE" --items api-docs --install --allow-http-localhost --shadcn-cli "$CLI" > "$LAB/kill.log" 2>&1; then
+  echo "ERROR: SIGKILL not triggered by durable transaction harness" >&2
+  exit 1
+fi
+test -f "$CRASH/.lego-install-txn/manifest.json"
+if python3 lego_safe.py --project "$CRASH" --registry "$BASE" --items api-docs --install --allow-http-localhost --shadcn-cli "$CLI" > "$LAB/locked.log" 2>&1; then
+  echo "ERROR: concurrent/stale install not rejected" >&2
+  exit 1
+fi
+python3 lego_safe.py --project "$CRASH" --recover > "$LAB/recover.json"
+test "$(sha256sum "$CRASH/package.json" | cut -d' ' -f1)" = "$old_pkg"
+test "$(sha256sum "$CRASH/pnpm-workspace.yaml" | cut -d' ' -f1)" = "$old_workspace"
+test ! -e "$CRASH/.lego-install-txn"
+test ! -e "$CRASH/pnpm-lock.yaml"
+test ! -e "$CRASH/src/docs.ts"
+cp "$LAB/recover.json" "$ROOT/registry-safety-recover.json"
+echo SAFE_REAL_SIGKILL_RECOVERY_PASS
+
 cp "$LAB/preview-a.json" "$ROOT/registry-safety-preview-a.json"
 cp "$LAB/preview-b.json" "$ROOT/registry-safety-preview-b.json"
 cp "$LAB/diff-a.json" "$ROOT/registry-safety-diff-a.json"
