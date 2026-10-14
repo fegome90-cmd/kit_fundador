@@ -11,6 +11,9 @@ on:
       - 'dev-docs/validation/2026-10-13-work/prototype/src/**'
       - 'dev-docs/validation/2026-10-13-work/prototype/drizzle/**'
       - 'dev-docs/validation/2026-10-13-work/ui6/**'
+      - 'dev-docs/validation/2026-10-13-work/registry.py'
+      - 'dev-docs/validation/2026-10-13-work/lego_safe.py'
+      - 'dev-docs/validation/2026-10-13-work/verify_assembled.mjs'
 
 permissions:
   contents: read
@@ -105,6 +108,36 @@ jobs:
         run: node --test ci/full-pg.test.mjs
       - name: Regression — BullMQ Valkey worker behaviors
         run: node --test tests/jobs.test.mjs
+      - name: LEGO assembled consumers — live PostgreSQL, Better Auth and independent workers
+        run: |
+          set -euo pipefail
+          cd ..
+          ROOT="$PWD"
+          LAB="$(mktemp -d)"
+          HTTP_PID=""
+          cleanup() {
+            if [[ -n "$HTTP_PID" ]]; then kill "$HTTP_PID" 2>/dev/null || true; fi
+            rm -rf "$LAB"
+          }
+          trap cleanup EXIT
+          python3 registry.py
+          python3 -m http.server 4380 --bind 127.0.0.1 --directory registry > "$LAB/http.log" 2>&1 &
+          HTTP_PID=$!
+          for i in $(seq 1 40); do
+            if curl --silent --fail http://127.0.0.1:4380/core-fastify.json >/dev/null; then break; fi
+            sleep 0.25
+          done
+          curl --silent --fail http://127.0.0.1:4380/core-fastify.json >/dev/null
+          CLI="$ROOT/prototype/node_modules/shadcn/dist/index.js"
+          for variant in a b; do
+            CONSUMER="$LAB/consumer-$variant"
+            mkdir -p "$CONSUMER"
+            printf '{"name":"lego-integrated-%s","version":"0.0.0","private":true,"type":"module","packageManager":"pnpm@11.25.0"}\n' "$variant" > "$CONSUMER/package.json"
+            cp prototype/pnpm-workspace.yaml "$CONSUMER/pnpm-workspace.yaml"
+            python3 lego_safe.py --project "$CONSUMER" --registry http://127.0.0.1:4380 --items "lego-full-$variant" --install --allow-http-localhost --shadcn-cli "$CLI"
+            (cd "$CONSUMER" && pnpm install --frozen-lockfile --strict-peer-dependencies && pnpm exec tsc --skipLibCheck && pnpm exec drizzle-kit migrate)
+            node verify_assembled.mjs "$CONSUMER" "$variant"
+          done
       - name: Comparative smoke benchmark — PostgreSQL vs Valkey on the same runner
         run: node ci/benchmark-ab.mjs
       - name: Record dependency advisory status (non-blocking until triaged)
