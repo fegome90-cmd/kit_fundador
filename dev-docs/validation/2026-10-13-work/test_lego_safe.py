@@ -17,7 +17,7 @@ FAKE=ROOT/'fake_cli.mjs'
 FAKE.write_text('''
 import { writeFileSync,mkdirSync,readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-if (process.env.FAKE_INSTALL_FAIL) process.exit(9);
+if (process.env.LEGO_PRIVATE_CANARY) process.exit(47);
 const urls=process.argv.slice(2).filter(x=>x.startsWith('http:'));
 const done=new Set();
 async function visit(url) {
@@ -32,6 +32,7 @@ pkg.dependencies={...pkg.dependencies,'fake-dep':'1.0.0'};
 writeFileSync('package.json',JSON.stringify(pkg,null,2)+'\\n');
 writeFileSync('pnpm-lock.yaml','lockfileVersion: fake\\n');
 ''')
+(ROOT/'bad_cli.mjs').write_text('process.exit(9);\n')
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def log_message(self,*args):pass
@@ -61,7 +62,7 @@ class LegoSafeTests(unittest.TestCase):
         return item
     def cmd(self,*items,action='--preview',env=None):
         args=[sys.executable,str(ROOT/'lego_safe.py'),'--registry',self.base,'--project',str(self.consumer),'--items',*items,action,'--allow-http-localhost']
-        if action in ('--install','--diff'):args+=['--shadcn-cli',str(FAKE)]
+        if action in ('--install','--diff'):args+=['--shadcn-cli',str(ROOT/'bad_cli.mjs' if (env or {}).get('FAKE_INSTALL_FAIL') else FAKE)]
         return subprocess.run(args,capture_output=True,text=True,env={**os.environ,**(env or {})})
     def checksum(self):
         return {x.relative_to(self.consumer).as_posix():hashlib.sha256(x.read_bytes()).hexdigest() for x in self.consumer.rglob('*') if x.is_file()}
@@ -136,6 +137,9 @@ class LegoSafeTests(unittest.TestCase):
         self.add('npmrc',{'.npmrc':'ignore-scripts=false'})
         r=self.cmd('npmrc');self.assertEqual(r.returncode,2)
         self.assertIn('Protected target',r.stderr)
+    def test_environment_secret_not_forwarded(self):
+        r=self.cmd('api-docs',action='--install',env={'LEGO_PRIVATE_CANARY':'top-secret-test-canary'})
+        self.assertEqual(r.returncode,0,r.stderr)
     def test_failure_in_stage_does_not_mutate(self):
         before=self.checksum();r=self.cmd('api-docs',action='--install',env={'FAKE_INSTALL_FAIL':'1'})
         self.assertEqual(r.returncode,2);self.assertEqual(before,self.checksum())
