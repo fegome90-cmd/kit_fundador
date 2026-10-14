@@ -10,16 +10,14 @@ from __future__ import annotations
 import argparse
 import difflib
 import hashlib
-import difflib
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
 from pathlib import Path, PurePosixPath
-from urllib.parse import urlsplit, urljoin
+from urllib.parse import urlsplit
 from urllib.request import urlopen
 
 NAME = re.compile(r"^[a-z][a-z0-9-]{0,63}$")
@@ -28,6 +26,7 @@ SKIP_DIRS = {'.git', 'node_modules', '.pnpm-store', 'dist', 'coverage', '__pycac
 MAX_ITEM_BYTES = 2_000_000
 MAX_ITEMS = 40
 ALLOW_CHANGE = {'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml'}
+STAGE_INPUTS = ALLOW_CHANGE | {'tsconfig.json'}
 
 class Rejected(ValueError):
     pass
@@ -262,6 +261,10 @@ def execute(args):
     before=snapshot(root)
     current_versions, wanted_versions=preflight_versions(items,before)
     entries=planned_changes(root,items,before)
+    # shadcn receives only the package manager metadata and the precise files
+    # declared by this registry composition, never unrelated consumer files.
+    # This is data minimization, not a substitute for filesystem sandboxing.
+    staged_before={p:body for p,body in before.items() if p in STAGE_INPUTS or p in targets}
     if args.preview:
         print(json.dumps({'mode':'preview','items':[i['name'] for i in items], 'files':entries,'dependencies':sorted(set(d for x in items for d in x.get('dependencies',[]))),'devDependencies':sorted(set(d for x in items for d in x.get('devDependencies',[]))),'writes':0},indent=2))
         return 0
@@ -273,7 +276,7 @@ def execute(args):
     with tempfile.TemporaryDirectory(prefix='lego-stage-') as tmp:
         stage=Path(tmp)/'consumer'
         stage.mkdir()
-        for rel,body in before.items():
+        for rel,body in staged_before.items():
             f=stage/rel
             f.parent.mkdir(parents=True, exist_ok=True)
             f.write_bytes(body)
@@ -293,7 +296,7 @@ def execute(args):
             raise Rejected('Installer staging failed with code '+str(proc.returncode)+': '+(proc.stdout+'\n'+proc.stderr)[-800:])
         after=snapshot(stage)
         check_staged_versions(current_versions,wanted_versions,after.get('package.json'))
-        added = {p:v for p,v in after.items() if before.get(p)!=v}
+        added = {p:v for p,v in after.items() if staged_before.get(p)!=v}
         unexpected=set(added)-set(targets)-ALLOW_CHANGE
         if unexpected:
             raise Rejected('Unexpected installed files: '+', '.join(sorted(unexpected)))
@@ -305,20 +308,20 @@ def execute(args):
         if args.diff:
             patches = []
             for target, body in sorted(added.items()):
-                old = before.get(target, b'')
+                old = staged_before.get(target, b'')
                 try:
                     old_lines = old.decode('utf-8').splitlines(keepends=True)
                     new_lines = body.decode('utf-8').splitlines(keepends=True)
                     full = list(difflib.unified_diff(old_lines, new_lines, fromfile='a/'+target, tofile='b/'+target))
                 except UnicodeDecodeError:
                     full = ['[binary change omitted]']
-                patches.append({'path': target, 'oldSha256': sha(old) if target in before else None,
+                patches.append({'path': target, 'oldSha256': sha(old) if target in staged_before else None,
                                 'newSha256': sha(body), 'diffLines': len(full),
                                 'unifiedDiffExcerpt': ''.join(full[:40]), 'truncated': len(full)>40})
             print(json.dumps({'mode':'diff','items':[i['name'] for i in items],
                               'patches':patches,'writes':0},indent=2))
             return 0
-        changed=commit_changes(root,before,after)
+        changed=commit_changes(root,staged_before,after)
     print(json.dumps({'mode':'installed','items':[i['name'] for i in items],'changes':changed,'stageExit':0},indent=2))
     return 0
 
