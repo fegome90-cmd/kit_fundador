@@ -54,6 +54,26 @@ async function waitJob(queue,id){
   throw new Error('Queue did not process job '+id);
 }
 
+async function verifyStartupDenied(extra, pattern) {
+  const child=spawn(process.execPath,['dist/server.js'],{
+    cwd,
+    env:{...process.env,PORT:'0',DB:'on',AUTH:'on',...extra},
+    stdio:['ignore','pipe','pipe']
+  });
+  let output='';
+  child.stderr.on('data',d=>output+=d.toString());
+  child.stdout.on('data',d=>output+=d.toString());
+  const exited=await Promise.race([
+    new Promise(r=>child.once('exit',r)),
+    sleep(8000).then(()=>{child.kill('SIGKILL');throw new Error('Invalid auth config did not stop startup');})
+  ]);
+  assert.notEqual(exited,0,'Invalid config unexpectedly allowed startup');
+  assert.match(output,pattern);
+}
+await verifyStartupDenied({LAB_AUTH_SECRET:'',BETTER_AUTH_SECRET:'',AUTH_URL:origin},/BETTER_AUTH_SECRET/);
+await verifyStartupDenied({LAB_AUTH_SECRET:'valid-lab-test-secret-only-1234567890',BETTER_AUTH_SECRET:'',AUTH_URL:''},/AUTH_URL/);
+console.log('ASSEMBLED_AUTH_FAIL_FAST_PASS');
+
 let server,worker,queue;
 try{
   server=await startNode('dist/server.js','LAB_LISTEN ',{
