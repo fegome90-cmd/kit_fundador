@@ -66,6 +66,8 @@ class LegoSafeTests(unittest.TestCase):
         args=[sys.executable,str(ROOT/'lego_safe.py'),'--registry',self.base,'--project',str(self.consumer),'--items',*items,action,'--allow-http-localhost']
         if action in ('--install','--diff'):args+=['--shadcn-cli',str(ROOT/'bad_cli.mjs' if (env or {}).get('FAKE_INSTALL_FAIL') else FAKE)]
         return subprocess.run(args,capture_output=True,text=True,env={**os.environ,**(env or {})})
+    def recover(self):
+        return subprocess.run([sys.executable,str(ROOT/'lego_safe.py'),'--project',str(self.consumer),'--recover'],capture_output=True,text=True)
     def checksum(self):
         return {x.relative_to(self.consumer).as_posix():hashlib.sha256(x.read_bytes()).hexdigest() for x in self.consumer.rglob('*') if x.is_file()}
 
@@ -155,6 +157,55 @@ class LegoSafeTests(unittest.TestCase):
         current=self.checksum()
         for path in ('private/credentials.json','secrets.txt'):
             self.assertEqual(current[path],before[path],path)
+    def test_sigkill_durable_recovery_restores_baseline(self):
+        baseline=self.checksum()
+        killed=self.cmd('api-docs',action='--install',env={'LEGO_TEST_KILL_AFTER':'2'})
+        self.assertEqual(killed.returncode,-9,killed.stderr)
+        txn=self.consumer/'.lego-install-txn'
+        self.assertTrue((txn/'manifest.json').is_file())
+        self.assertNotEqual(baseline,self.checksum())
+        denied=self.cmd('api-docs',action='--install')
+        self.assertEqual(denied.returncode,2)
+        self.assertIn('--recover',denied.stderr)
+        recovered=self.recover()
+        self.assertEqual(recovered.returncode,0,recovered.stderr)
+        self.assertEqual(baseline,self.checksum())
+        self.assertFalse(txn.exists())
+
+    def test_recovery_will_not_overwrite_post_crash_consumer_edits(self):
+        baseline=self.checksum()
+        killed=self.cmd('api-docs',action='--install',env={'LEGO_TEST_KILL_AFTER':'1'})
+        self.assertEqual(killed.returncode,-9)
+        current=(self.consumer/'package.json').read_bytes()
+        (self.consumer/'package.json').write_text('{"name":"edited-after-crash"}')
+        denied=self.recover()
+        self.assertEqual(denied.returncode,2)
+        self.assertIn('Consumer changed since interruption',denied.stderr)
+        self.assertIn('edited-after-crash',(self.consumer/'package.json').read_text())
+        self.assertTrue((self.consumer/'.lego-install-txn'/'manifest.json').exists())
+        (self.consumer/'package.json').write_bytes(current)
+        recovered=self.recover()
+        self.assertEqual(recovered.returncode,0,recovered.stderr)
+        self.assertEqual(baseline,self.checksum())
+
+    def test_stage_error_clears_exclusive_lock(self):
+        baseline=self.checksum()
+        failed=self.cmd('api-docs',action='--install',env={'FAKE_INSTALL_FAIL':'1'})
+        self.assertEqual(failed.returncode,2)
+        self.assertEqual(baseline,self.checksum())
+        self.assertFalse((self.consumer/'.lego-install-txn').exists())
+
+    def test_exclusive_lock_blocks_second_installer(self):
+        txn=self.consumer/'.lego-install-txn'
+        txn.mkdir()
+        baseline=self.checksum()
+        denied=self.cmd('api-docs',action='--install')
+        self.assertEqual(denied.returncode,2)
+        self.assertEqual(baseline,self.checksum())
+        recover=self.recover()
+        self.assertEqual(recover.returncode,0,recover.stderr)
+        self.assertFalse(txn.exists())
+
     def test_failure_in_stage_does_not_mutate(self):
         before=self.checksum();r=self.cmd('api-docs',action='--install',env={'FAKE_INSTALL_FAIL':'1'})
         self.assertEqual(r.returncode,2);self.assertEqual(before,self.checksum())
