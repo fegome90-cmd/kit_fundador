@@ -60,7 +60,7 @@ class LegoSafeTests(unittest.TestCase):
         return item
     def cmd(self,*items,action='--preview',env=None):
         args=[sys.executable,str(ROOT/'lego_safe.py'),'--registry',self.base,'--project',str(self.consumer),'--items',*items,action,'--allow-http-localhost']
-        if action=='--install':args+=['--shadcn-cli',str(FAKE)]
+        if action in ('--install','--diff'):args+=['--shadcn-cli',str(FAKE)]
         return subprocess.run(args,capture_output=True,text=True,env={**os.environ,**(env or {})})
     def checksum(self):
         return {x.relative_to(self.consumer).as_posix():hashlib.sha256(x.read_bytes()).hexdigest() for x in self.consumer.rglob('*') if x.is_file()}
@@ -93,6 +93,24 @@ class LegoSafeTests(unittest.TestCase):
         self.assertTrue((self.consumer/'src'/'docs.ts').is_file())
         self.assertIn('fake-dep',(self.consumer/'package.json').read_text())
         self.assertTrue((self.consumer/'pnpm-lock.yaml').is_file())
+    def test_real_staged_diff_readonly(self):
+        before=self.checksum();r=self.cmd('api-docs',action='--diff')
+        self.assertEqual(r.returncode,0,r.stderr)
+        d=json.loads(r.stdout)
+        self.assertEqual(d['mode'],'diff');self.assertEqual(d['writes'],0)
+        self.assertEqual(before,self.checksum())
+        paths={p['path'] for p in d['patches']}
+        self.assertIn('src/docs.ts',paths)
+        self.assertIn('package.json',paths)
+        self.assertIn('pnpm-lock.yaml',paths)
+    def test_protected_manifest_target(self):
+        self.add('poison',{'package.json':'{}'})
+        r=self.cmd('poison');self.assertEqual(r.returncode,2)
+        self.assertIn('Protected target',r.stderr)
+    def test_hidden_npmrc_rejected(self):
+        self.add('npmrc',{'.npmrc':'ignore-scripts=false'})
+        r=self.cmd('npmrc');self.assertEqual(r.returncode,2)
+        self.assertIn('Protected target',r.stderr)
     def test_failure_in_stage_does_not_mutate(self):
         before=self.checksum();r=self.cmd('api-docs',action='--install',env={'FAKE_INSTALL_FAIL':'1'})
         self.assertEqual(r.returncode,2);self.assertEqual(before,self.checksum())
