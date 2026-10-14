@@ -105,6 +105,8 @@ jobs:
         run: node --test ci/full-pg.test.mjs
       - name: Regression — BullMQ Valkey worker behaviors
         run: node --test tests/jobs.test.mjs
+      - name: Comparative smoke benchmark — PostgreSQL vs Valkey on the same runner
+        run: node ci/benchmark-ab.mjs
       - name: Record dependency advisory status (non-blocking until triaged)
         if: always()
         continue-on-error: true
@@ -116,5 +118,6 @@ jobs:
           name: lego-e2e-${{ github.run_id }}
           path: |
             dev-docs/validation/2026-10-13-work/prototype/ci-audit.json
+            dev-docs/validation/2026-10-13-work/prototype/ci-benchmark-ab.json
           if-no-files-found: ignore
           retention-days: 7
