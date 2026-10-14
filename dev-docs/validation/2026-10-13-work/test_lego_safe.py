@@ -15,9 +15,11 @@ import lego_safe
 ROOT=pathlib.Path(__file__).parent
 FAKE=ROOT/'fake_cli.mjs'
 FAKE.write_text('''
-import { writeFileSync,mkdirSync,readFileSync } from 'node:fs';
+import { writeFileSync,mkdirSync,readFileSync,existsSync } from 'node:fs';
 import { dirname } from 'node:path';
 if (process.env.LEGO_PRIVATE_CANARY) process.exit(47);
+if (existsSync('private/credentials.json')) process.exit(61);
+if (existsSync('secrets.txt')) process.exit(62);
 const urls=process.argv.slice(2).filter(x=>x.startsWith('http:'));
 const done=new Set();
 async function visit(url) {
@@ -140,6 +142,18 @@ class LegoSafeTests(unittest.TestCase):
     def test_environment_secret_not_forwarded(self):
         r=self.cmd('api-docs',action='--install',env={'LEGO_PRIVATE_CANARY':'top-secret-test-canary'})
         self.assertEqual(r.returncode,0,r.stderr)
+    def test_stage_excludes_unrelated_project_files(self):
+        private=self.consumer/'private'
+        private.mkdir()
+        (private/'credentials.json').write_text('{"token":"sensitive-test-canary"}')
+        (self.consumer/'secrets.txt').write_text('DO_NOT_STAGE')
+        before=self.checksum()
+        result=self.cmd('api-docs',action='--install')
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual((private/'credentials.json').read_text(),'{"token":"sensitive-test-canary"}')
+        self.assertEqual((self.consumer/'secrets.txt').read_text(),'DO_NOT_STAGE')
+        for path,digest in before.items():
+            self.assertEqual(self.checksum()[path],digest,path)
     def test_failure_in_stage_does_not_mutate(self):
         before=self.checksum();r=self.cmd('api-docs',action='--install',env={'FAKE_INSTALL_FAIL':'1'})
         self.assertEqual(r.returncode,2);self.assertEqual(before,self.checksum())
