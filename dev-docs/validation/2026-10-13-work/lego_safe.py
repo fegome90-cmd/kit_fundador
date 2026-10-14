@@ -23,6 +23,7 @@ from urllib.parse import urlsplit, urljoin
 from urllib.request import urlopen
 
 NAME = re.compile(r"^[a-z][a-z0-9-]{0,63}$")
+PACKAGE = re.compile(r"^(?:@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*$")
 SKIP_DIRS = {'.git', 'node_modules', '.pnpm-store', 'dist', 'coverage', '__pycache__', '.venv', 'venv'}
 MAX_ITEM_BYTES = 2_000_000
 MAX_ITEMS = 40
@@ -131,7 +132,7 @@ def fetch_registry(base: str, requested: list[str]) -> tuple[list[dict], dict[st
             if not isinstance(dependency,str) or '@' not in dependency[1:]:
                 raise Rejected('Unpinned package: ' + str(dependency))
             package, version = dependency.rsplit('@',1)
-            if not package or not version or re.search(r'[^0-9A-Za-z._^~+-]',version):
+            if not PACKAGE.fullmatch(package) or not version or re.search(r'[^0-9A-Za-z._^~+-]',version):
                 raise Rejected('Unpinned/invalid version: ' + dependency)
             if package in versions and versions[package] != version:
                 raise Rejected('Dependency version conflict: '+package)
@@ -147,6 +148,47 @@ def fetch_registry(base: str, requested: list[str]) -> tuple[list[dict], dict[st
     if {'lego-full-a','lego-full-b'} <= set(selected):
         raise Rejected('Mutually exclusive full recipes')
     return ordered, targets
+
+def manifest_versions(items: list[dict]) -> dict[str, str]:
+    result = {}
+    for item in items:
+        for spec in item.get('dependencies', []) + item.get('devDependencies', []):
+            key, version = spec.rsplit('@', 1)
+            result[key] = version
+    return result
+
+def package_versions(data: bytes | None) -> dict[str, str]:
+    if data is None:
+        raise Rejected('Project requires package.json before registry installation')
+    try:
+        pkg = json.loads(data)
+        deps = pkg.get('dependencies', {})
+        dev = pkg.get('devDependencies', {})
+        if not isinstance(deps,dict) or not isinstance(dev,dict):
+            raise ValueError('dependency field is not object')
+        if set(deps) & set(dev):
+            raise ValueError('same package declared as dependency and devDependency')
+        return {**deps, **dev}
+    except (ValueError, TypeError) as err:
+        raise Rejected('Invalid package.json: '+str(err)) from err
+
+def preflight_versions(items, existing):
+    wanted = manifest_versions(items)
+    current = package_versions(existing.get('package.json'))
+    for name, version in wanted.items():
+        if name in current and current[name] != version:
+            raise Rejected(f'Consumer dependency mismatch: {name} {current[name]} vs {version}')
+    return current, wanted
+
+def check_staged_versions(before_versions, wanted_versions, staged_bytes):
+    actual = package_versions(staged_bytes)
+    for name, version in wanted_versions.items():
+        if actual.get(name) != version:
+            raise Rejected(f'Installed version mismatch: {name} expected {version}, got {actual.get(name)}')
+    new = set(actual) - set(before_versions)
+    extra = new - set(wanted_versions)
+    if extra:
+        raise Rejected('Undeclared dependencies installed: '+', '.join(sorted(extra)))
 
 def planned_changes(root: Path, items: list[dict], existing: dict[str,bytes]):
     result = []
@@ -218,6 +260,7 @@ def execute(args):
         raise Rejected('No items selected')
     items, targets=fetch_registry(base,names)
     before=snapshot(root)
+    current_versions, wanted_versions=preflight_versions(items,before)
     entries=planned_changes(root,items,before)
     if args.preview:
         print(json.dumps({'mode':'preview','items':[i['name'] for i in items], 'files':entries,'dependencies':sorted(set(d for x in items for d in x.get('dependencies',[]))),'devDependencies':sorted(set(d for x in items for d in x.get('devDependencies',[]))),'writes':0},indent=2))
@@ -243,6 +286,7 @@ def execute(args):
         if proc.returncode != 0:
             raise Rejected('Installer staging failed with code '+str(proc.returncode)+': '+(proc.stdout+'\n'+proc.stderr)[-800:])
         after=snapshot(stage)
+        check_staged_versions(current_versions,wanted_versions,after.get('package.json'))
         added = {p:v for p,v in after.items() if before.get(p)!=v}
         unexpected=set(added)-set(targets)-ALLOW_CHANGE
         if unexpected:
