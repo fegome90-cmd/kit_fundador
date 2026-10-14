@@ -18,6 +18,7 @@ FAKE.write_text('''
 import { writeFileSync,mkdirSync,readFileSync,existsSync } from 'node:fs';
 import { dirname } from 'node:path';
 if (process.env.LEGO_PRIVATE_CANARY) process.exit(47);
+if (!process.env.HOME?.includes('lego-stage-')) process.exit(65);
 if (existsSync('private/credentials.json')) process.exit(61);
 if (existsSync('secrets.txt')) process.exit(62);
 const urls=process.argv.slice(2).filter(x=>x.startsWith('http:'));
