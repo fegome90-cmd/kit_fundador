@@ -258,3 +258,72 @@ Testear cada resultado **fuera del repo Kit Fundador** para detectar archivos oc
 - BullMQ idempotent jobs: https://docs.bullmq.io/patterns/idempotent-jobs
 - shadcn GitHub registry: https://ui.shadcn.com/docs/registry/github
 - shadcn universal items: https://ui.shadcn.com/docs/registry/examples
+
+## 10. Continuación de validación de composición (2026-10-13)
+
+**Alcance:** documentación oficial + inspección de manifests/releases GitHub + validador sintético in-memory. **No se ha ejecutado pnpm/npm install, compilado un proyecto generado, conectado una BD ni iniciado un worker.**
+
+### 10.1 Compatibilidad candidata (verificada por manifiestos/metadata, no por npm ci)
+
+| Dependencia | Versión candidata específica | Evidencia | Condición pendiente |
+|---|---|---|---|
+| Node.js | 24 LTS | objetivo de la fundación | disponer de Node 24 en runner y probar binario compilado |
+| fastify | 5.12.7 | release estable publicada el 2026-10-13 | instalar y probar ESM NodeNext |
+| @fastify/env | 5.0.3 | `index.js` del tag declara `fastify: '5.x'` | confirmar config async y plugin scopes |
+| @fastify/cors | 11.3.1 | `index.js` del tag declara `fastify: '5.x'` | credenciales, trustedOrigins y orígenes permitidos |
+| @fastify/helmet | 13.2.0 | `index.js` del tag declara `fastify: '5.x'` | CSP Swagger UI y tests de headers |
+| @fastify/swagger | 9.9.2 | `index.js` del tag declara `fastify: '5.x'` | registrarse antes de rutas |
+| @fastify/swagger-ui | 5.2.6 | `index.js` del tag declara `fastify: '5.x'`; declara dependencia a swagger | UI deshabilitada por defecto en producción |
+| drizzle-orm | 0.45.4 | manifiesto del proyecto; satisfecho por peer `^0.45.2` del adapter | instalación + typecheck junto a Better Auth |
+| drizzle-kit | 0.31.11 | manifiesto del proyecto; rango de Better Auth `>=0.31.4` | generar/migrar auth+app, revisar SQL |
+| better-auth | 1.7.7 | release/manifiesto del repo | cookies, sesiones, host confiable, CORS y 401/403 |
+| @better-auth/drizzle-adapter | 1.7.7 | manifiesto con peer drizzle `^0.45.2 || >=1.0.0-rc.1 <2.0.0` | versionar coordinado con better-auth y comprobar API real |
+| bullmq | 6.3.14 | release/manifiesto publicado el 2026-10-13; peer `pg>=8` o `ioredis>=5` | migraciones e idempotencia/recuperación bajo fallos |
+| pg | 8.x **sin patch fijado** | peer requerido Drizzle/Better Auth/BullMQ PG | seleccionar versión exacta y confirmar pool/SSL |
+| ioredis | 5.x **sin patch fijado** (solo variante B) | peer BullMQ >=5 | fijar versión exacta y validar Valkey |
+
+Nota: los repositorios de Fastify ya contienen nuevas majors en `main` (por ejemplo fastify 6 alpha, swagger-ui 6 y env 7). **No confundir `main` de cada paquete con el conjunto de versiones probado.** Los pines de la tabla son candidatos, no un lockfile validado. Aunque swagger-ui 6 y env 7 declaran metadata para Fastify 5, el baseline conservador sigue v5 en ambos para esta PoC; revisar notas de migración antes de actualizarlos.
+
+### 10.2 Resultado de pruebas estáticas
+
+Se ejecutó un verificador efímero en memoria con cierre transitivo de requisitos, orden de registro, detección de conflictos, destino de archivos, propiedad de esquema y composición de paquetes. **Resultados:**
+
+- Selecciones posibles de cinco add-ons (`api-docs`, `db-postgres`, `auth-better-auth`, `jobs-postgres`, `jobs-valkey`): **32**.
+- Combinaciones lógicamente válidas: **24**.
+- Combinaciones rechazadas: **8**, todas las que piden los dos backends de trabajos simultáneamente.
+- **15 verificaciones focales** adicionalmente: A/B completos, número de servicios, auto-resolución auth→DB, independencia docs, independencia jobs-valkey→PG, conflicto de backends, item desconocido, secreto auth ausente, Swagger registrado tarde, choque de archivos, dos migradores sobre el mismo namespace, Fastify major errónea y versión Drizzle incompatible.
+- **47 comprobaciones estáticas en total, cero fallos en este modelo sintético.** No afirmar que equivalen a test de dependencias npm, schemas reales o integración runtime.
+
+### 10.3 Conflictos concretos y ajustes obligatorios
+
+1. **Better Auth / Drizzle:** `auth generate` crea esquema Drizzle; `auth migrate` está pensado para el adaptador Kysely integrado. En nuestra receta usar únicamente `drizzle-kit generate` + `drizzle-kit migrate` para aplicación y auth, previa revisión del SQL. `auth check schema` no comprueba que las migraciones Drizzle ya se aplicaron a la BD.
+2. **BullMQ PostgreSQL:** invocar `runMigrations(client)` con una sesión PostgreSQL dedicada, no con el pool directo. Migrador propio con advisory lock y sin downgrade de schema. Nunca confundir su esquema con la migración de Better Auth.
+3. **BullMQ pool/namespace:** si se inyecta un `pg.Pool` ya construido en el backend de BullMQ, **BullMQ no es dueño de cerrarlo ni configura `search_path`**; preferir config de conexión separada y ciclo de vida explícito.
+4. **BullMQ tipado:** no usar `new Queue<MyPayload, Result>(..., createPostgresBackend)` con generics parciales, porque TypeScript presupone Redis. Usar `withBackend(createPostgresBackend)` o declarar todos los parámetros; evitar `setDefaultBackendFactory` global en una composición opt-in.
+5. **Fastify/Better Auth:** el ejemplo oficial crea URL con Host de solicitud; usar autoridad/base URL confiable y probar host manipulado, cookies múltiples y reenvío de respuestas Fetch. No dar por validada la integración por copiar la receta de documentación.
+6. **OpenAPI:** la ruta catch-all de Better Auth **no prueba cobertura de operación OpenAPI**. Mantener documento de autenticación aparte hasta tener una fusión verificable.
+7. **shadcn universal registry:** distribución de ficheros/deps soportada documentalmente, pero no aplica automáticamente orden del plugin ni rechaza conflictos entre jobs. PoC real de add/remove/collisions sigue bloqueante.
+8. **Actualizaciones:** fijar pnpm y packages en una combinación probada + lockfile; los archivos copiados pertenecen al consumidor, nunca sobreescribirlos silenciosamente.
+
+### 10.4 Estado de capacidad para ejecutar el siguiente gate
+
+- Nodo disponible en el entorno de comprobación: **Node 22.16.0**, no el Node 24 requerido.
+- La consulta de registro `npm view fastify version` falló por DNS (`EAI_AGAIN registry.npmjs.org`), por lo que **no se instalaron dependencias externas**.
+- El dispositivo Mac conectado por Desktop Commander figura **offline**; no se ejecutó ningún comando en él.
+- No se produjeron migraciones, lockfiles, contenedores ni binarios Fastify.
+- **Gate 0 (compatibilidad documental + grafo estático): ACEPTADO CON CONDICIONES.** Gates 1–5 (instalación y ejecución real): **PENDIENTES / NO-GO**.
+
+### 10.5 Próxima validación reproducible al tener runner con Node 24 + pnpm + acceso npm
+
+1. Crear **fuera de `main` y de cualquier proyecto usuario**, un directorio temporal y dos variantes de plantilla de prueba (A y B), con dependencias exactas y `pnpm-lock.yaml` generados por un install real.
+2. Comprobar `pnpm install --frozen-lockfile`, TypeScript NodeNext, `tsc`, `node dist/server.js` y un request `/health`; correr `pnpm audit` y revisar SBOM/licencias.
+3. Montar solo Swagger: instalar docs, registrar ANTES de rutas, inspeccionar spec, validar UI opt-in y CSP, verificar ruta catch-all auth separada.
+4. Levantar PostgreSQL 16 en contenedor descartable; generar schema Better Auth via `auth generate`, migrar con Drizzle, comprobar signup/signin/cookie/session/401/403 y reconexión.
+5. Variante A: migrar BullMQ PostgreSQL con sesión dedicada, worker independiente, encolado/retry/kill-restart/dedup/conexiones; registrar latencia de auth bajo carga.
+6. Variante B: usar Valkey persistente con política de noeviction, misma suite de jobs y carga. Comparar costo operativo, latencia y recuperación, no solo throughput.
+7. Instalar piezas vía registry shadcn universal en proyecto sin React, en ambos órdenes, y comprobar lockfile, diffs, idempotencia, conflicto A+B y marcha atrás segura.
+8. Reportar hashes de commits de paquetes, versiones reales, resultados de comandos, errores y trazas. **Solo entonces** decidir si la receta puede implementarse/públicarse en Kit Fundador.
+
+**Criterio conservador:** si ambas variantes pasan, B (Valkey) posee mayor historial operativo; A (PostgreSQL solamente) aporta menos infraestructura. No elegir una por adelantado basándose únicamente en el grafo.
+
+Fuentes adicionales: https://better-auth.com/docs/concepts/cli · https://docs.bullmq.io/guide/postgresql · https://github.com/fastify/fastify-swagger-ui · https://github.com/fastify/fastify-env · https://ui.shadcn.com/docs/registry/examples
