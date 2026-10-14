@@ -71,7 +71,7 @@ async function verifyStartupDenied(extra, pattern) {
   assert.match(output,pattern);
 }
 await verifyStartupDenied({LAB_AUTH_SECRET:'',BETTER_AUTH_SECRET:'',AUTH_URL:origin},/BETTER_AUTH_SECRET/);
-await verifyStartupDenied({LAB_AUTH_SECRET:'valid-lab-test-secret-only-1234567890',BETTER_AUTH_SECRET:'',AUTH_URL:''},/AUTH_URL/);
+await verifyStartupDenied({LAB_AUTH_SECRET:'',BETTER_AUTH_SECRET:'valid-lab-test-secret-only-1234567890',AUTH_URL:''},/AUTH_URL/);
 console.log('ASSEMBLED_AUTH_FAIL_FAST_PASS');
 
 let server,worker,queue;
