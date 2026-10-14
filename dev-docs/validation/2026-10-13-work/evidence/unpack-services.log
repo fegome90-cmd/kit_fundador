@@ -1,0 +1,11 @@
+dpkg-deb (subprocess): cannot copy archive member from 'lego-lab/system/debs/postgresql-16_16.15-0ubuntu0.24.04.1_amd64.deb' to decompressor pipe: unexpected end of file or stream
+dpkg-deb (subprocess): decompressing archive 'lego-lab/system/debs/postgresql-16_16.15-0ubuntu0.24.04.1_amd64.deb' (size=14067494) member 'data.tar': zstd error: Operation made no progress over multiple calls, due to input being empty
+tar: Unexpected EOF in archive
+tar: Unexpected EOF in archive
+tar: Error is not recoverable: exiting now
+dpkg-deb: error: tar subprocess returned error exit status 2
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['dpkg-deb', '-x', 'lego-lab/system/debs/postgresql-16_16.15-0ubuntu0.24.04.1_amd64.deb', 'lego-lab/system/root']' returned non-zero exit status 2.

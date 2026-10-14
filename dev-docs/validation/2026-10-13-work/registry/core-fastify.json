@@ -1,0 +1,31 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "core-fastify",
+  "type": "registry:item",
+  "title": "core-fastify",
+  "description": "Isolated validation fixture; not a published Kit item",
+  "files": [
+    {
+      "path": "tsconfig.json",
+      "type": "registry:file",
+      "target": "~/tsconfig.json",
+      "content": "{\n  \"compilerOptions\": {\n    \"target\": \"ES2022\", \"module\": \"NodeNext\", \"moduleResolution\": \"NodeNext\",\n    \"strict\": true, \"esModuleInterop\": true, \"skipLibCheck\": false,\n    \"rootDir\": \"src\", \"outDir\": \"dist\", \"types\": [\"node\"]\n  },\n  \"include\": [\"src/**/*.ts\"]\n}\n"
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "type": "registry:file",
+      "target": "~/pnpm-workspace.yaml",
+      "content": "allowBuilds:\n  esbuild: true\n  msgpackr-extract: false\nminimumReleaseAgeExclude:\n  - bullmq@6.3.14\n  - fastify@5.12.7\n"
+    }
+  ],
+  "dependencies": [
+    "fastify@5.12.7",
+    "@fastify/cors@11.3.1"
+  ],
+  "registryDependencies": [],
+  "devDependencies": [
+    "typescript@5.9.3",
+    "@types/node@24.19.2",
+    "@types/pg@8.23.1"
+  ]
+}

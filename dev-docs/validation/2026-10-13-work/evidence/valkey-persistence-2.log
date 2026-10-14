@@ -1,0 +1,9 @@
+Error: connect ECONNREFUSED 127.0.0.1:56379
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1864:16) {
+  errno: -111,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 56379
+}
+{"persistedQueued":100,"recoveredCompleted":100,"producerOutageRejected":true,"producerOutageRejectionMs":1,"backendRestartAndDrainMs":1160,"workerReconnect":true,"policy":"noeviction","appendfsync":"always"}

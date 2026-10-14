@@ -1,0 +1,54 @@
+Progress: resolved 1, reused 0, downloaded 0, added 0
+
+   ╭──────────────────────────────────────────────────────────────────────╮
+   │                                                                      │
+   │                 Update available! 11.25.0 → 12.11.2.                 │
+   │                 Changelog: https://pnpm.io/v/12.11.2                 │
+   │   To update, run: curl -fsSL https://get.pnpm.io/install.sh | sh -   │
+   │                                                                      │
+   ╰──────────────────────────────────────────────────────────────────────╯
+
+Progress: resolved 17, reused 0, downloaded 16, added 0
+Progress: resolved 103, reused 0, downloaded 74, added 0
+Progress: resolved 113, reused 0, downloaded 104, added 0
+Progress: resolved 114, reused 0, downloaded 104, added 0
+Progress: resolved 196, reused 0, downloaded 125, added 0
+Progress: resolved 269, reused 0, downloaded 198, added 0
+Progress: resolved 370, reused 0, downloaded 287, added 0
+Progress: resolved 466, reused 0, downloaded 356, added 0
+Progress: resolved 560, reused 0, downloaded 461, added 0
+[WARN] 2 deprecated subdependencies found: @esbuild-kit/core-utils@3.3.2, @esbuild-kit/esm-loader@2.6.5
+Packages: +464
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: /root/.local/share/pnpm/store/v11
+  Virtual store is at:             node_modules/.pnpm
+Progress: resolved 560, reused 0, downloaded 464, added 464, done
+
+dependencies:
++ @better-auth/drizzle-adapter 1.7.7
++ @fastify/cors 11.3.1
++ @fastify/swagger 9.9.2
++ @fastify/swagger-ui 5.2.6 (6.1.2 is available)
++ better-auth 1.7.7
++ bullmq 6.3.14
++ drizzle-orm 0.45.4
++ fastify 5.12.7
++ ioredis 6.0.0
++ pg 8.23.1
+
+devDependencies:
++ @apidevtools/swagger-parser 13.1.0
++ @types/node 26.6.5
++ @types/pg 8.23.1
++ auth 1.7.7
++ drizzle-kit 0.31.11
++ shadcn 4.21.4
++ typescript 7.0.2
+
+Added 2 entries to minimumReleaseAgeExclude in pnpm-workspace.yaml (set minimumReleaseAgeStrict to true to gate these updates with a prompt):
+  bullmq@6.3.14
+  fastify@5.12.7
+[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: esbuild@0.18.20, esbuild@0.25.12, esbuild@0.28.2, msgpackr-extract@3.0.4
+
+Run "pnpm approve-builds" to pick which dependencies should be allowed to run scripts.

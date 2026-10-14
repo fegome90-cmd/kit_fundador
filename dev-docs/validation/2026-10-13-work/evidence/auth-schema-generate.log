@@ -1,0 +1,8 @@
+2026-10-14T01:40:09.118Z ERROR [Better Auth]: Drizzle schema mismatch
+
+  Missing tables
+    user, session, account, verification
+
+  help: Run `npx auth generate` to refresh the Drizzle schema, then apply it with your migration tool.
+⠋ preparing schema...
+🚀 Schema was overwritten successfully!

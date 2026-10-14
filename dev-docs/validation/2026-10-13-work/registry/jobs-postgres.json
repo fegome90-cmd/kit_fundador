@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "jobs-postgres",
+  "type": "registry:item",
+  "title": "jobs-postgres",
+  "description": "Isolated validation fixture; not a published Kit item",
+  "files": [
+    {
+      "path": "src/backend.ts",
+      "type": "registry:file",
+      "target": "~/src/backend.ts",
+      "content": "import { withBackend, createPostgresBackend } from 'bullmq';\nexport const { Queue, Worker }=withBackend(createPostgresBackend);\nexport const connection={host:'127.0.0.1',port:55432,user:'lab',database:'legolab'};\n"
+    }
+  ],
+  "dependencies": [
+    "bullmq@6.3.14"
+  ],
+  "registryDependencies": [
+    "http://127.0.0.1:4380/db-postgres.json"
+  ]
+}

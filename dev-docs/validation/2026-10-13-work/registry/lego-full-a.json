@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "lego-full-a",
+  "type": "registry:item",
+  "title": "lego-full-a",
+  "description": "Isolated validation fixture; not a published Kit item",
+  "files": [
+    {
+      "path": "src/server.ts",
+      "type": "registry:file",
+      "target": "~/src/server.ts",
+      "content": "import { Queue, connection } from './backend.js';\nimport Fastify from 'fastify';\nimport { beforeRoutes, afterRoutes } from './docs.js';\nimport cors from '@fastify/cors';\nimport { fromNodeHeaders } from 'better-auth/node';\nimport { auth, pool } from './auth.js';\nconst app=Fastify({logger:false,bodyLimit:1024});\nif(process.env.DB==='on'&&!process.env.DATABASE_URL)throw new Error('DATABASE_URL is required');\nawait app.register(cors,{origin:['http://localhost:3000'],credentials:true});\nif(process.env.DOCS==='on')await beforeRoutes(app);\napp.setErrorHandler((err,req,reply)=>{const status=(err as {statusCode?:number}).statusCode??500;return reply.code(status).send({error:status<500?'Request rejected':'Internal error'});});\napp.get('/health',{schema:{response:{200:{type:'object',properties:{ok:{type:'boolean'}}}}}},async()=>({ok:true}));\napp.get('/ready',async(req,reply)=>{if(process.env.DB==='on'){try{await pool.query('SELECT 1');}catch{return reply.code(503).send({ok:false});}}return {ok:true};});\napp.post('/echo',{schema:{body:{type:'object',properties:{text:{type:'string'}},required:['text'],additionalProperties:false}}},async req=>req.body);\napp.get('/boom',async()=>{throw new Error('LAB_INTERNAL_SECRET');});\nif(process.env.AUTH){\n  app.route({method:['GET','POST'],url:'/api/auth/*',schema:{hide:true},handler:async(req,reply)=>{\n    // Trusted configured authority; do not derive public URL from client Host.\n    const url=new URL(req.url,auth.options.baseURL as string);\n    const response=await auth.handler(new Request(url,{method:req.method,headers:fromNodeHeaders(req.headers),...(req.body?{body:JSON.stringify(req.body)}:{})}));\n    reply.code(response.status);\n    for(const [key,value] of response.headers)if(key!=='set-cookie')reply.header(key,value);\n    const cookies=response.headers.getSetCookie();if(cookies.length)reply.header('set-cookie',cookies);\n    return reply.send(await response.text());\n  }});\n}\napp.get('/private',async(req,reply)=>{\n  if(!req.headers.cookie)return reply.code(401).send({error:'Unauthorized'});\n  const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});\n  if(!session)return reply.code(401).send({error:'Unauthorized'});\n  return {userId:session.user.id};\n});\napp.get('/admin',async(req,reply)=>{\n  const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});\n  if(!session)return reply.code(401).send({error:'Unauthorized'});\n  if(session.user.role!=='admin')return reply.code(403).send({error:'Forbidden'});\n  return {ok:true};\n});\nif(process.env.DOCS==='on')await afterRoutes(app);\nif(process.env.JOBS==='on'){const queue=new Queue('registry-probe',{connection});await queue.waitUntilReady();app.addHook('onClose',()=>queue.close());}\napp.addHook('onClose',()=>pool.end());\nconst address=await app.listen({port:Number(process.env.PORT??4310),host:'127.0.0.1'});\nconsole.log('LAB_LISTEN '+address);\nprocess.on('SIGTERM',async()=>{await app.close();process.exit(0);});\n"
+    }
+  ],
+  "dependencies": [],
+  "registryDependencies": [
+    "http://127.0.0.1:4380/api-docs.json",
+    "http://127.0.0.1:4380/auth-better-auth.json",
+    "http://127.0.0.1:4380/jobs-postgres.json"
+  ]
+}

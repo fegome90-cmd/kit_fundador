@@ -1,0 +1,718 @@
+{
+  "fastify": {
+    "name": "fastify",
+    "version": "5.12.7",
+    "engines": null,
+    "license": "MIT",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "dist": {
+      "shasum": "e8f9859b1ae908ba38bbdb0572d358788c4a4b46",
+      "tarball": "https://registry.npmjs.org/fastify/-/fastify-5.12.7.tgz",
+      "fileCount": 363,
+      "integrity": "sha512-v4pEPsTRPuqlDIYiQFB+BHjVN4SdHX9u0ABk0ZDUKbbdY1vsNryUd1j4Z+jQEZajvYIVk047Kimva9/AJ79GYw==",
+      "signatures": [
+        {
+          "sig": "MEUCIQDdLs777TiwOslMO/idGH05bxg80+NjE7/tiBTtFyMCNAIgFmARpbbz4ZQXQvmLD3sOf68PwnyIIm4RGfYYCLP2ZYA=",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+          "sig": "MEQCIDGArf4SMO2pVJisYrvvKpJADAJoLzXwIR92e/18A8O5AiBgzwF5w6jvb59Zt8o1+Cd4y1EPh8G/6R96Q3i42OH4Ew=="
+        }
+      ],
+      "unpackedSize": 2970996
+    }
+  },
+  "@fastify/swagger": {
+    "name": "@fastify/swagger",
+    "version": "9.9.2",
+    "engines": null,
+    "license": "MIT",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "dist": {
+      "shasum": "ace5743a908844f3dcb18f62cc1bcc63b0328255",
+      "tarball": "https://registry.npmjs.org/@fastify/swagger/-/swagger-9.9.2.tgz",
+      "fileCount": 63,
+      "integrity": "sha512-ayxItVgf/1axBvw33lqsA5ns02YMpT1r59G/HCJraRNWWBzvLgN+oiCBPhuzTiN67TvctlCYkG0+40WLKYuusQ==",
+      "signatures": [
+        {
+          "sig": "MEQCID2g9n8DRJa3bSlklAkLmtuVHRp/Azj+bpska5LZCl/DAiAcEgBxY5XtJBgNltvMc05uJablTSkXTuJa7lnoQlw3+A==",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+          "sig": "MEUCIBZpa4KDFl5WoDluTp7UsNR2jomTM5m1FZDJCtGSTYkcAiEA9ukuvuJaDL6BLu1OdL/83Zv+9DNFAoAWNxTrIS4ZLYU="
+        }
+      ],
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@fastify%2fswagger@9.9.2",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "unpackedSize": 427638
+    }
+  },
+  "@fastify/swagger-ui": {
+    "name": "@fastify/swagger-ui",
+    "version": "5.2.6",
+    "engines": null,
+    "license": "MIT",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "dist": {
+      "shasum": "d820b4ef64c7953d180ed51909c2c1ff9805d24b",
+      "tarball": "https://registry.npmjs.org/@fastify/swagger-ui/-/swagger-ui-5.2.6.tgz",
+      "fileCount": 66,
+      "integrity": "sha512-OMnms0O5s9wb6wis/K5nlrAMLsgUbr1GA8uphM41IasWe3AFdgxz6r/3bA9HTxlDNUYc2FGGKeqMp3ntxmSiNA==",
+      "signatures": [
+        {
+          "sig": "MEQCIFzpIO1OzypzSt4M8NbJpmEa4uIDZRkLdI1VlAwUqcU/AiBvdrhjzCEgbzEjtqBuOkhxNHeTuA1imu/BTobab8FLBg==",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        }
+      ],
+      "unpackedSize": 2494641
+    }
+  },
+  "@fastify/cors": {
+    "name": "@fastify/cors",
+    "version": "11.3.1",
+    "engines": null,
+    "license": "MIT",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "dist": {
+      "shasum": "4897642f6b1d343497209447ec84e97d5dfc7a05",
+      "tarball": "https://registry.npmjs.org/@fastify/cors/-/cors-11.3.1.tgz",
+      "fileCount": 21,
+      "integrity": "sha512-gZXNzd6FLHzOIfvoK4+Az3Wko2V6Y0MIsLxpyo4AEYl7a9q1JBPwPaxLea4nkr++8FCiJiPpYYo6E02uZW0dqw==",
+      "signatures": [
+        {
+          "sig": "MEUCIQCNq92W46TTrrSPm7fAyK+/calIT2nIqx/2nRQXJSf7UwIgAWcHqptfRfCrHNHN/76BACW0bmHr4/08soH5JyuIC8Y=",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+          "sig": "MEUCIQC4qHliql5pzxLmFn7UZxnGvoqhtJB92WGd7QYcm2k+5AIgInUqSJaz7/5C1W0iTfehNnU/v/+hIr+ZKW4eBp9OBLE="
+        }
+      ],
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@fastify%2fcors@11.3.1",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "unpackedSize": 121817
+    }
+  },
+  "drizzle-orm": {
+    "name": "drizzle-orm",
+    "version": "0.45.4",
+    "engines": null,
+    "license": "Apache-2.0",
+    "peerDependencies": {
+      "pg": ">=8",
+      "gel": ">=2",
+      "knex": "*",
+      "kysely": "*",
+      "mysql2": ">=2",
+      "sql.js": ">=1",
+      "sqlite3": ">=5",
+      "postgres": ">=3",
+      "@types/pg": "*",
+      "bun-types": "*",
+      "@netlify/db": ">=0.4.0",
+      "expo-sqlite": ">=14.0.0",
+      "@types/sql.js": "*",
+      "@libsql/client": ">=0.10.0",
+      "@prisma/client": "*",
+      "@upstash/redis": ">=1.34.7",
+      "better-sqlite3": ">=7",
+      "@xata.io/client": "*",
+      "@vercel/postgres": ">=0.8.0",
+      "@opentelemetry/api": "^1.4.1",
+      "@libsql/client-wasm": ">=0.10.0",
+      "@electric-sql/pglite": ">=0.2.0",
+      "@planetscale/database": ">=1.13",
+      "@tidbcloud/serverless": "*",
+      "@types/better-sqlite3": "*",
+      "@aws-sdk/client-rds-data": ">=3",
+      "@neondatabase/serverless": ">=0.10.0",
+      "@cloudflare/workers-types": ">=4",
+      "@op-engineering/op-sqlite": ">=2"
+    },
+    "peerDependenciesMeta": {
+      "pg": {
+        "optional": true
+      },
+      "gel": {
+        "optional": true
+      },
+      "knex": {
+        "optional": true
+      },
+      "kysely": {
+        "optional": true
+      },
+      "mysql2": {
+        "optional": true
+      },
+      "prisma": {
+        "optional": true
+      },
+      "sql.js": {
+        "optional": true
+      },
+      "sqlite3": {
+        "optional": true
+      },
+      "postgres": {
+        "optional": true
+      },
+      "@types/pg": {
+        "optional": true
+      },
+      "bun-types": {
+        "optional": true
+      },
+      "@netlify/db": {
+        "optional": true
+      },
+      "expo-sqlite": {
+        "optional": true
+      },
+      "@types/sql.js": {
+        "optional": true
+      },
+      "@libsql/client": {
+        "optional": true
+      },
+      "@prisma/client": {
+        "optional": true
+      },
+      "@upstash/redis": {
+        "optional": true
+      },
+      "better-sqlite3": {
+        "optional": true
+      },
+      "@xata.io/client": {
+        "optional": true
+      },
+      "@vercel/postgres": {
+        "optional": true
+      },
+      "@opentelemetry/api": {
+        "optional": true
+      },
+      "@libsql/client-wasm": {
+        "optional": true
+      },
+      "@electric-sql/pglite": {
+        "optional": true
+      },
+      "@planetscale/database": {
+        "optional": true
+      },
+      "@tidbcloud/serverless": {
+        "optional": true
+      },
+      "@types/better-sqlite3": {
+        "optional": true
+      },
+      "@aws-sdk/client-rds-data": {
+        "optional": true
+      },
+      "@neondatabase/serverless": {
+        "optional": true
+      },
+      "@cloudflare/workers-types": {
+        "optional": true
+      },
+      "@op-engineering/op-sqlite": {
+        "optional": true
+      }
+    },
+    "dist": {
+      "shasum": "0533fd69076b366f323f3ac1ffa1e4865ff41d0c",
+      "tarball": "https://registry.npmjs.org/drizzle-orm/-/drizzle-orm-0.45.4.tgz",
+      "fileCount": 2690,
+      "integrity": "sha512-NiM1YZpJ2UxyeE67DpDDZ+Tsw4YLX3trSlkNT7Tm9eKoUNb1LvaAaQzXgYQsWs+AQ9TUmmwMmBOCXuqqxUWKKQ==",
+      "signatures": [
+        {
+          "sig": "MEQCIDieQu5djU5Rn2kcUViASEe1R1Aq83mvvO1EaE0kW6j5AiAHCfCh1ge67wfGHP7THeyP1i7x9OU7ROJi6F86Vvqkew==",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+          "sig": "MEQCIBJdDL53M78yW/iQxUPMa505AAgNvhUmFVA5aSvXaDjNAiA+QyXOIyvFf9c21seL8UfpljFE1rBYpcfWBpzxUeaoQA=="
+        }
+      ],
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/drizzle-orm@0.45.4",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "unpackedSize": 10517974
+    }
+  },
+  "drizzle-kit": {
+    "name": "drizzle-kit",
+    "version": "0.31.11",
+    "engines": null,
+    "license": "MIT",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "dist": {
+      "shasum": "6188c577edd1495c23910c4903a23f898add9599",
+      "tarball": "https://registry.npmjs.org/drizzle-kit/-/drizzle-kit-0.31.11.tgz",
+      "fileCount": 13,
+      "integrity": "sha512-YCYqxTLIB2OCqf6w9/Vef13baBVbwQIPcbT4Y56AfO6B9ajZhDhD8Jkveg/hJvT/iuMloKD/IYYkyMMNhr7Kqg==",
+      "signatures": [
+        {
+          "sig": "MEUCIBWCzFAwAMSPe02rkrJUQseCiVjEwFjneeGltwlFlqo4AiEA+ZB5qLvNKP/YD5N7OQubA1KZwLyLTYM1qqL4sHhOR+w=",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+          "sig": "MEQCIC/F979gIlYOOeI17MsLkymDlLCCwRTYZfGE6aDabtxBAiBTg6Vqim4afzM5PwgDudAsrxzK3FRcS0UI53M71ZwD1A=="
+        }
+      ],
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/drizzle-kit@0.31.11",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "unpackedSize": 10267562
+    }
+  },
+  "better-auth": {
+    "name": "better-auth",
+    "version": "1.7.7",
+    "engines": null,
+    "license": "MIT",
+    "peerDependencies": {
+      "pg": "^8.0.0",
+      "vue": "^3.0.0",
+      "next": "^14.0.0 || ^15.0.0 || ^16.0.0",
+      "react": "^18.0.0 || ^19.0.0",
+      "mysql2": "^3.0.0",
+      "prisma": "^5.0.0 || ^6.0.0 || ^7.0.0",
+      "svelte": "^4.0.0 || ^5.0.0",
+      "vitest": "^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0",
+      "mongodb": "^6.0.0 || ^7.0.0",
+      "solid-js": "^1.0.0",
+      "react-dom": "^18.0.0 || ^19.0.0",
+      "drizzle-kit": ">=0.31.4 || >=1.0.0-beta.1",
+      "drizzle-orm": "^0.45.2 || >=1.0.0-rc.1 <2.0.0",
+      "@sveltejs/kit": "^2.0.0",
+      "@lynx-js/react": "*",
+      "@prisma/client": "^5.0.0 || ^6.0.0 || ^7.0.0",
+      "@tanstack/react-start": "^1.0.0",
+      "@tanstack/solid-start": "^1.0.0"
+    },
+    "peerDependenciesMeta": {
+      "pg": {
+        "optional": true
+      },
+      "vue": {
+        "optional": true
+      },
+      "next": {
+        "optional": true
+      },
+      "react": {
+        "optional": true
+      },
+      "mysql2": {
+        "optional": true
+      },
+      "prisma": {
+        "optional": true
+      },
+      "svelte": {
+        "optional": true
+      },
+      "vitest": {
+        "optional": true
+      },
+      "mongodb": {
+        "optional": true
+      },
+      "solid-js": {
+        "optional": true
+      },
+      "react-dom": {
+        "optional": true
+      },
+      "drizzle-kit": {
+        "optional": true
+      },
+      "drizzle-orm": {
+        "optional": true
+      },
+      "@sveltejs/kit": {
+        "optional": true
+      },
+      "@lynx-js/react": {
+        "optional": true
+      },
+      "@prisma/client": {
+        "optional": true
+      },
+      "@tanstack/react-start": {
+        "optional": true
+      },
+      "@tanstack/solid-start": {
+        "optional": true
+      }
+    },
+    "dist": {
+      "shasum": "25f41f08f12a7e778b15da3c07b67b0c8222247f",
+      "tarball": "https://registry.npmjs.org/better-auth/-/better-auth-1.7.7.tgz",
+      "fileCount": 467,
+      "integrity": "sha512-Zhgxi/c5ylmfB/sX+nwnBbsFf/j6k0L8DvL6CJXZSrXgxc5pPMC/e7j812zNd4L4B4ELmdURCPw3X8nAOUdcjw==",
+      "signatures": [
+        {
+          "sig": "MEUCIFK2s2x3RqNF8xG/9fF7WkCq/rlLfpiSkFy06rfw4JcCAiEA7ITFzpvW0LvQ+DrGPD/mrsa8HT+Kzj02UZUsqDRAG/o=",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+          "sig": "MEUCIGo7SeF8zbjkRbs/5lmAhDXnGDoSYCwHuK0RY1RA6qnuAiEA9qAm7Oi3vgphrd5bG5AlSNvbtxXTe4E1aKO8vZ8pQ/8="
+        }
+      ],
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/better-auth@1.7.7",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "unpackedSize": 2075328
+    }
+  },
+  "@better-auth/drizzle-adapter": {
+    "name": "@better-auth/drizzle-adapter",
+    "version": "1.7.7",
+    "engines": null,
+    "license": "MIT",
+    "peerDependencies": {
+      "drizzle-orm": "^0.45.2 || >=1.0.0-rc.1 <2.0.0",
+      "@better-auth/core": "^1.7.7",
+      "@better-auth/utils": "0.4.2"
+    },
+    "peerDependenciesMeta": {
+      "drizzle-orm": {
+        "optional": true
+      }
+    },
+    "dist": {
+      "shasum": "4389c5b2ca03c5aa39464379f36c401576befbbc",
+      "tarball": "https://registry.npmjs.org/@better-auth/drizzle-adapter/-/drizzle-adapter-1.7.7.tgz",
+      "fileCount": 9,
+      "integrity": "sha512-qon0U94PR5FQysuyGoAlGVQpIIiNg5dtDpwjE63sN/HjoRWZadZzHPcS9mn7JsJyQZK6iTNhd7LD0AaXt2f78w==",
+      "signatures": [
+        {
+          "sig": "MEUCIBpw3p+ELtoj2z/Rw4kk2kwLJaV9pezb9QxoJva/ax97AiEA0gRRl7ZYLKm/Io3vXpFZis2iS+3yaG4R7oR4Mf7qJbE=",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+          "sig": "MEUCIQCiidKrSlpMpb6EVJye3gzMXMY+zEhtKHiOfmYAB13lcQIgfCteRw6h3+xxWZ1OwCvKdEIkbjr4Ywg9jqGnx6BFQZo="
+        }
+      ],
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@better-auth%2fdrizzle-adapter@1.7.7",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "unpackedSize": 82403
+    }
+  },
+  "bullmq": {
+    "name": "bullmq",
+    "version": "6.3.14",
+    "engines": {
+      "node": ">=14.17.0"
+    },
+    "license": "MIT",
+    "peerDependencies": {
+      "pg": ">=8.0.0",
+      "redis": ">=5.0.0",
+      "ioredis": ">=5.0.0",
+      "bullmq-otel": ">=2.0.0"
+    },
+    "peerDependenciesMeta": {
+      "pg": {
+        "optional": true
+      },
+      "redis": {
+        "optional": true
+      },
+      "ioredis": {
+        "optional": true
+      },
+      "bullmq-otel": {
+        "optional": true
+      }
+    },
+    "dist": {
+      "shasum": "09f6d2a1a4aa33ad2e70fb1bcf17c9dd9460a500",
+      "tarball": "https://registry.npmjs.org/bullmq/-/bullmq-6.3.14.tgz",
+      "fileCount": 712,
+      "integrity": "sha512-iXpDyX45fonQugWAHw+FNPH/YIjqzmzi/xxs31dzWGNP7j6b4jAVN0oNWU5cz0mVi1RofEkrlRwRbLqhqNkjHw==",
+      "signatures": [
+        {
+          "sig": "MEYCIQDgJwCoC9IgkwevPSeea5xF1c6Lyev+Gw+T3Yfd3NLmZgIhAPxpxGJyrRkyOcDvqLqT2hUGJ5TxvSybwd/TsB+vfpcz",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+          "sig": "MEUCIQCFnPdsjIhUmtqrGtuwlhz1vdZwjJ1u8/il9Rq5NeFvtgIgRAzqKSuuUUR2CgOch5iut+MWd/IF4XVTLam/m7hLbOY="
+        }
+      ],
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/bullmq@6.3.14",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "unpackedSize": 3012063
+    }
+  },
+  "pg": {
+    "name": "pg",
+    "version": "8.23.1",
+    "engines": {
+      "node": ">= 16.0.0"
+    },
+    "license": "MIT",
+    "peerDependencies": {
+      "pg-native": ">=3.0.1"
+    },
+    "peerDependenciesMeta": {
+      "pg-native": {
+        "optional": true
+      }
+    },
+    "dist": {
+      "shasum": "e4848051a04aa2f968fd5671d075f89e5e7918b9",
+      "tarball": "https://registry.npmjs.org/pg/-/pg-8.23.1.tgz",
+      "fileCount": 20,
+      "integrity": "sha512-aL96AHANtWjPLDOLqnhx+ngp9+UK7ETEU8VJrDCGvsSSi/mGLcWYsS6Herg7lmaBJe4uwrfqsa7gTEFaSizDoQ==",
+      "signatures": [
+        {
+          "sig": "MEUCIQCaQ7YY2yU8gtOVUdpEmdwhMZX8RimNffuKliyHO8GPcQIgdnqtDpcBEkCylJPazoNxAcwG0J+2ErEXsbGHsceQDbQ=",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+          "sig": "MEUCIQCoTOteRl6SbOEx95tHOsn0FgIOYsb5wPdT77A0PUDC8wIgUGnJrpGJKdY8o6QUGoU0GRtQVHfVx3aHN7ChoRaAMmo="
+        }
+      ],
+      "unpackedSize": 102632
+    }
+  },
+  "ioredis": {
+    "name": "ioredis",
+    "version": "5.11.1",
+    "engines": {
+      "node": ">=12.22.0"
+    },
+    "license": "MIT",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "dist": {
+      "shasum": "2d1e52e350a79ee3b00883f3681a410427b49f28",
+      "tarball": "https://registry.npmjs.org/ioredis/-/ioredis-5.11.1.tgz",
+      "fileCount": 89,
+      "integrity": "sha512-ehuGcf94bQXhfagULNXrJdfnWO38v070jxSx/qE87Kjzmu2fU7ro5EFAb+OPituLqgfyuQaym5DlrNydW2sJ9A==",
+      "signatures": [
+        {
+          "sig": "MEUCIQDoYHQQvZSetxHTK8zXczQOy6vkBlaeFTzl+m70i+na8wIgS4BAFqSKTcsK6zNI6zHxdAhRWN5+AP3V5TWCVgq+pXg=",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        }
+      ],
+      "unpackedSize": 858494
+    }
+  },
+  "typescript": {
+    "name": "typescript",
+    "version": "5.9.3",
+    "engines": {
+      "node": ">=14.17"
+    },
+    "license": "Apache-2.0",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "dist": {
+      "shasum": "5b4f59e15310ab17a216f5d6cf53ee476ede670f",
+      "tarball": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+      "fileCount": 132,
+      "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
+      "signatures": [
+        {
+          "sig": "MEYCIQC5ifNi1il+zAZC19ov+Q5oSrhOwlpOpghAaAAXYA0RpAIhAKdcZ6pMNZGuprpke8Zi3OPB1zol9c88KVW+apJNVjTy",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        }
+      ],
+      "unpackedSize": 23625066
+    }
+  },
+  "@types/node": {
+    "name": "@types/node",
+    "version": "24.19.2",
+    "engines": null,
+    "license": "MIT",
+    "peerDependencies": {},
+    "peerDependenciesMeta": null,
+    "dist": {
+      "shasum": "8718eedbc0f89648de6525be9f4a9c61cdbaa502",
+      "tarball": "https://registry.npmjs.org/@types/node/-/node-24.19.2.tgz",
+      "fileCount": 88,
+      "integrity": "sha512-93d49wCWJkCyN87MxLpNN6KXPCwFw7bVUg79mGUV1OS40JGWwVCr8n61DXCSqz7CV6/VfPkb7xec7uP2M+QHWQ==",
+      "signatures": [
+        {
+          "sig": "MEQCIANcVRgt/opOpIiouz2oQFvOIyDM4lBAgR5KWFpeM0S7AiAlIKKketPR7tVtdmeqoW9ERmEN+hUSbmSsgvw4PZE5xg==",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "sig": "MEQCIEyyRKiIaH5zy091E3cDbeZApk+zitfD9OmZP0qKnrKRAiB6X7j1j2Vakh+MTSX0FSCk/vXjx9TKwcy6mTWJb+rXXg==",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        }
+      ],
+      "unpackedSize": 2613701
+    }
+  },
+  "@types/pg": {
+    "name": "@types/pg",
+    "version": "8.23.1",
+    "engines": null,
+    "license": "MIT",
+    "peerDependencies": {},
+    "peerDependenciesMeta": null,
+    "dist": {
+      "shasum": "7e712ce02cf44ad100862127f10f52e9c6b9d227",
+      "tarball": "https://registry.npmjs.org/@types/pg/-/pg-8.23.1.tgz",
+      "fileCount": 9,
+      "integrity": "sha512-fKVHpikPdg4GKks3JuLEhvwSyvwzF23hnabPy6DD8ljVbC7+6J5dQzdv4arV6jqq57djnMgs1HKBxX4P8aBI3A==",
+      "signatures": [
+        {
+          "sig": "MEYCIQCGT3gAmd1foe4h5A+yaOnvnGkX4FmiT1+tr47rnCz5NgIhAPlL7G9WIK6VVbn78dzvvjLpr92Qv7fs2EeVm3TegnYG",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "sig": "MEQCIECf+CMs6DtJn1Pv5baTTBd3pydqnHoxUG1uqL+954wEAiBThLT81ktCMBVT/tLtxIL2fhUbe9UonwJn0yW8y9pIDw==",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        }
+      ],
+      "unpackedSize": 19802
+    }
+  },
+  "shadcn": {
+    "name": "shadcn",
+    "version": "4.21.4",
+    "engines": {
+      "node": ">=20.18.1"
+    },
+    "license": "MIT",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "dist": {
+      "shasum": "32b5aadf994e045c18153a88743d82ddbbe6abfd",
+      "tarball": "https://registry.npmjs.org/shadcn/-/shadcn-4.21.4.tgz",
+      "fileCount": 21,
+      "integrity": "sha512-YYfn/hsHbRH2mGwnKBx9tk+DjTQH+RUMS5iCxjKzwzuJ5uoHPqLOFUCJSeX0sXfrcBSfgQaXiOLGKNLjlIQxxw==",
+      "signatures": [
+        {
+          "sig": "MEYCIQDiZTcZpqIBUsPThNHsn6xtolfZskzaQuB7Qv0EG9X/+QIhAPQ6YtkXRiXXzRL60t6T8520FELqAb3Tg8H/p/6Zu7GS",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+          "sig": "MEUCIEPEnpSP0Y83wU+SO+IgWJcOPrABhg6Rz9tE0HZdOiNbAiEA3yYanphdQkSBBFj+Fp8eKK86K/Bmfdv6VwO/8MWLc+0="
+        }
+      ],
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/shadcn@4.21.4",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "unpackedSize": 217288
+    }
+  },
+  "auth": {
+    "name": "auth",
+    "version": "1.7.7",
+    "engines": {
+      "node": ">=22.12.0"
+    },
+    "license": "MIT",
+    "peerDependencies": null,
+    "peerDependenciesMeta": null,
+    "dist": {
+      "shasum": "cb36c487f25f31c8775a32372dbffe133bc1e3e1",
+      "tarball": "https://registry.npmjs.org/auth/-/auth-1.7.7.tgz",
+      "fileCount": 6,
+      "integrity": "sha512-Iuka9UTqPUI4qQORHjZ0U4D/ceH3q11e1iGU+j2N/Flfy2jQK/vGACzrBBXDArE7kFAn468g/P8+aAOonU8s0A==",
+      "signatures": [
+        {
+          "sig": "MEYCIQDFQYjNcHOgf0Q0ym2mw9n9kKbnbqZ2SEhLw8Nmv17mKQIhAMhGa81W+Tuy3eUTrdu0nXZyfCMZWfvPFbXhfZTADkAh",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+          "sig": "MEUCICukWvi2auY+NJh7W/TyR59Bp2i4A72rJt9lYTUUtELzAiEA9z9PQUB/tAFIC2UXonFnRwH/jGtEuQuArybjJnzXuvQ="
+        }
+      ],
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/auth@1.7.7",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "unpackedSize": 311491
+    }
+  },
+  "@apidevtools/swagger-parser": {
+    "name": "@apidevtools/swagger-parser",
+    "version": "13.1.0",
+    "engines": {
+      "node": ">=22.19.0"
+    },
+    "license": "MIT",
+    "peerDependencies": {
+      "openapi-types": ">=7"
+    },
+    "peerDependenciesMeta": null,
+    "dist": {
+      "shasum": "efc8ffcc573838e715d0bce83d917b79636ca172",
+      "tarball": "https://registry.npmjs.org/@apidevtools/swagger-parser/-/swagger-parser-13.1.0.tgz",
+      "fileCount": 9,
+      "integrity": "sha512-dkCuqCWh5U7u0aurmmc/qvel2KeKDxHTwVtUdYonndIpD7mXV6AVaWNdvaja2HAy628z7FT/Qdz8sCgzwhgwKg==",
+      "signatures": [
+        {
+          "sig": "MEYCIQDwxRuNvEQHKuWx2gDQbRvQib20Yr7BMdjoxqkRAoBbZQIhAOYodrYrPhqbttoPkHnmQ1AHb2znwa4WPS+I2eiCNYlj",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+          "sig": "MEUCIFC4vFaLHJVOqa6GbjCrJI/nNMqYFYcFsCrwH/1K/IQDAiEAjokq0L7LYVzYTf/79omxS4RbjOFSDTq+m32anc26QW8="
+        }
+      ],
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@apidevtools%2fswagger-parser@13.1.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "unpackedSize": 56311
+    }
+  }
+}

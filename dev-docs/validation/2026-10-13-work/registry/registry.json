@@ -1,0 +1,195 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "kit-lego-validation",
+  "homepage": "https://github.com/fegome90-cmd/kit_fundador",
+  "items": [
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "core-fastify",
+      "type": "registry:item",
+      "title": "core-fastify",
+      "description": "Isolated validation fixture; not a published Kit item",
+      "files": [
+        {
+          "path": "tsconfig.json",
+          "type": "registry:file",
+          "target": "~/tsconfig.json",
+          "content": "{\n  \"compilerOptions\": {\n    \"target\": \"ES2022\", \"module\": \"NodeNext\", \"moduleResolution\": \"NodeNext\",\n    \"strict\": true, \"esModuleInterop\": true, \"skipLibCheck\": false,\n    \"rootDir\": \"src\", \"outDir\": \"dist\", \"types\": [\"node\"]\n  },\n  \"include\": [\"src/**/*.ts\"]\n}\n"
+        },
+        {
+          "path": "pnpm-workspace.yaml",
+          "type": "registry:file",
+          "target": "~/pnpm-workspace.yaml",
+          "content": "allowBuilds:\n  esbuild: true\n  msgpackr-extract: false\nminimumReleaseAgeExclude:\n  - bullmq@6.3.14\n  - fastify@5.12.7\n"
+        }
+      ],
+      "dependencies": [
+        "fastify@5.12.7",
+        "@fastify/cors@11.3.1"
+      ],
+      "registryDependencies": [],
+      "devDependencies": [
+        "typescript@5.9.3",
+        "@types/node@24.19.2",
+        "@types/pg@8.23.1"
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "api-docs",
+      "type": "registry:item",
+      "title": "api-docs",
+      "description": "Isolated validation fixture; not a published Kit item",
+      "files": [
+        {
+          "path": "src/docs.ts",
+          "type": "registry:file",
+          "target": "~/src/docs.ts",
+          "content": "import { type FastifyInstance } from 'fastify';\nimport swagger from '@fastify/swagger';\nimport swaggerUI from '@fastify/swagger-ui';\nexport async function beforeRoutes(app:FastifyInstance){await app.register(swagger,{openapi:{info:{title:'LEGO isolated PoC',version:'0.0.0'},components:{securitySchemes:{session:{type:'apiKey',in:'cookie',name:'better-auth.session_token'}}}}});}\nexport async function afterRoutes(app:FastifyInstance){await app.register(swaggerUI,{routePrefix:'/docs'});}\n"
+        }
+      ],
+      "dependencies": [
+        "@fastify/swagger@9.9.2",
+        "@fastify/swagger-ui@5.2.6"
+      ],
+      "registryDependencies": [
+        "http://127.0.0.1:4380/core-fastify.json"
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "db-postgres",
+      "type": "registry:item",
+      "title": "db-postgres",
+      "description": "Isolated validation fixture; not a published Kit item",
+      "files": [
+        {
+          "path": "drizzle.config.ts",
+          "type": "registry:file",
+          "target": "~/drizzle.config.ts",
+          "content": "import { defineConfig } from 'drizzle-kit';\nexport default defineConfig({ dialect: 'postgresql', schema: './src/auth-schema.ts', out: './drizzle', dbCredentials: { url: process.env.DATABASE_URL ?? 'postgres://lab@127.0.0.1:55432/legolab' } });\n"
+        }
+      ],
+      "dependencies": [
+        "drizzle-orm@0.45.4",
+        "pg@8.23.1"
+      ],
+      "registryDependencies": [
+        "http://127.0.0.1:4380/core-fastify.json"
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "auth-better-auth",
+      "type": "registry:item",
+      "title": "auth-better-auth",
+      "description": "Isolated validation fixture; not a published Kit item",
+      "files": [
+        {
+          "path": "src/auth.ts",
+          "type": "registry:file",
+          "target": "~/src/auth.ts",
+          "content": "import { betterAuth } from 'better-auth';\nimport { drizzleAdapter } from '@better-auth/drizzle-adapter';\nimport { drizzle } from 'drizzle-orm/node-postgres';\nimport { Pool } from 'pg';\nimport { openAPI } from 'better-auth/plugins';\nimport * as schema from './auth-schema.js';\nexport const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5, connectionTimeoutMillis: 1500 });\nexport const db = drizzle(pool, { schema });\nexport const auth = betterAuth({\n  baseURL: process.env.AUTH_URL ?? 'http://127.0.0.1:4310',\n  secret: process.env.LAB_AUTH_SECRET ?? 'isolated-lab-only-secret-000000000000000000000000000000',\n  trustedOrigins: ['http://127.0.0.1:4310','http://localhost:3000'],\n  database: drizzleAdapter(db, { provider: 'pg', schema }),\n  emailAndPassword: { enabled: true },\n  user: { additionalFields: { role: { type: 'string', defaultValue: 'user', input: false } } },\n  advanced: { useSecureCookies: process.env.AUTH_URL?.startsWith('https://') ?? false },\n  plugins: [openAPI()],\n});\n"
+        },
+        {
+          "path": "src/auth-schema.ts",
+          "type": "registry:file",
+          "target": "~/src/auth-schema.ts",
+          "content": "import { relations } from \"drizzle-orm\";\nimport { pgTable, text, timestamp, boolean, index } from \"drizzle-orm/pg-core\";\n\nexport const user = pgTable(\"user\", {\n  id: text(\"id\").primaryKey(),\n  name: text(\"name\").notNull(),\n  email: text(\"email\").notNull().unique(),\n  emailVerified: boolean(\"email_verified\").default(false).notNull(),\n  image: text(\"image\"),\n  createdAt: timestamp(\"created_at\").defaultNow().notNull(),\n  updatedAt: timestamp(\"updated_at\")\n    .defaultNow()\n    .$onUpdate(() => /* @__PURE__ */ new Date())\n    .notNull(),\n  role: text(\"role\").default(\"user\").notNull(),\n});\n\nexport const session = pgTable(\n  \"session\",\n  {\n    id: text(\"id\").primaryKey(),\n    expiresAt: timestamp(\"expires_at\").notNull(),\n    token: text(\"token\").notNull().unique(),\n    createdAt: timestamp(\"created_at\").defaultNow().notNull(),\n    updatedAt: timestamp(\"updated_at\")\n      .$onUpdate(() => /* @__PURE__ */ new Date())\n      .notNull(),\n    ipAddress: text(\"ip_address\"),\n    userAgent: text(\"user_agent\"),\n    userId: text(\"user_id\")\n      .notNull()\n      .references(() => user.id, { onDelete: \"cascade\" }),\n  },\n  (table) => [index(\"session_userId_idx\").on(table.userId)],\n);\n\nexport const account = pgTable(\n  \"account\",\n  {\n    id: text(\"id\").primaryKey(),\n    accountId: text(\"account_id\").notNull(),\n    providerId: text(\"provider_id\").notNull(),\n    userId: text(\"user_id\")\n      .notNull()\n      .references(() => user.id, { onDelete: \"cascade\" }),\n    accessToken: text(\"access_token\"),\n    refreshToken: text(\"refresh_token\"),\n    idToken: text(\"id_token\"),\n    accessTokenExpiresAt: timestamp(\"access_token_expires_at\"),\n    refreshTokenExpiresAt: timestamp(\"refresh_token_expires_at\"),\n    scope: text(\"scope\"),\n    password: text(\"password\"),\n    createdAt: timestamp(\"created_at\").defaultNow().notNull(),\n    updatedAt: timestamp(\"updated_at\")\n      .$onUpdate(() => /* @__PURE__ */ new Date())\n      .notNull(),\n  },\n  (table) => [index(\"account_userId_idx\").on(table.userId)],\n);\n\nexport const verification = pgTable(\n  \"verification\",\n  {\n    id: text(\"id\").primaryKey(),\n    identifier: text(\"identifier\").notNull(),\n    value: text(\"value\").notNull(),\n    expiresAt: timestamp(\"expires_at\").notNull(),\n    createdAt: timestamp(\"created_at\").defaultNow().notNull(),\n    updatedAt: timestamp(\"updated_at\")\n      .defaultNow()\n      .$onUpdate(() => /* @__PURE__ */ new Date())\n      .notNull(),\n  },\n  (table) => [index(\"verification_identifier_idx\").on(table.identifier)],\n);\n\nexport const userRelations = relations(user, ({ many }) => ({\n  sessions: many(session),\n  accounts: many(account),\n}));\n\nexport const sessionRelations = relations(session, ({ one }) => ({\n  user: one(user, {\n    fields: [session.userId],\n    references: [user.id],\n  }),\n}));\n\nexport const accountRelations = relations(account, ({ one }) => ({\n  user: one(user, {\n    fields: [account.userId],\n    references: [user.id],\n  }),\n}));\n"
+        }
+      ],
+      "dependencies": [
+        "better-auth@1.7.7",
+        "@better-auth/drizzle-adapter@1.7.7"
+      ],
+      "registryDependencies": [
+        "http://127.0.0.1:4380/db-postgres.json"
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "jobs-postgres",
+      "type": "registry:item",
+      "title": "jobs-postgres",
+      "description": "Isolated validation fixture; not a published Kit item",
+      "files": [
+        {
+          "path": "src/backend.ts",
+          "type": "registry:file",
+          "target": "~/src/backend.ts",
+          "content": "import { withBackend, createPostgresBackend } from 'bullmq';\nexport const { Queue, Worker }=withBackend(createPostgresBackend);\nexport const connection={host:'127.0.0.1',port:55432,user:'lab',database:'legolab'};\n"
+        }
+      ],
+      "dependencies": [
+        "bullmq@6.3.14"
+      ],
+      "registryDependencies": [
+        "http://127.0.0.1:4380/db-postgres.json"
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "jobs-valkey",
+      "type": "registry:item",
+      "title": "jobs-valkey",
+      "description": "Isolated validation fixture; not a published Kit item",
+      "files": [
+        {
+          "path": "src/backend.ts",
+          "type": "registry:file",
+          "target": "~/src/backend.ts",
+          "content": "export { Queue, Worker } from 'bullmq';\nexport const connection={host:'127.0.0.1',port:56379,maxRetriesPerRequest:null};\n"
+        }
+      ],
+      "dependencies": [
+        "bullmq@6.3.14",
+        "ioredis@5.11.1"
+      ],
+      "registryDependencies": [
+        "http://127.0.0.1:4380/core-fastify.json"
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "lego-full-a",
+      "type": "registry:item",
+      "title": "lego-full-a",
+      "description": "Isolated validation fixture; not a published Kit item",
+      "files": [
+        {
+          "path": "src/server.ts",
+          "type": "registry:file",
+          "target": "~/src/server.ts",
+          "content": "import { Queue, connection } from './backend.js';\nimport Fastify from 'fastify';\nimport { beforeRoutes, afterRoutes } from './docs.js';\nimport cors from '@fastify/cors';\nimport { fromNodeHeaders } from 'better-auth/node';\nimport { auth, pool } from './auth.js';\nconst app=Fastify({logger:false,bodyLimit:1024});\nif(process.env.DB==='on'&&!process.env.DATABASE_URL)throw new Error('DATABASE_URL is required');\nawait app.register(cors,{origin:['http://localhost:3000'],credentials:true});\nif(process.env.DOCS==='on')await beforeRoutes(app);\napp.setErrorHandler((err,req,reply)=>{const status=(err as {statusCode?:number}).statusCode??500;return reply.code(status).send({error:status<500?'Request rejected':'Internal error'});});\napp.get('/health',{schema:{response:{200:{type:'object',properties:{ok:{type:'boolean'}}}}}},async()=>({ok:true}));\napp.get('/ready',async(req,reply)=>{if(process.env.DB==='on'){try{await pool.query('SELECT 1');}catch{return reply.code(503).send({ok:false});}}return {ok:true};});\napp.post('/echo',{schema:{body:{type:'object',properties:{text:{type:'string'}},required:['text'],additionalProperties:false}}},async req=>req.body);\napp.get('/boom',async()=>{throw new Error('LAB_INTERNAL_SECRET');});\nif(process.env.AUTH){\n  app.route({method:['GET','POST'],url:'/api/auth/*',schema:{hide:true},handler:async(req,reply)=>{\n    // Trusted configured authority; do not derive public URL from client Host.\n    const url=new URL(req.url,auth.options.baseURL as string);\n    const response=await auth.handler(new Request(url,{method:req.method,headers:fromNodeHeaders(req.headers),...(req.body?{body:JSON.stringify(req.body)}:{})}));\n    reply.code(response.status);\n    for(const [key,value] of response.headers)if(key!=='set-cookie')reply.header(key,value);\n    const cookies=response.headers.getSetCookie();if(cookies.length)reply.header('set-cookie',cookies);\n    return reply.send(await response.text());\n  }});\n}\napp.get('/private',async(req,reply)=>{\n  if(!req.headers.cookie)return reply.code(401).send({error:'Unauthorized'});\n  const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});\n  if(!session)return reply.code(401).send({error:'Unauthorized'});\n  return {userId:session.user.id};\n});\napp.get('/admin',async(req,reply)=>{\n  const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});\n  if(!session)return reply.code(401).send({error:'Unauthorized'});\n  if(session.user.role!=='admin')return reply.code(403).send({error:'Forbidden'});\n  return {ok:true};\n});\nif(process.env.DOCS==='on')await afterRoutes(app);\nif(process.env.JOBS==='on'){const queue=new Queue('registry-probe',{connection});await queue.waitUntilReady();app.addHook('onClose',()=>queue.close());}\napp.addHook('onClose',()=>pool.end());\nconst address=await app.listen({port:Number(process.env.PORT??4310),host:'127.0.0.1'});\nconsole.log('LAB_LISTEN '+address);\nprocess.on('SIGTERM',async()=>{await app.close();process.exit(0);});\n"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "http://127.0.0.1:4380/api-docs.json",
+        "http://127.0.0.1:4380/auth-better-auth.json",
+        "http://127.0.0.1:4380/jobs-postgres.json"
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "lego-full-b",
+      "type": "registry:item",
+      "title": "lego-full-b",
+      "description": "Isolated validation fixture; not a published Kit item",
+      "files": [
+        {
+          "path": "src/server.ts",
+          "type": "registry:file",
+          "target": "~/src/server.ts",
+          "content": "import { Queue, connection } from './backend.js';\nimport Fastify from 'fastify';\nimport { beforeRoutes, afterRoutes } from './docs.js';\nimport cors from '@fastify/cors';\nimport { fromNodeHeaders } from 'better-auth/node';\nimport { auth, pool } from './auth.js';\nconst app=Fastify({logger:false,bodyLimit:1024});\nif(process.env.DB==='on'&&!process.env.DATABASE_URL)throw new Error('DATABASE_URL is required');\nawait app.register(cors,{origin:['http://localhost:3000'],credentials:true});\nif(process.env.DOCS==='on')await beforeRoutes(app);\napp.setErrorHandler((err,req,reply)=>{const status=(err as {statusCode?:number}).statusCode??500;return reply.code(status).send({error:status<500?'Request rejected':'Internal error'});});\napp.get('/health',{schema:{response:{200:{type:'object',properties:{ok:{type:'boolean'}}}}}},async()=>({ok:true}));\napp.get('/ready',async(req,reply)=>{if(process.env.DB==='on'){try{await pool.query('SELECT 1');}catch{return reply.code(503).send({ok:false});}}return {ok:true};});\napp.post('/echo',{schema:{body:{type:'object',properties:{text:{type:'string'}},required:['text'],additionalProperties:false}}},async req=>req.body);\napp.get('/boom',async()=>{throw new Error('LAB_INTERNAL_SECRET');});\nif(process.env.AUTH){\n  app.route({method:['GET','POST'],url:'/api/auth/*',schema:{hide:true},handler:async(req,reply)=>{\n    // Trusted configured authority; do not derive public URL from client Host.\n    const url=new URL(req.url,auth.options.baseURL as string);\n    const response=await auth.handler(new Request(url,{method:req.method,headers:fromNodeHeaders(req.headers),...(req.body?{body:JSON.stringify(req.body)}:{})}));\n    reply.code(response.status);\n    for(const [key,value] of response.headers)if(key!=='set-cookie')reply.header(key,value);\n    const cookies=response.headers.getSetCookie();if(cookies.length)reply.header('set-cookie',cookies);\n    return reply.send(await response.text());\n  }});\n}\napp.get('/private',async(req,reply)=>{\n  if(!req.headers.cookie)return reply.code(401).send({error:'Unauthorized'});\n  const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});\n  if(!session)return reply.code(401).send({error:'Unauthorized'});\n  return {userId:session.user.id};\n});\napp.get('/admin',async(req,reply)=>{\n  const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});\n  if(!session)return reply.code(401).send({error:'Unauthorized'});\n  if(session.user.role!=='admin')return reply.code(403).send({error:'Forbidden'});\n  return {ok:true};\n});\nif(process.env.DOCS==='on')await afterRoutes(app);\nif(process.env.JOBS==='on'){const queue=new Queue('registry-probe',{connection});await queue.waitUntilReady();app.addHook('onClose',()=>queue.close());}\napp.addHook('onClose',()=>pool.end());\nconst address=await app.listen({port:Number(process.env.PORT??4310),host:'127.0.0.1'});\nconsole.log('LAB_LISTEN '+address);\nprocess.on('SIGTERM',async()=>{await app.close();process.exit(0);});\n"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "http://127.0.0.1:4380/api-docs.json",
+        "http://127.0.0.1:4380/auth-better-auth.json",
+        "http://127.0.0.1:4380/jobs-valkey.json"
+      ]
+    }
+  ]
+}

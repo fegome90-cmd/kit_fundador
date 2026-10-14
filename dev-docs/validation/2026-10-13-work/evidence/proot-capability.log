@@ -1,0 +1,5 @@
+proot error: ptrace(TRACEME): Operation not permitted
+proot error: execve("/usr/bin/id"): Operation not permitted
+proot info: It seems your kernel contains this bug: https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1202161
+To workaround it, set the env. variable PROOT_NO_SECCOMP to 1.
+fatal error: see `proot --help`.

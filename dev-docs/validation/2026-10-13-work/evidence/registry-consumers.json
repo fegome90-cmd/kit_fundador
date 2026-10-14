@@ -1,0 +1,17 @@
+{
+  "consumer-a": {
+    "pnpm-lock.yaml": "1e426219cd588a06283da1b4919f56690bd3c3ed304e9a8c6eae633b41524367",
+    "package.json": "0243ab33bb68a8095a70cc0f90606059c0c9a9d8b18e8c7c4e5329d9d8b2134d",
+    "pnpm-workspace.yaml": "ef23f3d1e6d942e2b89f6a9a7edd1197442434e73d98cb21a1bd62cb8d03fa86"
+  },
+  "consumer-b": {
+    "pnpm-lock.yaml": "76a88ea202d6176735c3490b864c98e02b5d3952bb24b4ed4e7134490a7c0965",
+    "package.json": "81cd25c43901ceff52367064a77398b85613e601df44c950e14fe8592e251448",
+    "pnpm-workspace.yaml": "ef23f3d1e6d942e2b89f6a9a7edd1197442434e73d98cb21a1bd62cb8d03fa86"
+  },
+  "consumer-conflict": {
+    "pnpm-lock.yaml": "fc9a9ff6815b9549625b197722903434bbb776038ac050eebbfc1a2c163ea544",
+    "package.json": "58adcd146bd9cf3429a553237396ad10c05517f46fe5338e3c294ea711876765",
+    "pnpm-workspace.yaml": "ef23f3d1e6d942e2b89f6a9a7edd1197442434e73d98cb21a1bd62cb8d03fa86"
+  }
+}

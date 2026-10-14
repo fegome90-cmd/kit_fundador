@@ -1,0 +1,36 @@
+Usage: better-auth generate [options]
+
+Options:
+  -c, --cwd <cwd>      the working directory. defaults to the current directory.
+                       (default:
+                       "/workspace/scratch/c24b1457b59a/lego-lab/prototype")
+  --config <config>    the path to the configuration file. defaults to the first
+                       configuration file found.
+  --output <output>    the file to output to the generated schema
+  --adapter <adapter>  specify the adapter type (e.g., prisma, drizzle, kysely)
+                       without requiring a configured adapter
+  --dialect <dialect>  specify the database dialect/provider (e.g., postgresql,
+                       mysql, sqlite). For drizzle, postgresql maps to 'pg'
+  -y, --yes            automatically answer yes to all prompts (default: false)
+  --y                  (deprecated) same as --yes (default: false)
+  -h, --help           display help for command
+Usage: shadcn add [options] [components...]
+
+add a component to your project
+
+Arguments:
+  components         item addresses to add
+
+Options:
+  -y, --yes          skip confirmation prompt. (default: false)
+  -o, --overwrite    overwrite existing files. (default: false)
+  -c, --cwd <cwd>    the working directory. defaults to the current directory.
+                     (default:
+                     "/workspace/scratch/c24b1457b59a/lego-lab/prototype")
+  -a, --all          add all available components (default: false)
+  -p, --path <path>  the path to add the component to.
+  -s, --silent       mute output. (default: false)
+  --dry-run          preview changes without writing files. (default: false)
+  --diff [path]      show diff for a file.
+  --view [path]      show file contents.
+  -h, --help         display help for command

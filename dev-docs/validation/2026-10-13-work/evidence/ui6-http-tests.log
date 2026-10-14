@@ -1,0 +1,12 @@
+✔ compiled core HTTP, errors and docs opt-out (977.151209ms)
+{"ownPaths":["/health","/ready","/echo","/boom","/private","/admin"],"authPaths":30}
+✔ OpenAPI contains own paths, UI opt-in and Better Auth operations separate (1104.642766ms)
+✔ enabled DB without DATABASE_URL stops before listen (840.901227ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3042.436504

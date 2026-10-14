@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "jobs-valkey",
+  "type": "registry:item",
+  "title": "jobs-valkey",
+  "description": "Isolated validation fixture; not a published Kit item",
+  "files": [
+    {
+      "path": "src/backend.ts",
+      "type": "registry:file",
+      "target": "~/src/backend.ts",
+      "content": "export { Queue, Worker } from 'bullmq';\nexport const connection={host:'127.0.0.1',port:56379,maxRetriesPerRequest:null};\n"
+    }
+  ],
+  "dependencies": [
+    "bullmq@6.3.14",
+    "ioredis@5.11.1"
+  ],
+  "registryDependencies": [
+    "http://127.0.0.1:4380/core-fastify.json"
+  ]
+}

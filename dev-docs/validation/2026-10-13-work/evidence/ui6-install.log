@@ -1,0 +1,40 @@
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Progress: resolved 538, reused 456, downloaded 0, added 0
+[WARN] 2 deprecated subdependencies found: @esbuild-kit/core-utils@3.3.2, @esbuild-kit/esm-loader@2.6.5
+Packages: +463
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: /root/.local/share/pnpm/store/v11
+  Virtual store is at:             node_modules/.pnpm
+Progress: resolved 540, reused 460, downloaded 0, added 460
+Progress: resolved 540, reused 460, downloaded 1, added 460
+Progress: resolved 540, reused 460, downloaded 3, added 463, done
+.../esbuild@0.28.2/node_modules/esbuild postinstall$ node install.js
+.../esbuild@0.25.12/node_modules/esbuild postinstall$ node install.js
+.../esbuild@0.18.20/node_modules/esbuild postinstall$ node install.js
+.../esbuild@0.28.2/node_modules/esbuild postinstall: Done
+.../esbuild@0.25.12/node_modules/esbuild postinstall: Done
+.../esbuild@0.18.20/node_modules/esbuild postinstall: Done
+
+dependencies:
++ @better-auth/drizzle-adapter 1.7.7
++ @fastify/cors 11.3.1
++ @fastify/swagger 9.9.2
++ @fastify/swagger-ui 6.1.2
++ better-auth 1.7.7
++ bullmq 6.3.14
++ drizzle-orm 0.45.4
++ fastify 5.12.7
++ ioredis 5.11.1 (6.0.0 is available)
++ pg 8.23.1
+
+devDependencies:
++ @apidevtools/swagger-parser 13.1.0
++ @types/node 24.19.2 (26.6.5 is available)
++ @types/pg 8.23.1
++ auth 1.7.7
++ drizzle-kit 0.31.11
++ shadcn 4.21.4
++ typescript 5.9.3 (7.0.2 is available)
+
+Done in 12.3s using pnpm v11.25.0

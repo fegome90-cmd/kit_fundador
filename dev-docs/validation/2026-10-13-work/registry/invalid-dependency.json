@@ -1,0 +1,1 @@
+{"$schema": "https://ui.shadcn.com/schema/registry-item.json", "name": "invalid-dependency", "type": "registry:item", "dependencies": ["fastify@0.0.999999"], "files": [{"path": "src/invalid.ts", "type": "registry:file", "target": "~/src/invalid.ts", "content": "export const invalid=true;"}]}

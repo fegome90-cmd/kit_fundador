@@ -1,0 +1,17 @@
+{"test":"retry","attempts":3,"elapsedMs":344}
+✔ B producer -> separate compiled worker, result, bounded retry/backoff (554.030959ms)
+✔ B jobId and deduplication reject duplicate enqueues before processing (209.679941ms)
+✔ B permanent failure and invalid payload have explicit failed states (226.97954ms)
+{"test":"kill-recovery","recoveryMs":3718}
+✔ B worker SIGKILL active job recovered after lock expiry (3936.660182ms)
+{"test":"effect-ack","executions":2,"uniqueEffects":1}
+✔ B effect committed before ack: repeated execution uses durable idempotency key (3909.982521ms)
+✔ B graceful SIGTERM drains an active job (516.26668ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9512.976593

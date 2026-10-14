@@ -1,0 +1,30 @@
+- Checking registry.
+✔ Checking registry.
+- Installing dependencies.
+- Installing dependencies.
+
+
+Something went wrong. Please check the error below for more details.
+If the problem persists, please open an issue on GitHub.
+
+Command failed with exit code 1: pnpm add -- 'fastify@0.0.999999'
+
+✓ Lockfile passes supply-chain policies (verified 1s ago)
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Progress: resolved 12, reused 12, downloaded 0, added 0
+[ERR_PNPM_NO_MATCHING_VERSION] No matching version found for fastify@0.0.999999 while fetching it from https://registry.npmjs.org/
+
+This error happened while installing a direct dependency of /workspace/scratch/c24b1457b59a/lego-lab/consumer-fixed-b
+
+The latest release of fastify is "5.12.7". Published at 10/13/2026 4:07:53 AM
+
+Other releases are:
+  * three: 3.29.5 published at 1/21/2023
+  * four: 4.29.1 published at 4/28/2025
+  * next: 6.0.0-alpha.5 published at 10/13/2026 2:52:47 AM
+
+If you need the full list of all 334 published versions run "pnpm view fastify versions".
+
+You can also try a previous version to see if that works:
+npx shadcn@4.20.0 add http://127.0.0.1:4380/invalid-dependency.json --yes
+

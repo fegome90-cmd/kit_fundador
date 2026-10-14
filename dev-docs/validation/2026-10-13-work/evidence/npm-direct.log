@@ -1,0 +1,36 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+{
+  "version": "6.3.14",
+  "engines": {
+    "node": ">=14.17.0"
+  },
+  "peerDependencies": {
+    "pg": ">=8.0.0",
+    "redis": ">=5.0.0",
+    "ioredis": ">=5.0.0",
+    "bullmq-otel": ">=2.0.0"
+  },
+  "dist": {
+    "shasum": "09f6d2a1a4aa33ad2e70fb1bcf17c9dd9460a500",
+    "tarball": "https://registry.npmjs.org/bullmq/-/bullmq-6.3.14.tgz",
+    "fileCount": 712,
+    "integrity": "sha512-iXpDyX45fonQugWAHw+FNPH/YIjqzmzi/xxs31dzWGNP7j6b4jAVN0oNWU5cz0mVi1RofEkrlRwRbLqhqNkjHw==",
+    "signatures": [
+      {
+        "sig": "MEYCIQDgJwCoC9IgkwevPSeea5xF1c6Lyev+Gw+T3Yfd3NLmZgIhAPxpxGJyrRkyOcDvqLqT2hUGJ5TxvSybwd/TsB+vfpcz",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      },
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEUCIQCFnPdsjIhUmtqrGtuwlhz1vdZwjJ1u8/il9Rq5NeFvtgIgRAzqKSuuUUR2CgOch5iut+MWd/IF4XVTLam/m7hLbOY="
+      }
+    ],
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/bullmq@6.3.14",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "unpackedSize": 3012063
+  }
+}

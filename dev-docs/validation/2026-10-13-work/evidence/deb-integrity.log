@@ -1,0 +1,68 @@
+total 14584
+-rw-r--r-- 1 root root   151262 Aug 19 08:36 libpq5_16.15-0ubuntu0.24.04.1_amd64.deb
+-rw-r--r-- 1 root root    27260 Mar 31  2024 libtalloc2_2.4.2-1build2_amd64.deb
+-rw-r--r-- 1 root root 14067494 Oct 13 21:38 postgresql-16_16.15-0ubuntu0.24.04.1_amd64.deb
+-rw-r--r-- 1 root root   603495 Oct 13 21:38 postgresql-client-16_16.15-0ubuntu0.24.04.1_amd64.deb
+-rw-r--r-- 1 root root    75316 Dec 23  2018 proot_5.1.0-1.3_amd64.deb
+Package: postgresql-16
+Priority: optional
+Section: database
+Installed-Size: 44352
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Architecture: amd64
+Version: 16.15-0ubuntu0.24.04.1
+Recommends: sysstat
+Provides: postgresql-16-jit-llvm (= 17), postgresql-contrib-16
+Depends: locales | locales-all, postgresql-client-16, postgresql-common (>= 252~), ssl-cert, tzdata, debconf (>= 0.5) | debconf-2.0, libc6 (>= 2.38), libgcc-s1 (>= 3.3.1), libgssapi-krb5-2 (>= 1.14+dfsg), libicu74 (>= 74.1-1~), libldap2 (>= 2.6.2), libllvm17t64, liblz4-1 (>= 0.0~r130), libpam0g (>= 0.99.7.1), libpq5 (>= 16~~), libselinux1 (>= 3.1~), libssl3t64 (>= 3.0.0), libstdc++6 (>= 5.2), libsystemd0, libuuid1 (>= 2.16), libxml2 (>= 2.7.4), libxslt1.1 (>= 1.1.25), libzstd1 (>= 1.5.5), zlib1g (>= 1:1.1.4)
+Breaks: dbconfig-common (<< 2.0.22~)
+Filename: pool/main/p/postgresql-16/postgresql-16_16.15-0ubuntu0.24.04.1_amd64.deb
+Size: 15610426
+MD5sum: 1092945ffffdacdadd2f1cd7b5cbff0e
+SHA1: 625a455fd9f8176d868f102209bed57580638764
+SHA256: d60ae76fb862cd4cca7bfdcdcdcc271c5e1d75f6b7915305ce2d962735a4b666
+SHA512: 40d19bdafc688b06e819b282ea80edfdb4173e48a45a19106953cfde0a44f9973cf579ea8d25b7d9ef61fc9580724e41f59e7111b678b13603f57b6bb3dbed08
+Homepage: http://www.postgresql.org/
+Description: The World's Most Advanced Open Source Relational Database
+Description-md5: d7367291c15795e56aa78252604f9ced
+Original-Maintainer: Debian PostgreSQL Maintainers <team+postgresql@tracker.debian.org>
+Postgresql-Catversion: 202307071
+Origin: Ubuntu
+Bugs: https://bugs.launchpad.net/ubuntu/+filebug
+Task: postgresql-server
+3f96dd36bcd7841172c1ead4965da20a193bb9ccf9a93a3f5a3ac7f56369dbb1  lego-lab/system/debs/libpq5_16.15-0ubuntu0.24.04.1_amd64.deb
+c9728388084bdccdbcfb3e97358535431855f4ce57992c2a775534dc1bd4935f  lego-lab/system/debs/libtalloc2_2.4.2-1build2_amd64.deb
+ebc72e45cc4270fe78e797b7a3d94d406d0736bd794a6dcc7ee8581f223c33b1  lego-lab/system/debs/postgresql-16_16.15-0ubuntu0.24.04.1_amd64.deb
+29fbc0320f931d9fec60f2a0fa944816f3bcb5f30c700beab8e2beb7b5a58141  lego-lab/system/debs/postgresql-client-16_16.15-0ubuntu0.24.04.1_amd64.deb
+01a5d27c4ac16e184bdb356c9e69fa7d494325ac653c4cd64fae4c3fc63cdbbb  lego-lab/system/debs/proot_5.1.0-1.3_amd64.deb
+ new Debian package, version 2.0.
+ size 603495 bytes: control archive=7293 bytes.
+    1250 bytes,    26 lines      control
+   20476 bytes,   239 lines      md5sums
+     193 bytes,    13 lines   *  postinst             #!/bin/sh
+     185 bytes,    12 lines   *  prerm                #!/bin/sh
+ Package: postgresql-client-16
+ Source: postgresql-16
+ Version: 16.15-0ubuntu0.24.04.1
+ Architecture: amd64
+ Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+ Installed-Size: 4272
+ Depends: libpq5 (>= 16.15), postgresql-client-common (>= 182~), sensible-utils, libc6 (>= 2.38), liblz4-1 (>= 0.0~r127), libreadline8t64 (>= 6.0), libssl3t64 (>= 3.0.0), libzstd1 (>= 1.5.5), zlib1g (>= 1:1.1.4)
+ Suggests: postgresql-16, postgresql-doc-16
+ Provides: postgresql-client
+ Section: database
+ Priority: optional
+ Multi-Arch: foreign
+ Homepage: http://www.postgresql.org/
+ Description: front-end programs for PostgreSQL 16
+  This package contains client and administrative programs for
+  PostgreSQL: these are the interactive terminal client psql and
+  programs for creating and removing users and databases.
+  .
+  This is the client package for PostgreSQL 16. If you install
+  PostgreSQL 16 on a standalone machine, you need the server package
+  postgresql-16, too. On a network, you can install this package on
+  many client machines, while the server package may be installed on
+  only one machine.
+  .
+  PostgreSQL is an object-relational SQL database management system.
+ Original-Maintainer: Debian PostgreSQL Maintainers <team+postgresql@tracker.debian.org>

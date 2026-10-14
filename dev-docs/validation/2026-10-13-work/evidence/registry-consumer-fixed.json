@@ -1,0 +1,44 @@
+{
+  "consumer-fixed-a": {
+    "pnpm-lock.yaml": "26d694fd6da4dfcd6ec3d7c684cd494251b3667326bae00ab1cc2b0df34af63a",
+    "tsconfig.json": "548a24ce045b2cd27d48d75ad908bbc44d21a685f5e5b97f5bab01cf62dedb6d",
+    "drizzle.config.ts": "5e0d5fd0782d4875f06c21fd3295f92bf0c975604e69d9d3fd9da2839fe26651",
+    "package.json": "804d99c8d2a7c3d3dce51eca064c2297ea1fec5ac32f1bf72de66402b236bd16",
+    "pnpm-workspace.yaml": "9f4a21a950d2ed9b2d740b5acec90b9fd4acc5b5a795868adfec64c35a20b247",
+    "dist/backend.js": "6799627a768beaab0ec699651d40c7e1d258b96106b6ff8c879d65fd66cc6d30",
+    "dist/auth.js": "c70e720482452b12c32b3b5c710bd9ae07db72df1b9015fa1efe451fd62c50a5",
+    "dist/docs.js": "e161267565a29084a8a8609ab7868f2f1deecda9b62e44d57a3df0aaad0e6730",
+    "dist/server.js": "ffb349fca4059c2619cd6f8a60d8bf876a092846f4fb1280bc0536ad57d128b1",
+    "dist/auth-schema.js": "cde4659184b1db90b829564ad7f9257bbb9c1382cbc15f7eb1fd101392cb5619",
+    "src/backend.ts": "54237a817df9d70145f1199fc7af0c5dcb7c4a27d139b6a9687947298727a862",
+    "src/server.ts": "7dd0e466b4f6e80926fabc94cfcbf9862e1335895c59d378a871a467a65da17a",
+    "src/docs.ts": "b04bb7c52498b41a18b8b2437228084e4fcba742bb45434ce8b340eab0a8ba8f",
+    "src/auth.ts": "8d0567c97211bdd5153e192899ee833fd961f44bf8a4b18ff85bdfd7ce856ac0",
+    "src/auth-schema.ts": "66a3ee793eca437fec7c89306d68e1c8012ab34e3a80eb877637230724e01fa4"
+  },
+  "consumer-fixed-b": {
+    "pnpm-lock.yaml": "11422c478d1c26a6ce797e308f1c10e22e58dc8d1d0ee8a19b3caae4a99cce35",
+    "tsconfig.json": "548a24ce045b2cd27d48d75ad908bbc44d21a685f5e5b97f5bab01cf62dedb6d",
+    "drizzle.config.ts": "5e0d5fd0782d4875f06c21fd3295f92bf0c975604e69d9d3fd9da2839fe26651",
+    "package.json": "a85c1e5661c398b6976cdd2069b8a0ee5ec61fecd04b3f46294b3899484f927d",
+    "pnpm-workspace.yaml": "9f4a21a950d2ed9b2d740b5acec90b9fd4acc5b5a795868adfec64c35a20b247",
+    "dist/backend.js": "9a55b33c22d3bb153e805a7abb1062fb0047038bd4723bf39345cf135a9ecc9f",
+    "dist/auth.js": "c70e720482452b12c32b3b5c710bd9ae07db72df1b9015fa1efe451fd62c50a5",
+    "dist/docs.js": "06725d2fcf6a2d549518bdbd261f85cb8cd785be9856fb0be0cb886c2ab4336a",
+    "dist/server.js": "ffb349fca4059c2619cd6f8a60d8bf876a092846f4fb1280bc0536ad57d128b1",
+    "dist/auth-schema.js": "cde4659184b1db90b829564ad7f9257bbb9c1382cbc15f7eb1fd101392cb5619",
+    "src/backend.ts": "b7283cf39757d8ed6a0ef59f54fc10b9dcbacb163376641867988945363c77ac",
+    "src/server.ts": "7dd0e466b4f6e80926fabc94cfcbf9862e1335895c59d378a871a467a65da17a",
+    "src/docs.ts": "90e9a2a2a6c918adce543971bf962d22f9fcf106fdd514188f7cfde1896770bd",
+    "src/auth.ts": "8d0567c97211bdd5153e192899ee833fd961f44bf8a4b18ff85bdfd7ce856ac0",
+    "src/auth-schema.ts": "66a3ee793eca437fec7c89306d68e1c8012ab34e3a80eb877637230724e01fa4"
+  },
+  "consumer-fixed-conflict": {
+    "pnpm-lock.yaml": "d6fcc3076a8d9c854755d7adb0407ee74920036f3dbd3dddc5b2bd12de24d1c5",
+    "tsconfig.json": "548a24ce045b2cd27d48d75ad908bbc44d21a685f5e5b97f5bab01cf62dedb6d",
+    "drizzle.config.ts": "5e0d5fd0782d4875f06c21fd3295f92bf0c975604e69d9d3fd9da2839fe26651",
+    "package.json": "42b2f1512856bb95c49e40ea1dca90e7afe28d93e064bab62e6c32065fc7d131",
+    "pnpm-workspace.yaml": "9f4a21a950d2ed9b2d740b5acec90b9fd4acc5b5a795868adfec64c35a20b247",
+    "src/backend.ts": "b7283cf39757d8ed6a0ef59f54fc10b9dcbacb163376641867988945363c77ac"
+  }
+}

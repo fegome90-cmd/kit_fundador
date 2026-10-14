@@ -1,0 +1,15 @@
+- Checking registry.
+✔ Checking registry.
+- Installing dependencies.
+- Installing dependencies.
+✔ Installing dependencies.
+- Updating files.
+ℹ Skipped 8 files: (files might be identical, use --overwrite to overwrite)
+  - tsconfig.json
+  - pnpm-workspace.yaml
+  - src/docs.ts
+  - drizzle.config.ts
+  - src/auth.ts
+  - src/auth-schema.ts
+  - src/backend.ts
+  - src/server.ts

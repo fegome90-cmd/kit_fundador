@@ -1,0 +1,26 @@
+? Verifying lockfile against supply-chain policies (560 entries)...
+✓ Lockfile passes supply-chain policies (560 entries in 10.3s)
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Progress: resolved 301, reused 193, downloaded 6, added 0
+[WARN] 2 deprecated subdependencies found: @esbuild-kit/core-utils@3.3.2, @esbuild-kit/esm-loader@2.6.5
+Packages: +7 -5
++++++++-----
+Progress: resolved 543, reused 460, downloaded 6, added 7, done
+
+dependencies:
+- ioredis 6.0.0
++ ioredis 5.11.1 (6.0.0 is available)
+
+devDependencies:
+- @types/node 26.6.5
++ @types/node 24.19.2 (26.6.5 is available)
+- typescript 7.0.2
++ typescript 5.9.3 (7.0.2 is available)
+
+.../esbuild@0.25.12/node_modules/esbuild postinstall$ node install.js
+.../esbuild@0.18.20/node_modules/esbuild postinstall$ node install.js
+.../esbuild@0.28.2/node_modules/esbuild postinstall$ node install.js
+.../esbuild@0.25.12/node_modules/esbuild postinstall: Done
+.../esbuild@0.18.20/node_modules/esbuild postinstall: Done
+.../esbuild@0.28.2/node_modules/esbuild postinstall: Done
+Done in 13.5s using pnpm v11.25.0

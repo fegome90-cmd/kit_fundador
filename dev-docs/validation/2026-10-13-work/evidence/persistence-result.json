@@ -1,0 +1,10 @@
+{
+  "persistedQueued": 100,
+  "recoveredCompleted": 100,
+  "producerOutageRejected": true,
+  "producerOutageRejectionMs": 1,
+  "backendRestartAndDrainMs": 1160,
+  "workerReconnect": true,
+  "policy": "noeviction",
+  "appendfsync": "always"
+}

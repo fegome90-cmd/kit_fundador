@@ -1,0 +1,90 @@
+0 = ERROR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+1 = WARNING
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+2 = DEBUG
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+3 = TRACE
+.RE
+.RE
+.PP
+\fBUID_WRAPPER_MYUID\fR
+.RS 4
+This environment variable can be used to tell uid_wrapper to let geteuid() return the real (instead of the faked) UID of the user who started the process with uid_wrapper\&.
+.RE
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+uid_t uid;
+
+setenv("UID_WRAPPER_MYUID", "1", 1);
+uid = geteuid();
+unsetenv("UID_WRAPPER_MYUID");
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+\fBUID_WRAPPER_DISABLE_DEEPBIND\fR
+.RS 4
+This allows you to disable deep binding in uid_wrapper\&. This is useful for running valgrind tools or sanitizers like (address, undefined, thread)\&.
+.RE
+.SH "EXAMPLE"
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ LD_PRELOAD=libuid_wrapper\&.so UID_WRAPPER=1 UID_WRAPPER_ROOT=1 id
+uid=0(root) gid=0(root) 0(root)
+.fi
+.if n \{\
+.RE
+.\}
+.SH "WORKAROUNDS"
+.sp
+If you need to write code that behaves differently depending on whether uid_wrapper is enabled or not, for example in cases where you have to file permissions, you can predefine the uid_wrapper_enabled() function in your project as follows:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+bool uid_wrapper_enabled(void)
+{
+    return false;
+}
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Since uid_wrapper overloads this function if enabled, you can use it in your code to detect uid_wrapper\&.

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "db-postgres",
+  "type": "registry:item",
+  "title": "db-postgres",
+  "description": "Isolated validation fixture; not a published Kit item",
+  "files": [
+    {
+      "path": "drizzle.config.ts",
+      "type": "registry:file",
+      "target": "~/drizzle.config.ts",
+      "content": "import { defineConfig } from 'drizzle-kit';\nexport default defineConfig({ dialect: 'postgresql', schema: './src/auth-schema.ts', out: './drizzle', dbCredentials: { url: process.env.DATABASE_URL ?? 'postgres://lab@127.0.0.1:55432/legolab' } });\n"
+    }
+  ],
+  "dependencies": [
+    "drizzle-orm@0.45.4",
+    "pg@8.23.1"
+  ],
+  "registryDependencies": [
+    "http://127.0.0.1:4380/core-fastify.json"
+  ]
+}

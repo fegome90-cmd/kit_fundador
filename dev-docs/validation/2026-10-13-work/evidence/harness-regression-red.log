@@ -1,0 +1,48 @@
+0.1:4380/lego-full-a.json", "--yes"], "started_utc": "2026-10-14T02:04:23Z", "seconds": 3.33, "exit_code": 0, "log": "registry-repeat-4.log"}
+- Checking registry.
+✔ Checking registry.
+- Installing dependencies.
+- Installing dependencies.
+✔ Installing dependencies.
+- Updating files.
+ℹ Skipped 8 files: (files might be identical, use --overwrite to overwrite)
+  - tsconfig.json
+  - pnpm-workspace.yaml
+  - src/docs.ts
+  - drizzle.config.ts
+  - src/auth.ts
+  - src/auth-schema.ts
+  - src/backend.ts
+  - src/server.ts
+
+REPEAT_FILES_IDENTICAL True
+{"label": "registry-conflict", "cwd": "/workspace/scratch/c24b1457b59a/lego-lab/consumer-fixed-conflict", "argv": ["node", "/workspace/scratch/c24b1457b59a/lego-lab/prototype/node_modules/shadcn/dist/index.js", "add", "http://127.0.0.1:4380/jobs-postgres.json", "http://127.0.0.1:4380/jobs-valkey.json", "--yes"], "started_utc": "2026-10-14T02:04:27Z", "seconds": 2.931, "exit_code": 0, "log": "registry-conflict-3.log"}
+- Checking registry.
+✔ Checking registry.
+- Installing dependencies.
+- Installing dependencies.
+✔ Installing dependencies.
+- Updating files.
+[?25l[2K[1G? The file backend.ts already exists. Would you like to overwrite? › (y/N)
+{"label": "registry-missing", "cwd": "/workspace/scratch/c24b1457b59a/lego-lab/consumer-fixed-b", "argv": ["node", "/workspace/scratch/c24b1457b59a/lego-lab/prototype/node_modules/shadcn/dist/index.js", "add", "http://127.0.0.1:4380/missing.json", "--yes"], "started_utc": "2026-10-14T02:04:30Z", "seconds": 0.916, "exit_code": 1, "log": "registry-missing-3.log"}
+
+
+Something went wrong. Please check the error below for more details.
+If the problem persists, please open an issue on GitHub.
+
+Message:
+The item at http://127.0.0.1:4380/missing.json was not found. It may not exist at the registry.
+
+Suggestion:
+Check if the item name is correct and the registry URL is accessible.
+
+You can also try a previous version to see if that works:
+npx shadcn@4.20.0 add http://127.0.0.1:4380/missing.json --yes
+
+
+
+Traceback (most recent call last):
+  File "/workspace/scratch/c24b1457b59a/lego-lab/check-registry-harness.py", line 5, in <module>
+    assert p.returncode==1,f'Known preview/conflict gate failures must return 1, observed {p.returncode}'
+           ^^^^^^^^^^^^^^^
+AssertionError: Known preview/conflict gate failures must return 1, observed 0

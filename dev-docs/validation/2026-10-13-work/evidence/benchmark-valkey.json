@@ -1,0 +1,89 @@
+{
+  "note": "Single-host native Valkey, no PostgreSQL comparison. Processing latencies exclude waiting in paused queue; 500 no-op arithmetic jobs x 3 repetitions per enqueue mode.",
+  "runs": [
+    {
+      "backend": "Valkey",
+      "kind": "sequential",
+      "trial": 1,
+      "count": 500,
+      "concurrency": 4,
+      "appendfsync": "always",
+      "enqueueMs": 94.67357900000002,
+      "enqueueJobsPerSecond": 5281.304512634933,
+      "processingMs": 65.49044199999997,
+      "processingJobsPerSecond": 7634.701869930886,
+      "jobProcessingP50Ms": 0,
+      "jobProcessingP95Ms": 1
+    },
+    {
+      "backend": "Valkey",
+      "kind": "sequential",
+      "trial": 2,
+      "count": 500,
+      "concurrency": 4,
+      "appendfsync": "always",
+      "enqueueMs": 71.23166800000001,
+      "enqueueJobsPerSecond": 7019.349876799178,
+      "processingMs": 85.33486000000005,
+      "processingJobsPerSecond": 5859.27017399454,
+      "jobProcessingP50Ms": 1,
+      "jobProcessingP95Ms": 1
+    },
+    {
+      "backend": "Valkey",
+      "kind": "sequential",
+      "trial": 3,
+      "count": 500,
+      "concurrency": 4,
+      "appendfsync": "always",
+      "enqueueMs": 54.40374699999995,
+      "enqueueJobsPerSecond": 9190.54343812018,
+      "processingMs": 62.908995000000004,
+      "processingJobsPerSecond": 7947.9889958502745,
+      "jobProcessingP50Ms": 0,
+      "jobProcessingP95Ms": 1
+    },
+    {
+      "backend": "Valkey",
+      "kind": "bulk",
+      "trial": 1,
+      "count": 500,
+      "concurrency": 4,
+      "appendfsync": "always",
+      "enqueueMs": 21.64673800000014,
+      "enqueueJobsPerSecond": 23098.16841687633,
+      "processingMs": 62.90466300000003,
+      "processingJobsPerSecond": 7948.536343005284,
+      "jobProcessingP50Ms": 0,
+      "jobProcessingP95Ms": 1
+    },
+    {
+      "backend": "Valkey",
+      "kind": "bulk",
+      "trial": 2,
+      "count": 500,
+      "concurrency": 4,
+      "appendfsync": "always",
+      "enqueueMs": 21.683342999999923,
+      "enqueueJobsPerSecond": 23059.174962089644,
+      "processingMs": 86.49103100000002,
+      "processingJobsPerSecond": 5780.946234760456,
+      "jobProcessingP50Ms": 1,
+      "jobProcessingP95Ms": 1
+    },
+    {
+      "backend": "Valkey",
+      "kind": "bulk",
+      "trial": 3,
+      "count": 500,
+      "concurrency": 4,
+      "appendfsync": "always",
+      "enqueueMs": 17.80573400000003,
+      "enqueueJobsPerSecond": 28080.8418232014,
+      "processingMs": 62.84013600000026,
+      "processingJobsPerSecond": 7956.6982477567835,
+      "jobProcessingP50Ms": 0,
+      "jobProcessingP95Ms": 1
+    }
+  ]
+}

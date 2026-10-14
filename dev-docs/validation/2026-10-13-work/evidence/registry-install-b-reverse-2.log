@@ -1,0 +1,41 @@
+- Checking registry.
+✔ Checking registry.
+- Installing dependencies.
+- Installing dependencies.
+
+
+Something went wrong. Please check the error below for more details.
+If the problem persists, please open an issue on GitHub.
+
+Command failed with exit code 1: pnpm add -- 'fastify@5.12.7' '@fastify/cors@11.3.1' 'bullmq@6.3.14' 'ioredis@5.11.1' '@fastify/swagger@9.9.2' '@fastify/swagger-ui@5.2.6' 'drizzle-orm@0.45.4' 'pg@8.23.1' 'better-auth@1.7.7' '@better-auth/drizzle-adapter@1.7.7'
+
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +131
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: /root/.local/share/pnpm/store/v11
+  Virtual store is at:             node_modules/.pnpm
+Progress: resolved 136, reused 131, downloaded 0, added 131, done
+
+dependencies:
++ @better-auth/drizzle-adapter 1.7.7
++ @fastify/cors 11.3.1
++ @fastify/swagger 9.9.2
++ @fastify/swagger-ui 5.2.6 (6.1.2 is available)
++ better-auth 1.7.7
++ bullmq 6.3.14
++ drizzle-orm 0.45.4
++ fastify 5.12.7
++ ioredis 5.11.1 (6.0.0 is available)
++ pg 8.23.1
+
+Added 2 entries to minimumReleaseAgeExclude in pnpm-workspace.yaml (set minimumReleaseAgeStrict to true to gate these updates with a prompt):
+  bullmq@6.3.14
+  fastify@5.12.7
+[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: msgpackr-extract@3.0.4
+
+Run "pnpm approve-builds" to pick which dependencies should be allowed to run scripts.
+
+You can also try a previous version to see if that works:
+npx shadcn@4.20.0 add http://127.0.0.1:4380/jobs-valkey.json http://127.0.0.1:4380/auth-better-auth.json http://127.0.0.1:4380/api-docs.json http://127.0.0.1:4380/lego-full-b.json --yes
+

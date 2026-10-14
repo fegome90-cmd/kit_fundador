@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "api-docs",
+  "type": "registry:item",
+  "title": "api-docs",
+  "description": "Isolated validation fixture; not a published Kit item",
+  "files": [
+    {
+      "path": "src/docs.ts",
+      "type": "registry:file",
+      "target": "~/src/docs.ts",
+      "content": "import { type FastifyInstance } from 'fastify';\nimport swagger from '@fastify/swagger';\nimport swaggerUI from '@fastify/swagger-ui';\nexport async function beforeRoutes(app:FastifyInstance){await app.register(swagger,{openapi:{info:{title:'LEGO isolated PoC',version:'0.0.0'},components:{securitySchemes:{session:{type:'apiKey',in:'cookie',name:'better-auth.session_token'}}}}});}\nexport async function afterRoutes(app:FastifyInstance){await app.register(swaggerUI,{routePrefix:'/docs'});}\n"
+    }
+  ],
+  "dependencies": [
+    "@fastify/swagger@9.9.2",
+    "@fastify/swagger-ui@5.2.6"
+  ],
+  "registryDependencies": [
+    "http://127.0.0.1:4380/core-fastify.json"
+  ]
+}

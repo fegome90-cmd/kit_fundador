@@ -1,0 +1,6 @@
+v24.19.0
+11.25.0
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+11.9.0
+Linux b8c42b7fc6fa 6.18.44 #1 SMP Sat Sep 26 20:02:31 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+unshare: write failed /proc/self/uid_map: Operation not permitted

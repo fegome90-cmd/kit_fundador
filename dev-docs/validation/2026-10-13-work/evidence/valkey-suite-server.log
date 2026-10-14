@@ -1,0 +1,24 @@
+5:M 13 Oct 2026 21:56:16.468 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+5:M 13 Oct 2026 21:56:16.468 * oO0OoO0OoO0Oo Valkey is starting oO0OoO0OoO0Oo
+5:M 13 Oct 2026 21:56:16.468 * Valkey version=8.1.4, bits=64, commit=5f4bae3e, modified=0, pid=5, just started
+5:M 13 Oct 2026 21:56:16.468 * Configuration loaded
+5:M 13 Oct 2026 21:56:16.469 * monotonic clock: POSIX clock_gettime
+5:M 13 Oct 2026 21:56:16.469 * Running mode=standalone, port=56379.
+5:M 13 Oct 2026 21:56:16.469 * Server initialized
+5:M 13 Oct 2026 21:56:16.469 * Reading RDB base file on AOF loading...
+5:M 13 Oct 2026 21:56:16.469 * Loading RDB produced by Valkey version 8.1.4
+5:M 13 Oct 2026 21:56:16.469 * RDB age 933 seconds
+5:M 13 Oct 2026 21:56:16.469 * RDB memory usage when created 0.92 Mb
+5:M 13 Oct 2026 21:56:16.469 * RDB is base AOF
+5:M 13 Oct 2026 21:56:16.469 * Done loading RDB, keys loaded: 0, keys expired: 0.
+5:M 13 Oct 2026 21:56:16.469 * DB loaded from base file appendonly.aof.1.base.rdb: 0.000 seconds
+5:M 13 Oct 2026 21:56:16.569 * DB loaded from incr file appendonly.aof.1.incr.aof: 0.100 seconds
+5:M 13 Oct 2026 21:56:16.569 * DB loaded from append only file: 0.100 seconds
+5:M 13 Oct 2026 21:56:16.569 * Opening AOF incr file appendonly.aof.1.incr.aof on server start
+5:M 13 Oct 2026 21:56:16.569 * Ready to accept connections tcp
+5:signal-handler (1791942977) Received SIGTERM scheduling shutdown...
+5:M 13 Oct 2026 21:56:17.773 * User requested shutdown...
+5:M 13 Oct 2026 21:56:17.773 * Calling fsync() on the AOF file.
+5:M 13 Oct 2026 21:56:17.773 * Saving the final RDB snapshot before exiting.
+5:M 13 Oct 2026 21:56:17.774 * DB saved on disk
+5:M 13 Oct 2026 21:56:17.774 # Valkey is now ready to exit, bye bye...
