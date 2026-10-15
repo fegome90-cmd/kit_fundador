@@ -133,6 +133,8 @@ def fetch_registry(base: str, requested: list[str]) -> tuple[list[dict], dict[st
         for file in files:
             if not isinstance(file,dict) or set(file)-ALLOWED_FILE_FIELDS:
                 raise Rejected('Unsupported registry file fields: '+name)
+            if isinstance(file.get('path'),str) and '..' in file['path'].split('/'):
+                raise Rejected('Path traversal in registry file source: '+name)
             if (file.get('type') != 'registry:file' or not isinstance(file.get('content'),str)
                     or not isinstance(file.get('path'),str)
                     or '://' in file['path'] or '..' in file['path'].split('/')
