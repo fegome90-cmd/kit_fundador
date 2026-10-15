@@ -3,7 +3,7 @@ name: LEGO MVP distribution (isolated)
 on:
   workflow_dispatch:
   push:
-    branches: [feat/fastify-lego-foundation, feat/lego-mvp-scaffold]
+    branches: [feat/fastify-lego-foundation]
     paths:
       - .github/workflows/lego-mvp-distribution.yml
       - templates/fastify-core/**
@@ -23,6 +23,12 @@ on:
 
 permissions:
   contents: read
+
+# Review branches use pull_request checks; experimental research uses push.
+# Cancel superseded runs to avoid wasting hosted CI minutes.
+concurrency:
+  group: lego-mvp-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   template-validation:
