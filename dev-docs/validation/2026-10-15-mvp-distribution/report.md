@@ -64,9 +64,11 @@ Se preservaron los prototipos de PostgreSQL, Drizzle, Better Auth y BullMQ/Valke
 - **Sin instalador in-place:** una instalación sobre proyecto con personalizaciones queda fuera de este contrato; no se copió `lego_safe.py` ni su journal al MVP.
 - **Sin distribución npm/Homebrew:** no existe `create-kitfundador` publicado, tap Brew, marketplace VS Code ni extensiones; para bootstrap se usa `giget` existente.
 
-## 6. Próximo gate antes de un PR de producción
+## 6. Aislamiento realizado para revisión
 
-Separar las dos plantillas y su workflow/quickstart en **un PR enfocado** sobre `main`, evitando el mega-diff de laboratorios acumulados en `feat/fastify-lego-foundation`. Pedir revisión de seguridad y experiencia de instalación; repetir CI desde la rama de PR, idealmente con CodeRabbit. No integrar automáticamente el código de las cuatro piezas A/B.
+**PASS:** se creó `feat/lego-mvp-scaffold` desde `main` en un único commit `ae8e6f232e996f9b75f8b36c3f4e5c80e04c0f0e`, con **34 archivos** y ningún archivo de los prototipos experimentales. La comparación GitHub confirmó `ahead=1`, `behind=0` y cero rutas fuera de las plantillas, el workflow MVP, el quickstart y los dos informes. El origen está en `feat/fastify-lego-foundation`; el backend Express existente permanece intacto.
+
+**Siguiente gate:** ejecutar CI nuevamente sobre la rama limpia y abrir una PR **en borrador**. No fusionar antes de review humano/CodeRabbit y verificación de seguridad. No integrar automáticamente el código de cuatro piezas A/B.
 
 No autorizar despliegue público solo porque el starter de Fastify pase CI. Para ese objetivo requerir revisión de threat model, middleware/cabeceras de seguridad, control de acceso, rate limit y observabilidad, según la aplicación.
 
