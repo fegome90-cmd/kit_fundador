@@ -115,7 +115,16 @@ jobs:
             exit 1
           fi
           test "$(cat "$LAB/occupied/consumer-file.txt")" = PRESERVE_ME
+          test "$(find "$LAB/occupied" -type f -printf '%P\n')" = "consumer-file.txt"
           echo "MVP_OCCUPIED_DESTINATION_REJECTED"
+          ln -s "$LAB/occupied" "$LAB/occupied-symlink"
+          if pnpm dlx giget@3.3.1 "$SOURCE" "$LAB/occupied-symlink" > "$LAB/giget-symlink-error.log" 2>&1; then
+            echo "Unexpected installation through a symlink to an occupied folder" >&2
+            exit 1
+          fi
+          test "$(cat "$LAB/occupied/consumer-file.txt")" = PRESERVE_ME
+          test "$(find "$LAB/occupied" -type f -printf '%P\n')" = "consumer-file.txt"
+          echo "MVP_OCCUPIED_SYMLINK_REJECTED"
       - name: Retain independently resolved lockfile
         if: always()
         uses: actions/upload-artifact@v4
