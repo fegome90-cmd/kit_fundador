@@ -68,7 +68,8 @@ test('Problem Details titles reflect 403 and 502 without leaking error messages'
   }
 });
 
-test('compiled JS listens and stops cleanly on SIGTERM', async () => {
+for (const signal of ['SIGTERM', 'SIGINT']) {
+test(`compiled JS listens and stops cleanly on ${signal}`, async () => {
   const child = spawn(process.execPath, ['dist/server.js'], {
     env: { ...process.env, PORT: '0', HOST: '127.0.0.1' },
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -91,9 +92,10 @@ test('compiled JS listens and stops cleanly on SIGTERM', async () => {
   } finally {
     if (child.exitCode === null) {
       const exit = new Promise(resolve => child.once('exit', resolve));
-      child.kill('SIGTERM');
+      child.kill(signal);
       const code = await Promise.race([exit, new Promise((_, reject) => setTimeout(() => reject(new Error('SIGTERM timeout')), 7000))]);
       assert.equal(code, 0);
     }
   }
 });
+}
