@@ -1,12 +1,13 @@
 """Restricted Docker invocation for experimental LEGO shadcn installations.
 
-IMPORTANT: The lab uses --network host to reach its ephemeral frozen registry.
-This restricts filesystem visibility and process privileges but does NOT
-isolate network access to local services. No release security claim follows.
+IMPORTANT: The lab uses a Docker bridge with a host-gateway address to fetch
+a frozen registry. This isolates network namespaces, but Internet egress and
+the host gateway remain reachable. No release security claim follows.
 """
 from __future__ import annotations
 
 import os
+import ipaddress
 from pathlib import Path
 import re
 import secrets
@@ -18,6 +19,25 @@ class SandboxRejected(ValueError):
 
 
 IMAGE = re.compile(r"^[a-zA-Z0-9_.:/@-]{1,180}$")
+
+
+def bridge_gateway() -> str:
+    """Discover the host address on Docker's bridge. No host-network fallback."""
+    try:
+        process = subprocess.run(
+            ["docker", "network", "inspect", "bridge",
+             "--format", "{{(index .IPAM.Config 0).Gateway}}"],
+            text=True, capture_output=True, timeout=10
+        )
+    except (OSError, subprocess.TimeoutExpired) as e:
+        raise SandboxRejected("Docker bridge is unavailable") from e
+    if process.returncode != 0:
+        raise SandboxRejected("Docker bridge gateway lookup failed: " + process.stderr[-250:])
+    try:
+        return str(ipaddress.IPv4Address(process.stdout.strip()))
+    except ipaddress.AddressValueError as e:
+        raise SandboxRejected("Docker bridge has no valid IPv4 gateway") from e
+
 
 
 def docker_install(stage: Path, cli: Path, urls: list[str], *, image: str,
@@ -41,9 +61,9 @@ def docker_install(stage: Path, cli: Path, urls: list[str], *, image: str,
         "docker", "run", "--rm", "--name", name,
         "--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges",
         "--pids-limit=192", "--memory=1024m", "--cpus=2",
-        # LAB ONLY: host network allows the container to contact the local
-        # frozen registry and npm. It is NOT a network security boundary.
-        "--network=host",
+        # Bridge networking gives a separate network namespace. Egress remains
+        # allowed (npm); this is NOT complete network egress isolation.
+        "--network=bridge", "--add-host=host.docker.internal:host-gateway",
         "--user", f"{os.getuid()}:{os.getgid()}",
         "--tmpfs", "/tmp:rw,nosuid,nodev,size=384m,mode=1777",
         "--mount", f"type=bind,src={stage.resolve()},dst=/work",
@@ -54,8 +74,8 @@ def docker_install(stage: Path, cli: Path, urls: list[str], *, image: str,
         "-e", "XDG_CACHE_HOME=/tmp/cache",
         "-e", "npm_config_userconfig=/tmp/.npmrc",
         "-e", "CI=true",
-        "-e", "NO_PROXY=localhost,127.0.0.1",
-        "-e", "no_proxy=localhost,127.0.0.1",
+        "-e", "NO_PROXY=localhost,127.0.0.1,host.docker.internal",
+        "-e", "no_proxy=localhost,127.0.0.1,host.docker.internal",
         "-e", "npm_config_registry=https://registry.npmjs.org",
         image, "node", "/deps/node_modules/" + relative,
         "add", *urls, "--yes"
