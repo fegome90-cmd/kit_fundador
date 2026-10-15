@@ -67,7 +67,7 @@ def safe_target(raw: str) -> str:
         raise Rejected('Protected target: ' + raw)
     return p
 
-def snapshot(root: Path) -> dict[str, bytes]:
+def snapshot(root: Path, *, selected: set[str] | None = None) -> dict[str, bytes]:
     result = {}
     for directory, dirs, files in os.walk(root, followlinks=False):
         dirs[:] = [x for x in dirs if x not in SKIP_DIRS]
@@ -82,6 +82,10 @@ def snapshot(root: Path) -> dict[str, bytes]:
             rel = f.relative_to(root).as_posix()
             if rel == '.env' or rel.startswith('.env.'):
                 # Secrets are not copied into the staging tree or inspected.
+                continue
+            if selected is not None and rel not in selected:
+                # Inspect the filesystem for symlinks but never open unrelated
+                # consumer files, even in the trusted host-side Python process.
                 continue
             result[rel] = f.read_bytes()
     return result
@@ -254,7 +258,7 @@ def execute(args):
         local_lab_mode=bool(args.allow_http_localhost and
                             urlsplit(base).hostname in ('127.0.0.1', 'localhost'))
     )
-    before=snapshot(root)
+    before=snapshot(root,selected=STAGE_INPUTS | set(targets))
     current_versions, wanted_versions=preflight_versions(items,before)
     entries=planned_changes(root,items,before)
     # shadcn receives only the package manager metadata and the precise files
