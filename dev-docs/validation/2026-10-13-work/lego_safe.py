@@ -18,6 +18,7 @@ import sys
 import tempfile
 import lego_transaction
 import lego_registry_snapshot
+import lego_docker
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit
 from urllib.request import urlopen
@@ -267,6 +268,12 @@ def execute(args):
         raise Rejected('Choose --preview, --diff or --install')
     if not args.shadcn_cli:
         raise Rejected('--shadcn-cli required for --diff or --install')
+    # Fail closed on remote sources until the container network boundary
+    # supports the pinned snapshot transport without --network host.
+    if not args.allow_http_localhost and (args.install or args.diff):
+        raise Rejected('Remote installation is not yet supported safely; use a reviewed CI laboratory')
+    if args.sandbox == 'docker' and not args.sandbox_image:
+        raise Rejected('--sandbox-image required for Docker installation')
     cli=Path(args.shadcn_cli).resolve(strict=True)
     if args.install:
         lego_transaction.begin(root)
@@ -298,7 +305,12 @@ def execute(args):
           env.pop('ALL_PROXY',None);env.pop('all_proxy',None)
           env['NO_PROXY']='localhost,127.0.0.1';env['no_proxy']=env['NO_PROXY']
           cmd=['node',str(cli),'add',*[url_for(frozen_base,x) for x in names],'--yes']
-          proc=subprocess.run(cmd,cwd=stage,env=env,capture_output=True,text=True,timeout=180)
+          if args.sandbox == 'docker':
+              proc=lego_docker.docker_install(
+                  stage, cli, [url_for(frozen_base,x) for x in names],
+                  image=args.sandbox_image)
+          else:
+              proc=subprocess.run(cmd,cwd=stage,env=env,capture_output=True,text=True,timeout=180)
           if proc.returncode != 0:
               raise Rejected('Installer staging failed with code '+str(proc.returncode)+': '+(proc.stdout+'\n'+proc.stderr)[-800:])
           after=snapshot(stage)
@@ -349,10 +361,12 @@ def main():
     mode.add_argument('--install',action='store_true')
     mode.add_argument('--recover',action='store_true')
     p.add_argument('--shadcn-cli')
+    p.add_argument('--sandbox', choices=['native','docker'], default='native',help='docker currently lab-only, with host networking')
+    p.add_argument('--sandbox-image')
     p.add_argument('--allow-http-localhost',action='store_true')
     args=p.parse_args()
     try: return execute(args)
-    except (Rejected, lego_transaction.TransactionRejected, lego_registry_snapshot.RegistryIntegrityError, OSError, subprocess.TimeoutExpired, RuntimeError) as e:
+    except (Rejected, lego_transaction.TransactionRejected, lego_registry_snapshot.RegistryIntegrityError, lego_docker.SandboxRejected, OSError, subprocess.TimeoutExpired, RuntimeError) as e:
         print('LEGO_REJECTED: '+str(e),file=sys.stderr)
         return 2
 
