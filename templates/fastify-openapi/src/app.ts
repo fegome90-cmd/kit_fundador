@@ -36,7 +36,9 @@ export function buildApp(composition: AppComposition = {}): FastifyInstance {
   });
 
   app.setErrorHandler((error, request, reply) => {
-    const candidate = error.statusCode;
+    const candidate = typeof error === 'object' && error !== null && 'statusCode' in error
+      ? error.statusCode
+      : undefined;
     const status = typeof candidate === 'number' && candidate >= 400 && candidate < 600
       ? candidate
       : 500;
