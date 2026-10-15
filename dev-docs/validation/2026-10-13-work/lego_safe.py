@@ -27,6 +27,8 @@ PACKAGE = re.compile(r"^(?:@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*$")
 SKIP_DIRS = {'.git', 'node_modules', '.pnpm-store', 'dist', 'coverage', '__pycache__', '.venv', 'venv'}
 MAX_ITEM_BYTES = 2_000_000
 MAX_ITEMS = 40
+ALLOWED_ITEM_FIELDS = {'$schema','name','type','title','description','files','dependencies','devDependencies','registryDependencies'}
+ALLOWED_FILE_FIELDS = {'path','type','target','content'}
 ALLOW_CHANGE = {'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml'}
 STAGE_INPUTS = ALLOW_CHANGE | {'tsconfig.json'}
 
@@ -111,6 +113,8 @@ def fetch_registry(base: str, requested: list[str]) -> tuple[list[dict], dict[st
             item = json.loads(raw)
         except json.JSONDecodeError as e:
             raise Rejected('Invalid registry JSON: ' + name) from e
+        if not isinstance(item,dict) or set(item)-ALLOWED_ITEM_FIELDS:
+            raise Rejected('Unsupported registry item fields: '+name)
         if item.get('name') != name or item.get('type') != 'registry:item':
             raise Rejected('Unexpected registry item id/type: ' + name)
         deps = item.get('registryDependencies', [])
@@ -123,15 +127,28 @@ def fetch_registry(base: str, requested: list[str]) -> tuple[list[dict], dict[st
             if '/' in depname or not NAME.fullmatch(depname):
                 raise Rejected('Unsafe dependency: ' + depname)
             visit(depname)
-        for file in item.get('files', []):
-            if file.get('type') != 'registry:file' or not isinstance(file.get('content'),str):
+        files=item.get('files', [])
+        if not isinstance(files,list) or len(files)>200:
+            raise Rejected('Invalid registry file list: '+name)
+        for file in files:
+            if not isinstance(file,dict) or set(file)-ALLOWED_FILE_FIELDS:
+                raise Rejected('Unsupported registry file fields: '+name)
+            if (file.get('type') != 'registry:file' or not isinstance(file.get('content'),str)
+                    or not isinstance(file.get('path'),str)
+                    or '://' in file['path'] or '..' in file['path'].split('/')
+                    or file['path'].startswith('/')):
+
                 raise Rejected('Unsupported file entry in '+name)
             target = safe_target(file.get('target'))
             digest = sha(file['content'].encode('utf-8'))
             if target in targets and targets[target] != digest:
                 raise Rejected('Conflicting target: '+target)
             targets[target] = digest
-        for dependency in (item.get('dependencies', []) + item.get('devDependencies', [])):
+        runtime_deps=item.get('dependencies',[])
+        dev_deps=item.get('devDependencies',[])
+        if not isinstance(runtime_deps,list) or not isinstance(dev_deps,list):
+            raise Rejected('Invalid package dependency list: '+name)
+        for dependency in runtime_deps + dev_deps:
             if not isinstance(dependency,str) or '@' not in dependency[1:]:
                 raise Rejected('Unpinned package: ' + str(dependency))
             package, version = dependency.rsplit('@',1)
