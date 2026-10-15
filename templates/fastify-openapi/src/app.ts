@@ -1,5 +1,5 @@
 import { STATUS_CODES } from 'node:http';
-import Fastify, { type FastifyInstance } from 'fastify';
+import Fastify, { LogController, type FastifyInstance } from 'fastify';
 import { healthPlugin } from './plugins/health.js';
 
 export interface AppComposition {
@@ -24,8 +24,9 @@ export function buildApp(composition: AppComposition = {}): FastifyInstance {
       },
     },
     bodyLimit: 1024 * 1024,
-    // Automatic request logs can expose credentials present in URL queries.
-    disableRequestLogging: true,
+    // Avoid automatic request URL logging (which could contain query secrets).
+    // Use Fastify's supported controller API, not deprecated top-level options.
+    logController: new LogController({ disableRequestLogging: true }),
     trustProxy: false,
   });
 
