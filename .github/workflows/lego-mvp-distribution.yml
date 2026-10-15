@@ -15,10 +15,6 @@ permissions:
 
 jobs:
   template-validation:
-    # Temporary write permission ONLY to commit the generated OpenAPI lockfile.
-    # Restore contents:read once the lockfile is versioned.
-    permissions:
-      contents: write
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     strategy:
@@ -34,14 +30,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Prepare lockfile (first OpenAPI seed only)
-        run: |
-          set -euo pipefail
-          cd "templates/${{ matrix.template }}"
-          if [[ ! -f pnpm-lock.yaml ]]; then
-            echo "SEEDING_MISSING_LOCKFILE — must commit lock before release"
-            pnpm install --lockfile-only --strict-peer-dependencies
-          fi
+      - name: Require committed and non-empty dependency lockfile
+        run: test -s "templates/${{ matrix.template }}/pnpm-lock.yaml"
       - name: Standalone frozen install
         run: |
           cd "templates/${{ matrix.template }}"
@@ -73,23 +63,33 @@ jobs:
         run: |
           cd "templates/${{ matrix.template }}"
           pnpm audit --prod --no-optional
-      - name: One-time seed of independently resolved OpenAPI lockfile
-        if: matrix.template == 'fastify-openapi'
+      - name: Download the published template by exact GitHub commit SHA (giget)
         run: |
           set -euo pipefail
-          FILE=templates/fastify-openapi/pnpm-lock.yaml
-          if git ls-files --error-unmatch "$FILE" >/dev/null 2>&1; then
-            echo "LOCK_ALREADY_COMMITTED"
-            exit 0
+          test "$GITHUB_SHA" = "$(git rev-parse HEAD)"
+          LAB="$(mktemp -d)"
+          trap 'rm -rf "$LAB"' EXIT
+          SOURCE="gh:$GITHUB_REPOSITORY/templates/${{ matrix.template }}#$GITHUB_SHA"
+          TARGET="$LAB/copied-backend"
+          pnpm dlx giget@3.3.1 "$SOURCE" "$TARGET"
+          for relative in package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json src/app.ts src/server.ts; do
+            cmp "templates/${{ matrix.template }}/$relative" "$TARGET/$relative"
+          done
+          test ! -f "$TARGET/../package.json"
+          test ! -e "$TARGET/node_modules"
+          (cd "$TARGET" &&
+            pnpm install --frozen-lockfile --strict-peer-dependencies &&
+            pnpm run typecheck &&
+            pnpm test)
+          echo "MVP_GIGET_SHA_BOOTSTRAP_PASS $SOURCE"
+          mkdir "$LAB/occupied"
+          echo PRESERVE_ME > "$LAB/occupied/consumer-file.txt"
+          if pnpm dlx giget@3.3.1 "$SOURCE" "$LAB/occupied" > "$LAB/giget-error.log" 2>&1; then
+            echo "Unexpected overwrite of nonempty target" >&2
+            exit 1
           fi
-          test "$GITHUB_REF" = "refs/heads/feat/fastify-lego-foundation"
-          test -s "$FILE"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "$FILE"
-          git commit -m "chore(mvp): pin verified OpenAPI pnpm dependency graph"
-          git push origin "HEAD:feat/fastify-lego-foundation"
-          echo "OPENAPI_LOCK_COMMITTED"
+          test "$(cat "$LAB/occupied/consumer-file.txt")" = PRESERVE_ME
+          echo "MVP_OCCUPIED_DESTINATION_REJECTED"
       - name: Retain independently resolved lockfile
         if: always()
         uses: actions/upload-artifact@v4
