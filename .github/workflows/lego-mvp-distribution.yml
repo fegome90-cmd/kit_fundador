@@ -1,0 +1,79 @@
+name: LEGO MVP distribution (isolated)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/fastify-lego-foundation]
+    paths:
+      - .github/workflows/lego-mvp-distribution.yml
+      - templates/fastify-core/**
+      - templates/fastify-openapi/**
+      - dev-docs/plans/lego-mvp-distribution-2026-10-15.md
+
+permissions:
+  contents: read
+
+jobs:
+  template-validation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        template: [fastify-core, fastify-openapi]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Prepare lockfile (first OpenAPI seed only)
+        run: |
+          set -euo pipefail
+          cd "templates/${{ matrix.template }}"
+          if [[ ! -f pnpm-lock.yaml ]]; then
+            echo "SEEDING_MISSING_LOCKFILE — must commit lock before release"
+            pnpm install --lockfile-only --strict-peer-dependencies
+          fi
+      - name: Standalone frozen install
+        run: |
+          cd "templates/${{ matrix.template }}"
+          pnpm install --frozen-lockfile --strict-peer-dependencies
+      - name: Strict typecheck and compiled HTTP tests
+        run: |
+          cd "templates/${{ matrix.template }}"
+          pnpm run typecheck
+          pnpm test
+      - name: Dependency boundaries
+        run: |
+          cd "templates/${{ matrix.template }}"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p=JSON.parse(fs.readFileSync('package.json','utf8'));
+          const deps=Object.keys(p.dependencies).sort();
+          const expected=process.env.TEMPLATE==='fastify-core'
+            ? ['fastify']
+            : ['@fastify/swagger','@fastify/swagger-ui','fastify'];
+          if(JSON.stringify(deps)!==JSON.stringify(expected))throw new Error('Unexpected runtime deps: '+deps);
+          if(p.packageManager!=='pnpm@11.25.0'||p.type!=='module')throw new Error('Unexpected install/runtime config');
+          const scripts=Object.values(p.scripts||{}).join(' ');
+          if(/postinstall|preinstall|prepare|degit|shadcn/.test(scripts))throw new Error('Unexpected install side effect');
+          console.log('BOUNDARY_PASS',p.name,JSON.stringify(deps));
+          NODE
+        env:
+          TEMPLATE: ${{ matrix.template }}
+      - name: Check production dependency advisories (no optional deps)
+        run: |
+          cd "templates/${{ matrix.template }}"
+          pnpm audit --prod --no-optional
+      - name: Retain independently resolved lockfile
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mvp-${{ matrix.template }}-lock-${{ github.run_id }}
+          path: templates/${{ matrix.template }}/pnpm-lock.yaml
+          retention-days: 7
+          if-no-files-found: error
