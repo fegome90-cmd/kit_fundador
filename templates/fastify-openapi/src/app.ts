@@ -23,6 +23,8 @@ export function buildApp(composition: AppComposition = {}): FastifyInstance {
       },
     },
     bodyLimit: 1024 * 1024,
+    // Automatic request logs can expose credentials present in URL queries.
+    disableRequestLogging: true,
     trustProxy: false,
   });
 
