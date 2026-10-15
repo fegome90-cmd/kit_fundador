@@ -9,6 +9,8 @@ on:
       - templates/fastify-core/**
       - templates/fastify-openapi/**
       - dev-docs/plans/lego-mvp-distribution-2026-10-15.md
+      - dev-docs/validation/2026-10-15-mvp-distribution/report.md
+      - LEGO-MVP.md
 
 permissions:
   contents: read
