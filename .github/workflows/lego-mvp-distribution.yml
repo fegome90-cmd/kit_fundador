@@ -63,6 +63,13 @@ jobs:
         run: |
           cd "templates/${{ matrix.template }}"
           pnpm audit --prod --no-optional
+      - name: Ensure both variants share exactly the same core source
+        run: |
+          set -euo pipefail
+          for relative in src/app.ts src/config.ts src/runtime.ts src/plugins/health.ts tests/config.test.mjs tests/http.test.mjs tests/logging.test.mjs tsconfig.json; do
+            cmp "templates/fastify-core/$relative" "templates/fastify-openapi/$relative"
+          done
+          echo "MVP_COMMON_CORE_PARITY_PASS"
       - name: Download the published template by exact GitHub commit SHA (giget)
         run: |
           set -euo pipefail
