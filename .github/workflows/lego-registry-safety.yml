@@ -9,6 +9,9 @@ on:
       - .github/workflows/lego-registry-safety.yml
       - dev-docs/validation/2026-10-13-work/lego_safe.py
       - dev-docs/validation/2026-10-13-work/lego_registry_snapshot.py
+      - dev-docs/validation/2026-10-13-work/lego_docker.py
+      - dev-docs/validation/2026-10-13-work/test_registry_docker.sh
+      - dev-docs/validation/2026-10-13-work/Dockerfile.lego-sandbox
       - dev-docs/validation/2026-10-13-work/test_lego_registry_snapshot.py
       - dev-docs/validation/2026-10-13-work/test_lego_safe.py
       - dev-docs/validation/2026-10-13-work/test_registry_real.sh
@@ -45,6 +48,10 @@ jobs:
           pnpm install --frozen-lockfile --strict-peer-dependencies
       - name: Real registry staging, preview and negative contracts
         run: bash test_registry_real.sh
+      - name: Build restricted Docker test image
+        run: docker build -f Dockerfile.lego-sandbox -t kit-lego-sandbox:ci .
+      - name: Restricted Docker file-system proof and real shadcn install
+        run: bash test_registry_docker.sh
       - name: Upload audit JSON evidence
         if: always()
         uses: actions/upload-artifact@v4
