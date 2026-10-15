@@ -1,6 +1,6 @@
 # Informe de auditoría y ejecución — Kit Fundador LEGO MVP
 
-**Fecha:** 15 de octubre de 2026 · **Rama auditada:** `feat/fastify-lego-foundation` · **Dictamen:** **GO para bootstrap aislado de proyectos nuevos**; **NO-GO para sustituir Express en `main`, despliegue público o distribución productiva de los cuatro bloques**.
+**Fecha:** 15 de octubre de 2026 · **Rama auditada:** `feat/lego-mvp-scaffold` · **Dictamen:** **GO para bootstrap aislado de proyectos nuevos**; **NO-GO para sustituir Express en `main`, despliegue público o distribución productiva de los cuatro bloques**.
 
 ## 1. Objetivo y decisión revisada
 
@@ -14,8 +14,8 @@ Se preservaron los prototipos de PostgreSQL, Drizzle, Better Auth y BullMQ/Valke
 
 ## 2. Evidencia primaria
 
-- **Commit de plantillas efectivamente probado con giget:** `b85190ed63e9223901db640d3fa61d85b689222a`.
-- **Workflow completo:** [LEGO MVP distribution (isolated), run 38720093190](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38720093190), conclusión `success`, mismo SHA de commit.
+- **Commit de plantillas efectivamente probado con giget:** `69b7873721a2693e58289631eea03482be8afe62`.
+- **Workflow completo:** [LEGO MVP distribution (isolated), run 38725632148](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38720093190), conclusión `success`, mismo SHA de commit.
 - **Run previo:** [38719749137](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38719749137), primera prueba de giget por SHA y rechazo de directorio ocupado, `success`.
 - El lockfile de la variante OpenAPI se generó mediante un install auténtico de pnpm y quedó versionado; el workflow tuvo temporalmente permiso de escritura para ese único archivo y **se restauró a `contents: read`** inmediatamente después. La CI definitiva exige el lockfile existente; **no lo regenera**.
 - El pipeline tradicional de Express permanece separado del pipeline `lego-mvp-distribution.yml`.
@@ -29,11 +29,11 @@ Se preservaron los prototipos de PostgreSQL, Drizzle, Better Auth y BullMQ/Valke
 | Rechazo de carpeta destino ocupada | **PASS** | **PASS** | Sin `--force`, sentinel intacto |
 | `pnpm install --frozen-lockfile --strict-peer-dependencies` | **PASS** | **PASS** | Sobre checkout y proyecto descargado |
 | `tsc --noEmit` con `strict` y `skipLibCheck:false` | **PASS** | **PASS** | Sin ocultar fallos en declaraciones de terceros |
-| Tests nativos Node sobre artefacto JS compilado | **7/7 PASS** | **10/10 PASS** | Los mismos se repitieron después de descargar con giget |
+| Tests nativos Node sobre artefacto JS compilado | **12/12 PASS** | **15/15 PASS** | Los mismos se repitieron después de descargar con giget |
 | Configuración `PORT`/`HOST` inválida | **PASS** | **PASS** | Fallo antes de `listen` |
 | Health, 400/404/413/500 y cuerpo 500 sanitizado | **PASS** | **PASS** | `app.inject` real de Fastify |
 | Cabeceras de protección, request ID, CORS no permisivo | **PASS** | **PASS** | No implica seguridad de proxy ni `helmet` |
-| SIGTERM contra `node dist/server.js` | **PASS** | **PASS** | Se observó exit code 0 |
+| SIGTERM y SIGINT contra `node dist/server.js` | **PASS** | **PASS** | Se observó exit code 0 |
 | Token de consulta en logs de salida | **PASS** | **PASS** | Canary `CANARY_DO_NOT_LOG_849312` ausente; request logging automático deshabilitado |
 | OpenAPI/UI apagados por defecto | N/A (paquetes ausentes) | **PASS** | `/docs/` y `/docs/json` = 404 |
 | OpenAPI habilitado cubre `/health` y sirve UI | N/A | **PASS** | Swagger antes de rutas, UI después |
@@ -43,7 +43,7 @@ Se preservaron los prototipos de PostgreSQL, Drizzle, Better Auth y BullMQ/Valke
 | `pnpm audit` completo (dev y opcionales incluidos) | **PASS** | **PASS** | `No known vulnerabilities found` en fecha de prueba |
 | Ausencia de PostgreSQL, Redis, BullMQ, Auth, React y Docker en Core | **PASS** | **PASS** | Sin servicios en boot, imports ni deps runtime |
 
-**Total:** 17 casos de prueba definidos a través de las dos variantes, más checks automáticos de distribución, paridad, typecheck y auditoría. No duplicar el conteo al ejecutarlos una segunda vez después de descargar.
+**Total:** 27 casos de prueba definidos a través de las dos variantes, más checks automáticos de distribución, paridad, typecheck y auditoría. No duplicar el conteo al ejecutarlos una segunda vez después de descargar.
 
 ## 4. Defectos reales encontrados y correcciones
 
@@ -64,11 +64,31 @@ Se preservaron los prototipos de PostgreSQL, Drizzle, Better Auth y BullMQ/Valke
 - **Sin instalador in-place:** una instalación sobre proyecto con personalizaciones queda fuera de este contrato; no se copió `lego_safe.py` ni su journal al MVP.
 - **Sin distribución npm/Homebrew:** no existe `create-kitfundador` publicado, tap Brew, marketplace VS Code ni extensiones; para bootstrap se usa `giget` existente.
 
+## 5bis. Auditoría de código independiente de la PR #79 (15-10-2026)
+
+**PR:** https://github.com/fegome90-cmd/kit_fundador/pull/79 — mantiene estado **draft**, sin merge. Se revisaron `src/app.ts`, `src/runtime.ts`, composición Swagger, pruebas de errores, tests de logging, lockfiles, CI y bootstrap giget.
+
+| Hallazgo | Severidad | Solución y evidencia |
+|---|---|---|
+| Event listeners `SIGTERM/SIGINT` acumulados cuando una app es cerrada fuera del manejador de señales | P1 / ciclo de vida | Hook `onClose` retira los handlers; test inicia, cierra y comprueba `listenerCount` |
+| Configuración `PORT/HOST` inválida dejaba `app` creado sin ejecutar teardown | P1 / recursos | `listen()` cierra el Fastify app incluso si falla `readServerConfig`; prueba cuenta cierre |
+| Puerto ocupado no se probaba como error de arranque | P1 / edge case | Test con servidor `node:net` ocupando el puerto; verifica `EADDRINUSE` y ausencia de manejadores residuales |
+| `disableRequestLogging` top-level deprecado en Fastify 5 (`FSTDEP023`) | P1 / compatibilidad | Uso del `LogController` oficial con `disableRequestLogging:true`, sin registrar parámetros URL |
+| Title RFC 9457 incorrecto para 403 y 502 | P2 / protocolo HTTP | Uso de `STATUS_CODES[status]` y tests del body `application/problem+json`; errores privados no se exponen |
+| Test añadía una nueva ruta después de una primera llamada `inject()` | P1 / tests | Definir rutas antes de inicializar el router. Fallo y fix quedaron en GitHub Actions |
+| `SIGINT` no tenía E2E contra JS compilado | P2 / regresión | Ejecuta SIGTERM y SIGINT en procesos distintos y verifica salida cero |
+| giget en directorios ocupados no verificaba inventario completo/symlink | P1 / no destrucción | CI prueba archivo sentinel, inventario exacto y symlink hacia directorio poblado |
+| CI por push + PR duplicaba ejecución en la rama de revisión | P2 / coste CI | Sólo investigación por push; `pull_request: main` para branch de PR, `concurrency.cancel-in-progress` |
+
+**Prueba concluyente de source y distribución tras fixes:** [run 38725632148](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38725632148) **PASS** (12/12 Core, 15/15 OpenAPI en checkout y proyecto descargado por SHA). La auditoría completa `pnpm audit` y el typecheck con `skipLibCheck:false` conservaron estado PASS. Esto no demuestra seguridad de producción ni ausencia universal de bugs.
+
+**CodeRabbit:** el PR estaba marcado `draft`; se solicitó manualmente un full review, pero el bot canceló ese intento porque la rama cambió mientras analizaba. Se requiere solicitar nuevamente cuando termine la corrección de los hallazgos, para que exista una revisión externa válida.
+
 ## 6. Aislamiento realizado para revisión
 
 **PASS:** se creó `feat/lego-mvp-scaffold` desde `main` en un único commit `ae8e6f232e996f9b75f8b36c3f4e5c80e04c0f0e`, con **34 archivos** y ningún archivo de los prototipos experimentales. La comparación GitHub confirmó `ahead=1`, `behind=0` y cero rutas fuera de las plantillas, el workflow MVP, el quickstart y los dos informes. El origen está en `feat/fastify-lego-foundation`; el backend Express existente permanece intacto.
 
-**Siguiente gate:** ejecutar CI nuevamente sobre la rama limpia y abrir una PR **en borrador**. No fusionar antes de review humano/CodeRabbit y verificación de seguridad. No integrar automáticamente el código de cuatro piezas A/B.
+**Gate ejecutado:** PR #79 abierta en borrador; se revisaron errores HTTP, lifecycle y CI. **Pendiente:** revisión externa válida de CodeRabbit y eventual aprobación humana. No fusionar antes de review humano/CodeRabbit y verificación de seguridad. No integrar automáticamente el código de cuatro piezas A/B.
 
 No autorizar despliegue público solo porque el starter de Fastify pase CI. Para ese objetivo requerir revisión de threat model, middleware/cabeceras de seguridad, control de acceso, rate limit y observabilidad, según la aplicación.
 
