@@ -45,6 +45,26 @@ test('404, malformed JSON 400, body-limit 413 and sanitized 500', async (t) => {
   assert.equal(failed.json().status, 500);
 });
 
+test('Problem Details titles reflect 403 and 502 without leaking error messages', async (t) => {
+  const app = buildApp();
+  t.after(() => app.close());
+  for (const [status, title] of [[403, 'Forbidden'], [502, 'Bad Gateway']]) {
+    app.get('/status-' + status, async () => {
+      const error = new Error('PRIVATE_DIAGNOSTIC_MESSAGE');
+      error.statusCode = status;
+      throw error;
+    });
+    const response = await app.inject({ method: 'GET', url: '/status-' + status });
+    assert.equal(response.statusCode, status);
+    assert.equal(response.headers['content-type'], 'application/problem+json; charset=utf-8');
+    const body = response.json();
+    assert.equal(body.status, status);
+    assert.equal(body.title, title);
+    assert.equal(body.type, 'about:blank');
+    assert.ok(!response.body.includes('PRIVATE_DIAGNOSTIC_MESSAGE'));
+  }
+});
+
 test('compiled JS listens and stops cleanly on SIGTERM', async () => {
   const child = spawn(process.execPath, ['dist/server.js'], {
     env: { ...process.env, PORT: '0', HOST: '127.0.0.1' },
