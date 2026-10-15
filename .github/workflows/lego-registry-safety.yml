@@ -8,6 +8,8 @@ on:
     paths:
       - .github/workflows/lego-registry-safety.yml
       - dev-docs/validation/2026-10-13-work/lego_safe.py
+      - dev-docs/validation/2026-10-13-work/lego_registry_snapshot.py
+      - dev-docs/validation/2026-10-13-work/test_lego_registry_snapshot.py
       - dev-docs/validation/2026-10-13-work/test_lego_safe.py
       - dev-docs/validation/2026-10-13-work/test_registry_real.sh
       - dev-docs/validation/2026-10-13-work/registry.py
@@ -33,7 +35,7 @@ jobs:
         with:
           node-version: '24'
       - name: Offline unit and failure-injection tests
-        run: python3 -m unittest test_lego_safe -v
+        run: python3 -m unittest test_lego_safe test_lego_registry_snapshot -v
       - name: Install pinned shadcn CLI from tested lockfile
         run: |
           cp ui6/package.json prototype/package.json
