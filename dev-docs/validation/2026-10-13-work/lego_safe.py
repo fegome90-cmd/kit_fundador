@@ -282,7 +282,11 @@ def execute(args):
     if args.install:
         lego_transaction.begin(root)
     try:
-      with tempfile.TemporaryDirectory(prefix='lego-stage-') as tmp, lego_registry_snapshot.frozen_registry(items, base) as frozen_base:
+      with tempfile.TemporaryDirectory(prefix='lego-stage-') as tmp, lego_registry_snapshot.frozen_registry(
+          items, base,
+          bind_address=lego_docker.bridge_gateway() if args.sandbox == 'docker' else '127.0.0.1',
+          advertise_host='host.docker.internal' if args.sandbox == 'docker' else None
+      ) as frozen_base:
           stage=Path(tmp)/'consumer'
           stage.mkdir()
           for rel,body in staged_before.items():
