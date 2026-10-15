@@ -64,9 +64,9 @@ class _RegistryServer(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = False
 
-    def __init__(self, items: dict[str, bytes]):
+    def __init__(self, items: dict[str, bytes], *, bind_address: str):
         self.payloads = items
-        super().__init__(("127.0.0.1", 0), _Handler)
+        super().__init__((bind_address, 0), _Handler)
 
 
 class _Handler(BaseHTTPRequestHandler):
@@ -96,15 +96,15 @@ class _Handler(BaseHTTPRequestHandler):
 
 
 @contextmanager
-def frozen_registry(items: list[dict], source_origin: str):
+def frozen_registry(items: list[dict], source_origin: str, *, bind_address='127.0.0.1', advertise_host=None):
     """Serve a consistent content snapshot and rewrite *only* closure links.
 
     The items are already vetted by lego_safe.fetch_registry, including file
     targets and dependency closure. Do not serve unvalidated input here.
     """
-    server = _RegistryServer({})
+    server = _RegistryServer({},bind_address=bind_address)
     thread = threading.Thread(target=server.serve_forever, name="lego-frozen-registry", daemon=True)
-    local_base = f"http://127.0.0.1:{server.server_port}"
+    local_base = f"http://{advertise_host or bind_address}:{server.server_port}"
     payloads = {}
     try:
         for item in items:
