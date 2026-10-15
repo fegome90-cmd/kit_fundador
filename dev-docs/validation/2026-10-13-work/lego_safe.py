@@ -17,6 +17,7 @@ import subprocess
 import sys
 import tempfile
 import lego_transaction
+import lego_registry_snapshot
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit
 from urllib.request import urlopen
@@ -88,6 +89,7 @@ def fetch_registry(base: str, requested: list[str]) -> tuple[list[dict], dict[st
     ordered = []
     targets: dict[str, str] = {}
     versions = {}
+    source_hashes: dict[str, str] = {}
 
     def visit(name: str):
         if name in active:
@@ -104,6 +106,7 @@ def fetch_registry(base: str, requested: list[str]) -> tuple[list[dict], dict[st
             raw = rsp.read(MAX_ITEM_BYTES+1)
         if len(raw) > MAX_ITEM_BYTES:
             raise Rejected('Registry item too large')
+        source_hashes[name] = lego_registry_snapshot.source_digest(raw)
         try:
             item = json.loads(raw)
         except json.JSONDecodeError as e:
@@ -147,7 +150,7 @@ def fetch_registry(base: str, requested: list[str]) -> tuple[list[dict], dict[st
         raise Rejected('Mutually exclusive jobs backends: jobs-postgres vs jobs-valkey')
     if {'lego-full-a','lego-full-b'} <= set(selected):
         raise Rejected('Mutually exclusive full recipes')
-    return ordered, targets
+    return ordered, targets, source_hashes
 
 def manifest_versions(items: list[dict]) -> dict[str, str]:
     result = {}
@@ -225,7 +228,12 @@ def execute(args):
             if item: names.append(item)
     if not names:
         raise Rejected('No items selected')
-    items, targets=fetch_registry(base,names)
+    items, targets, source_hashes=fetch_registry(base,names)
+    lego_registry_snapshot.load_lock(
+        args.registry_lock, base, source_hashes,
+        local_lab_mode=bool(args.allow_http_localhost and
+                            urlsplit(base).hostname in ('127.0.0.1', 'localhost'))
+    )
     before=snapshot(root)
     current_versions, wanted_versions=preflight_versions(items,before)
     entries=planned_changes(root,items,before)
@@ -244,7 +252,7 @@ def execute(args):
     if args.install:
         lego_transaction.begin(root)
     try:
-      with tempfile.TemporaryDirectory(prefix='lego-stage-') as tmp:
+      with tempfile.TemporaryDirectory(prefix='lego-stage-') as tmp, lego_registry_snapshot.frozen_registry(items, base) as frozen_base:
           stage=Path(tmp)/'consumer'
           stage.mkdir()
           for rel,body in staged_before.items():
@@ -267,10 +275,10 @@ def execute(args):
           env['XDG_CACHE_HOME']=str(sandbox_home/'cache')
           env['XDG_CONFIG_HOME']=str(sandbox_home/'config')
           env['npm_config_userconfig']=str(sandbox_home/'.npmrc')
-          if args.allow_http_localhost:
-              env.pop('ALL_PROXY',None);env.pop('all_proxy',None)
-              env['NO_PROXY']='localhost,127.0.0.1';env['no_proxy']=env['NO_PROXY']
-          cmd=['node',str(cli),'add',*[url_for(base,x) for x in names],'--yes']
+          # The CLI reads only immutable localhost copies of vetted registry items.
+          env.pop('ALL_PROXY',None);env.pop('all_proxy',None)
+          env['NO_PROXY']='localhost,127.0.0.1';env['no_proxy']=env['NO_PROXY']
+          cmd=['node',str(cli),'add',*[url_for(frozen_base,x) for x in names],'--yes']
           proc=subprocess.run(cmd,cwd=stage,env=env,capture_output=True,text=True,timeout=180)
           if proc.returncode != 0:
               raise Rejected('Installer staging failed with code '+str(proc.returncode)+': '+(proc.stdout+'\n'+proc.stderr)[-800:])
@@ -314,6 +322,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--project',required=True)
     p.add_argument('--registry')
+    p.add_argument('--registry-lock',help='JSON SHA-256 lockfile, required for non-loopback registries')
     p.add_argument('--items',nargs='+')
     mode=p.add_mutually_exclusive_group(required=True)
     mode.add_argument('--preview',action='store_true')
@@ -324,7 +333,7 @@ def main():
     p.add_argument('--allow-http-localhost',action='store_true')
     args=p.parse_args()
     try: return execute(args)
-    except (Rejected, lego_transaction.TransactionRejected, OSError, subprocess.TimeoutExpired, RuntimeError) as e:
+    except (Rejected, lego_transaction.TransactionRejected, lego_registry_snapshot.RegistryIntegrityError, OSError, subprocess.TimeoutExpired, RuntimeError) as e:
         print('LEGO_REJECTED: '+str(e),file=sys.stderr)
         return 2
 
