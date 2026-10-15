@@ -145,6 +145,19 @@ class LegoSafeTests(unittest.TestCase):
     def test_environment_secret_not_forwarded(self):
         r=self.cmd('api-docs',action='--install',env={'LEGO_PRIVATE_CANARY':'top-secret-test-canary'})
         self.assertEqual(r.returncode,0,r.stderr)
+    def test_preflight_never_opens_unrelated_unreadable_file(self):
+        directory=self.consumer/'private'
+        directory.mkdir()
+        secret=directory/'unreadable-secret.txt'
+        secret.write_text('SENSITIVE_LOCAL_FIXTURE')
+        secret.chmod(0)
+        try:
+            result=self.cmd('api-docs',action='--preview')
+            self.assertEqual(result.returncode,0,result.stderr)
+        finally:
+            secret.chmod(0o600)
+        self.assertEqual(secret.read_text(),'SENSITIVE_LOCAL_FIXTURE')
+
     def test_stage_excludes_unrelated_project_files(self):
         private=self.consumer/'private'
         private.mkdir()
