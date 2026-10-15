@@ -11,6 +11,15 @@ on:
       - dev-docs/plans/lego-mvp-distribution-2026-10-15.md
       - dev-docs/validation/2026-10-15-mvp-distribution/report.md
       - LEGO-MVP.md
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/lego-mvp-distribution.yml
+      - templates/fastify-core/**
+      - templates/fastify-openapi/**
+      - LEGO-MVP.md
+      - dev-docs/plans/lego-mvp-distribution-2026-10-15.md
+      - dev-docs/validation/2026-10-15-mvp-distribution/**
 
 permissions:
   contents: read
@@ -80,9 +89,13 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_SHA" = "$(git rev-parse HEAD)"
+          # PR uses a synthetic merge commit; download the actual reviewed head
+          # while validating its contents against the checked-out merge tree.
+          SOURCE_SHA="${{ github.event.pull_request.head.sha || github.sha }}"
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
           LAB="$(mktemp -d)"
           trap 'rm -rf "$LAB"' EXIT
-          SOURCE="gh:$GITHUB_REPOSITORY/templates/${{ matrix.template }}#$GITHUB_SHA"
+          SOURCE="gh:$GITHUB_REPOSITORY/templates/${{ matrix.template }}#$SOURCE_SHA"
           TARGET="$LAB/copied-backend"
           pnpm dlx giget@3.3.1 "$SOURCE" "$TARGET"
           for relative in package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json src/app.ts src/server.ts; do
