@@ -1,3 +1,4 @@
+import { STATUS_CODES } from 'node:http';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { healthPlugin } from './plugins/health.js';
 
@@ -44,10 +45,9 @@ export function buildApp(composition: AppComposition = {}): FastifyInstance {
     const status = typeof candidate === 'number' && candidate >= 400 && candidate < 600
       ? candidate
       : 500;
-    const title = status === 400 ? 'Bad Request'
-      : status === 413 ? 'Payload Too Large'
-      : status >= 500 ? 'Internal Server Error'
-      : 'Request Failed';
+    // RFC 9457 'about:blank' titles should match the HTTP status's
+    // standard reason phrase, not "Internal Server Error" for every 5xx.
+    const title = STATUS_CODES[status] ?? 'HTTP Error';
     if (status >= 500) {
       // Do not log raw errors or untrusted message bodies in the public starter.
       request.log.error({ statusCode: status, requestId: request.id }, 'Request failed');
