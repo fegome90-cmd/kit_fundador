@@ -1,6 +1,6 @@
 # Kit Fundador LEGO — MVP para proyectos nuevos
 
-**Estado:** GO para descargar y probar las dos plantillas mínimas; **no equivale a aprobación de producción**. Sin merge a `main`. Última validación funcional: [GitHub Actions](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38720093190).
+**Estado:** GO para descargar y probar las dos plantillas mínimas; **no equivale a aprobación de producción**. Sin merge a `main`. Última validación funcional: [GitHub Actions](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38725632148).
 
 Kit Fundador ya no necesita un instalador propietario para iniciar un backend. Usa **giget**, una carpeta del repositorio en un **commit SHA completo** y `pnpm` con un lockfile reproducible.
 
@@ -14,13 +14,13 @@ Kit Fundador ya no necesita un instalador propietario para iniciar un backend. U
 El commit de plantilla auditado es:
 
 ```text
-b85190ed63e9223901db640d3fa61d85b689222a
+69b7873721a2693e58289631eea03482be8afe62
 ```
 
 ## Opción A — Fastify Core (sin servicios externos)
 
 ```bash
-pnpm dlx giget@3.3.1 'gh:fegome90-cmd/kit_fundador/templates/fastify-core#b85190ed63e9223901db640d3fa61d85b689222a' mi-api
+pnpm dlx giget@3.3.1 'gh:fegome90-cmd/kit_fundador/templates/fastify-core#69b7873721a2693e58289631eea03482be8afe62' mi-api
 cd mi-api
 pnpm install --frozen-lockfile
 pnpm run typecheck
@@ -33,7 +33,7 @@ Responde `GET http://127.0.0.1:3000/health` con `{"ok":true}`. El único paquete
 ## Opción B — Fastify Core + OpenAPI
 
 ```bash
-pnpm dlx giget@3.3.1 'gh:fegome90-cmd/kit_fundador/templates/fastify-openapi#b85190ed63e9223901db640d3fa61d85b689222a' mi-api-docs
+pnpm dlx giget@3.3.1 'gh:fegome90-cmd/kit_fundador/templates/fastify-openapi#69b7873721a2693e58289631eea03482be8afe62' mi-api-docs
 cd mi-api-docs
 pnpm install --frozen-lockfile
 pnpm run typecheck
@@ -53,14 +53,14 @@ En sistemas Unix, la documentación activada aparece en `http://127.0.0.1:3000/d
 | `buildApp()` sin abrir puertos | Sí | Sí |
 | Health, 400/404/413/500 y JSON Problem Details | Sí | Sí |
 | IDs de solicitud, logs sin URLs automáticas | Sí | Sí |
-| SIGTERM y bind `127.0.0.1` por defecto | Sí | Sí |
+| SIGTERM/SIGINT y bind `127.0.0.1` por defecto | Sí | Sí |
 | Sin Docker, PostgreSQL, auth ni Redis | Sí | Sí |
 | OpenAPI y UI activables | No | Sí |
 | `pnpm-lock.yaml` independiente, `--frozen-lockfile` | Sí | Sí |
-| Tests tras descarga por SHA | 7 PASS | 10 PASS |
+| Tests tras descarga por SHA | 12 PASS | 15 PASS |
 | `pnpm audit` completo al 15-10-2026 | Sin avisos conocidos | Sin avisos conocidos |
 
-Se probó que giget no sobrescribe una carpeta ocupada por defecto. No uses `--force`. El código generado pasa a ser propiedad del nuevo proyecto; no existe actualización automática in-place.
+Se probó que giget no sobrescribe una carpeta ocupada ni una ruta simbólica hacia ella. No uses `--force`. El código generado pasa a ser propiedad del nuevo proyecto; no existe actualización automática in-place.
 
 ## Lo que deliberadamente NO está publicado
 
@@ -72,4 +72,4 @@ Tampoco hay un Marketplace VS Code, Homebrew tap, CLI propia, registro de plugin
 
 El starter utiliza una configuración HTTP prudente, pero **no es una aplicación lista para exponer públicamente**. Añade autenticación, autorización, rate limiting, cabeceras avanzadas, TLS en proxy, observabilidad y persistencia solo según tus necesidades. La protección de logs no sustituye políticas de privacidad.
 
-Para comprobar la evidencia, consulta [el plan y auditoría previa](dev-docs/plans/lego-mvp-distribution-2026-10-15.md) y [la ejecución reproducible](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38720093190). Los detalles del cierre se guardan en `dev-docs/validation/2026-10-15-mvp-distribution/report.md`.
+Para comprobar la evidencia, consulta [el plan y auditoría previa](dev-docs/plans/lego-mvp-distribution-2026-10-15.md) y [la ejecución reproducible](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38725632148). Los detalles del cierre se guardan en `dev-docs/validation/2026-10-15-mvp-distribution/report.md`.
