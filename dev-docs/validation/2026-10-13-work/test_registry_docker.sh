@@ -30,7 +30,8 @@ CANARY="$LAB/do-not-read-host-canary.txt"
 printf 'HOST_SECRET_CANARY_SHOULD_NOT_BE_VISIBLE\n' > "$CANARY"
 docker run --rm --read-only --cap-drop ALL \
   --security-opt=no-new-privileges --pids-limit 128 --memory=512m \
-  --network host --user "$(id -u):$(id -g)" \
+  --network bridge --add-host host.docker.internal:host-gateway \
+  --user "$(id -u):$(id -g)" \
   --tmpfs /tmp:rw,nosuid,nodev,size=128m,mode=1777 \
   --mount "type=bind,src=$CONSUMER,dst=/work" \
   --workdir /work \
@@ -44,7 +45,18 @@ docker run --rm --read-only --cap-drop ALL \
   ' "$CANARY"
 test "$(cat "$CONSUMER/container-write-probe")" = 'ok'
 rm "$CONSUMER/container-write-probe"
-echo "DOCKER_FILESYSTEM_BOUNDARY_PASS (network host intentionally shared)"
+echo "DOCKER_FILESYSTEM_BOUNDARY_PASS"
+docker run --rm --read-only --cap-drop ALL \
+  --security-opt=no-new-privileges --network bridge \
+  --user "$(id -u):$(id -g)" \
+  kit-lego-sandbox:ci node -e '
+    const c=new AbortController();
+    setTimeout(()=>c.abort(),2000).unref();
+    fetch("http://127.0.0.1:4380/core-fastify.json",{signal:c.signal})
+      .then(()=>process.exit(95))
+      .catch(()=>{console.log("DOCKER_LOOPBACK_ORIGIN_BLOCKED_PASS");process.exit(0)});
+  '
+
 
 CLI="$ROOT/prototype/node_modules/shadcn/dist/index.js"
 BASE="http://127.0.0.1:4380"
@@ -77,4 +89,4 @@ PY
 
 cp "$LAB/sandbox-diff.json" "$ROOT/registry-safety-docker-diff.json"
 cp "$LAB/sandbox-install.json" "$ROOT/registry-safety-docker-install.json"
-echo "DOCKER_SANDBOX_LAB_PASS (filesystem/process containment only)"
+echo "DOCKER_SANDBOX_LAB_PASS (separate network namespace, egress still allowed)"
