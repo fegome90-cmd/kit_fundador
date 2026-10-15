@@ -48,12 +48,15 @@ test('404, malformed JSON 400, body-limit 413 and sanitized 500', async (t) => {
 test('Problem Details titles reflect 403 and 502 without leaking error messages', async (t) => {
   const app = buildApp();
   t.after(() => app.close());
-  for (const [status, title] of [[403, 'Forbidden'], [502, 'Bad Gateway']]) {
+  // Register every route before the first inject() finalizes Fastify's graph.
+  for (const status of [403, 502]) {
     app.get('/status-' + status, async () => {
       const error = new Error('PRIVATE_DIAGNOSTIC_MESSAGE');
       error.statusCode = status;
       throw error;
     });
+  }
+  for (const [status, title] of [[403, 'Forbidden'], [502, 'Bad Gateway']]) {
     const response = await app.inject({ method: 'GET', url: '/status-' + status });
     assert.equal(response.statusCode, status);
     assert.equal(response.headers['content-type'], 'application/problem+json; charset=utf-8');
