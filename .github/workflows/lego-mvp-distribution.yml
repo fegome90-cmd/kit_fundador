@@ -15,6 +15,10 @@ permissions:
 
 jobs:
   template-validation:
+    # Temporary write permission ONLY to commit the generated OpenAPI lockfile.
+    # Restore contents:read once the lockfile is versioned.
+    permissions:
+      contents: write
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     strategy:
@@ -69,6 +73,23 @@ jobs:
         run: |
           cd "templates/${{ matrix.template }}"
           pnpm audit --prod --no-optional
+      - name: One-time seed of independently resolved OpenAPI lockfile
+        if: matrix.template == 'fastify-openapi'
+        run: |
+          set -euo pipefail
+          FILE=templates/fastify-openapi/pnpm-lock.yaml
+          if git ls-files --error-unmatch "$FILE" >/dev/null 2>&1; then
+            echo "LOCK_ALREADY_COMMITTED"
+            exit 0
+          fi
+          test "$GITHUB_REF" = "refs/heads/feat/fastify-lego-foundation"
+          test -s "$FILE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$FILE"
+          git commit -m "chore(mvp): pin verified OpenAPI pnpm dependency graph"
+          git push origin "HEAD:feat/fastify-lego-foundation"
+          echo "OPENAPI_LOCK_COMMITTED"
       - name: Retain independently resolved lockfile
         if: always()
         uses: actions/upload-artifact@v4
