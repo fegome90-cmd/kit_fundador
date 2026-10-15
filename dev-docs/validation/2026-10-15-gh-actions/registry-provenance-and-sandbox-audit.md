@@ -30,7 +30,7 @@ La CLI experimental ahora:
 | Snapshot sirve solo items del grafo aprobado | **PASS** | GET autorizado 200; item ajeno 404 |
 | Campo extra peligroso en item | **PASS** | Rechaza `envVars` |
 | URL remota en campo `files[].path` | **PASS** | Rechaza archivo remoto |
-| Regresión previa del instalador y shadcn real | **PASS** | `34/34` en [CI](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38714290343) |
+| Regresión del instalador y shadcn real | **PASS** | **35/35** en [CI](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38715376125), incluidos archivos ajenos sin permiso de lectura |
 
 **Referencia:** `dev-docs/validation/2026-10-13-work/lego_registry_snapshot.py` y `test_lego_registry_snapshot.py`. La aserción TOCTOU cuenta exactamente un fetch del origen por item y demuestra que la versión mutada no entra en el consumidor. No prueba autenticidad de la persona que redactó el `registry-lock`.
 
