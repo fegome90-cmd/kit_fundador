@@ -11,9 +11,11 @@ No se modificaron `templates/fastify-core`, `templates/fastify-openapi` ni `exam
 
 ## Evidencia CI ejecutada en PostgreSQL verdadero
 
+**Última validación funcional sobre código verificado:** [PostgreSQL E2E run 38958745568](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38958745568) y [CI heredada run 38958745552](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38958745552), ambas **success** para `a0edb8fe00f709f2bac544b3b0a057efbb274294`; Node 24, PostgreSQL 16.15 efímero. El add-on aprobó **7/7** pruebas Node con los dos casos de socket/host añadido; regresión heredada **111 PASS, 2 omitidas**, Identity Access standalone **9/9 PASS**. Auditoría de producción: sin vulnerabilidades conocidas; auditoría completa: **1 moderate, 0 high/critical**. **Este resultado no resuelve D-01 ni D-02.**
+
 - [LEGO PostgreSQL (isolated) — run 38957656346](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38957656346), **success** en commit `d215ff77776649fe53b17fa60b9077e75b5548b7`. GitHub-hosted Ubuntu 24.04, servicio PostgreSQL `postgres:16.15`, credenciales sintéticas efímeras.
 - [CI heredada — run 38957656348](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38957656348), **success** en mismo commit. 111/113 tests ejecutados/aprobados, 2 omitidos; la suite independiente previa de Identity & Access aprobó 9/9.
-- El add-on se copió a directorio temporal sin manifest padre: `pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts`, TypeScript `strict:true` sobre código propio, `drizzle-kit check`, build NodeNext y 5/5 pruebas Node nativas, todos **PASS**.
+- El add-on se copió a directorio temporal sin manifest padre: `pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts`, TypeScript `strict:true` sobre código propio, `drizzle-kit check`, build NodeNext y 7/7 pruebas Node nativas, todos **PASS**.
 - `drizzle-kit migrate` se ejecutó **dos veces**. Journal `drizzle.__drizzle_migrations`: **una** entrada; tabla `lego_app.notes`: una tabla. Ninguna migración corre al arrancar Fastify. Marcador: `LEGO_PG_MIGRATIONS_APPLIED_ONCE`.
 - Rol `lego_app_ci` creado por la migración CI: acceso `CONNECT`, `USAGE` y DML al esquema, sin `CREATE` ni permisos de lectura sobre el journal Drizzle ni tabla ajena. Tres pruebas negativas denegadas por PostgreSQL con SQLSTATE `42501`.
 - Pruebas: núcleo sin plugin sigue con health y 404 de datos; URL ausente, mal formada o servicio caído abortan inicio sin exponer secreto; insert/select de datos mediante Drizzle tipado, cadenas de inyección tratadas como dato; al cerrar Fastify, `pg_stat_activity` no conserva conexiones del pool.
@@ -27,7 +29,7 @@ No se modificaron `templates/fastify-core`, `templates/fastify-openapi` ni `exam
 
 **D-03 — cobertura de producción no demostrada.** No se probaron TLS con certificado CA, cargas reales, rotación de credenciales, despliegue externo, escalado de pools múltiples, migraciones *expand/contract*, backups/restore, failover, drift externo, ventanas de upgrade ni migración de datos reales. No hay sesiones ni autorización de usuario final, tampoco multi-tenant. Todo dato insertado fue sintético. La imagen de Postgres está fijada por tag, no digest de imagen firmado.
 
-**D-04 — cierre por revisión humana.** Las CI de laboratorio no autorizan publicar un paquete npm/shadcn ni aplicar la pieza sobre un repositorio ocupado. Revisar CodeRabbit y cerrar sus hallazgos. El código del consumidor pasa a su propiedad y requiere migraciones explícitas, política de upgrades y observabilidad antes de producción.
+**D-04 — cierre por revisión humana.** Las CI de laboratorio no autorizan publicar un paquete npm/shadcn ni aplicar la pieza sobre un repositorio ocupado. CodeRabbit publicó un hallazgo verificable; se corrigió en `a0edb8f`, se validó y el thread quedó **resuelto**. La PR permanece **draft**, sin autorización de merge. El código del consumidor pasa a su propiedad y requiere migraciones explícitas, política de upgrades y observabilidad antes de producción.
 
 ## Dictamen
 
