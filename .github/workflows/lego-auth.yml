@@ -1,0 +1,202 @@
+name: LEGO Better Auth + PostgreSQL (isolated)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - addons/auth-better-auth/**
+      - .github/workflows/lego-auth.yml
+      - dev-docs/plans/lego-auth-2026-10-16.md
+      - dev-docs/validation/2026-10-16-lego-auth/**
+  push:
+    branches: [main]
+    paths:
+      - addons/auth-better-auth/**
+      - .github/workflows/lego-auth.yml
+      - dev-docs/plans/lego-auth-2026-10-16.md
+      - dev-docs/validation/2026-10-16-lego-auth/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lego-auth-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  auth-isolation:
+    name: Better Auth sessions + roles + PostgreSQL 16
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16.15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: temporary-lego-auth-admin
+          POSTGRES_DB: lego_auth_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d lego_auth_ci"
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 15
+    env:
+      MIGRATION_DATABASE_URL: postgresql://postgres:temporary-lego-auth-admin@127.0.0.1:5432/lego_auth_ci
+      AUTH_MIGRATION_DATABASE_URL: postgresql://postgres:temporary-lego-auth-admin@127.0.0.1:5432/lego_auth_ci
+      AUTH_APP_DATABASE_URL: postgresql://lego_auth_ci:temporary-lego-auth-role@127.0.0.1:5432/lego_auth_ci
+      AUTH_ROLE_TEST_PASSWORD: temporary-lego-auth-role
+      AUTH_TEST_SECRET: synthetic-ephemeral-better-auth-test-secret-2026-10-16-never-reuse
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check the optional add-on dependency, schema and script boundaries
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          const path = 'addons/auth-better-auth/';
+          const pkg = JSON.parse(fs.readFileSync(path + 'package.json','utf8'));
+          assert.equal(pkg.packageManager, 'pnpm@11.25.0');
+          assert.deepEqual(pkg.dependencies, {
+            'better-auth':'1.7.10',
+            '@better-auth/drizzle-adapter':'1.7.10',
+            'drizzle-orm':'0.45.4',
+            pg:'8.23.1'
+          });
+          assert.deepEqual(pkg.peerDependencies, {fastify:'^5.0.0'});
+          const allowed = new Set(['typecheck','build','test','db:generate','db:check','db:migrate']);
+          for (const name of Object.keys(pkg.scripts)) assert.ok(allowed.has(name), 'Unexpected script '+name);
+          assert.ok(!Object.keys(pkg.scripts).some(name=>/^(pre|post|prepare)/.test(name)));
+          assert.ok(fs.statSync(path + 'pnpm-lock.yaml').size > 1000);
+          assert.ok(fs.statSync(path + 'drizzle/meta/_journal.json').size > 0);
+          assert.ok(!JSON.stringify(pkg).includes('workspace:'));
+          const sql = fs.readFileSync(path+'drizzle/0000_init.sql','utf8');
+          assert.ok(sql.includes('CREATE SCHEMA "auth"'));
+          assert.ok(sql.includes('"auth"."session"'));
+          assert.ok(!sql.includes('CREATE SCHEMA "lego_app"'));
+          const cfg = fs.readFileSync(path+'drizzle.config.ts','utf8');
+          assert.ok(cfg.includes("schema: 'auth_meta'"));
+          console.log('LEGO_AUTH_SCOPE_BOUNDARIES_PASS');
+          NODE
+      - name: Install and migrate independent PostgreSQL and Better Auth pieces
+        shell: bash
+        run: |
+          set -euo pipefail
+          LAB="$(mktemp -d)"
+          trap 'rm -rf "$LAB"' EXIT
+          cp -a addons/db-postgres "$LAB/db-postgres"
+          cp -a addons/auth-better-auth "$LAB/auth-better-auth"
+          test ! -e "$LAB/package.json"
+          (
+            cd "$LAB/db-postgres"
+            pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
+            pnpm run db:check
+            pnpm run db:migrate
+            pnpm run db:migrate
+          )
+          (
+            cd "$LAB/auth-better-auth"
+            pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
+            pnpm run typecheck
+            # Full dependency declarations remain upstream-blocked by Drizzle.
+            # Audit errors explicitly and never mislabel the waiver as typecheck PASS.
+            if pnpm exec tsc --noEmit --skipLibCheck false > "$RUNNER_TEMP/auth-declarations.log" 2>&1; then
+              echo 'LEGO_AUTH_UPSTREAM_DECLARATIONS_PASS'
+            else
+              awk '
+                /error TS[0-9]+/ {
+                  if (index($0, "node_modules/.pnpm/drizzle-orm@0.45.4") == 0) {
+                    print "Unexpected dependency/type error: " $0
+                    unexpected=1
+                  } else {
+                    upstream++
+                  }
+                }
+                END {
+                  if (upstream == 0 || unexpected) exit 1
+                  print "LEGO_AUTH_UPSTREAM_WAIVER", upstream, "Drizzle 0.45.4 declarations only"
+                }
+              ' "$RUNNER_TEMP/auth-declarations.log"
+            fi
+            pnpm run db:check
+            pnpm run build
+            # An unapplied auth schema must abort startup without creating tables.
+            node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import Fastify from 'fastify';
+          import { createAuthPlugin } from './dist/index.js';
+          import { Pool } from 'pg';
+          const connectionString=process.env.AUTH_MIGRATION_DATABASE_URL;
+          const p=new Pool({connectionString});
+          const x=Fastify({logger:false});
+          x.register(createAuthPlugin({
+            databaseUrl:connectionString,baseURL:'http://127.0.0.1:4310',
+            secret:process.env.AUTH_TEST_SECRET
+          }));
+          await assert.rejects(x.ready(), /Auth add-on initialization failed/);
+          await x.close().catch(()=>{});
+          const table=await p.query("SELECT COUNT(*)::integer AS n FROM pg_tables WHERE schemaname='auth'");
+          assert.equal(table.rows[0].n,0);
+          await p.end();
+          console.log('AUTH_NEVER_AUTOMIGRATES_PASS');
+          NODE
+            pnpm run db:migrate
+            pnpm run db:migrate
+            node scripts/setup-ci-db.mjs
+            pnpm test
+            mkdir "$LAB/core"
+            cp -a "$GITHUB_WORKSPACE/templates/fastify-core/." "$LAB/core/"
+            (
+              cd "$LAB/core"
+              pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
+              pnpm run typecheck
+              pnpm run build
+            )
+            node scripts/verify-core.mjs "$LAB/core/dist/app.js"
+            echo 'LEGO_AUTH_CORE_COMPOSITION_PASS'
+          )
+      - name: Audit runtime dependency advisories (blocking)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd addons/auth-better-auth
+          pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
+          pnpm audit --prod --no-optional
+      - name: Audit full dependency tree for high and critical advisories
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd addons/auth-better-auth
+          pnpm audit --audit-level high
+      - name: Record and preserve the complete dependency audit
+        shell: bash
+        if: always()
+        run: |
+          set -euo pipefail
+          cd addons/auth-better-auth
+          pnpm audit --json > "$RUNNER_TEMP/lego-auth-audit.json" || echo 'AUTH_DEV_AUDIT_HAS_ADVISORIES'
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const data = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/lego-auth-audit.json','utf8'));
+          console.log('LEGO_AUTH_AUDIT_SUMMARY',JSON.stringify(data.metadata?.vulnerabilities ?? {}));
+          NODE
+      - name: Preserve audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lego-auth-audit-${{ github.run_id }}
+          path: ${{ runner.temp }}/lego-auth-audit.json
+          if-no-files-found: warn
+          retention-days: 7
