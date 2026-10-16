@@ -75,7 +75,7 @@ export class RegisterUserAccountHandler {
       email,
       name: command.name,
       password,
-      role: command.role,
+      role: 'user',
     });
   }
 }

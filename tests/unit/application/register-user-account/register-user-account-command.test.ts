@@ -10,31 +10,40 @@ function buildPayload(
     email: 'USER@example.com',
     name: '  Ada Lovelace  ',
     password: 'super-secure-pass',
-    role: 'user',
     ...overrides,
   };
 }
 
 describe('RegisterUserAccountCommand', () => {
 
-  it('normalizes whitespace, casing and defaults role to user', () => {
+  it('normalizes email and name but keeps the public command free of roles', () => {
     const command = buildRegisterUserAccountCommand(
-      buildPayload({ role: undefined })
+      buildPayload()
     );
 
     expect(command.email).toBe('user@example.com');
     expect(command.name).toBe('Ada Lovelace');
     expect(command.password).toBe('super-secure-pass');
-    expect(command.role).toBe('user');
+    expect(command).not.toHaveProperty('role');
     expect(Object.isFrozen(command)).toBe(true);
   });
 
-  it('respects explicit role when it is allowed', () => {
-    const command = buildRegisterUserAccountCommand(
-      buildPayload({ role: 'admin' })
-    );
+  it('ignores an administrative role supplied at runtime', () => {
+    const untrustedInput = { ...buildPayload(), role: 'admin' };
+    const command = buildRegisterUserAccountCommand(untrustedInput);
+    expect(command).not.toHaveProperty('role');
+  });
 
-    expect(command.role).toBe('admin');
+  it('does not retain caller-supplied role in the public command', () => {
+    const untrustedInput = { ...buildPayload(), role: 'user' };
+    const command = buildRegisterUserAccountCommand(untrustedInput);
+    expect(command).not.toHaveProperty('role');
+  });
+
+  it('does not trim meaningful whitespace from a password', () => {
+    const rawPassword = '  SecurePass123!  ';
+    const command = buildRegisterUserAccountCommand(buildPayload({ password: rawPassword }));
+    expect(command.password).toBe(rawPassword);
   });
 
   it('throws when email is empty', () => {
@@ -56,10 +65,10 @@ describe('RegisterUserAccountCommand', () => {
     ).toThrow('password cannot be blank');
   });
 
-  it('throws when role is not supported', () => {
-    expect(() =>
-      buildRegisterUserAccountCommand(buildPayload({ role: 'manager' as any }))
-    ).toThrow('role must be one of');
+  it('does not retain arbitrary role values supplied at runtime', () => {
+    const untrustedInput = { ...buildPayload(), role: 'manager' };
+    const command = buildRegisterUserAccountCommand(untrustedInput);
+    expect(command).not.toHaveProperty('role');
   });
 
   // MCQS Prevention: Test edge case for null/undefined values

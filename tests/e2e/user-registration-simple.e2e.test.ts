@@ -25,7 +25,6 @@ describe('User Registration E2E Workflow', () => {
       email: `e2e-simple-${Date.now()}@example.com`,
       name: 'E2E Simple Test User',
       password: 'SecurePass123!',
-      role: 'user'
     };
 
     // Act: API Request
@@ -46,7 +45,7 @@ describe('User Registration E2E Workflow', () => {
     // Assert: Response Values
     expect(typeof apiResponse.body.data.userId).toBe('string');
     expect(typeof apiResponse.body.data.name).toBe('string');
-    expect(typeof apiResponse.body.data.role).toBe('string');
+    expect(apiResponse.body.data.role).toBe('user');
     expect(typeof apiResponse.body.data.createdAt).toBe('string');
 
     console.log(`E2E Registration: User ${apiResponse.body.data.userId} created successfully`);
@@ -58,7 +57,6 @@ describe('User Registration E2E Workflow', () => {
       email: 'invalid-email-format', // ← INVÁLIDO
       name: 'Test User',
       password: 'ValidPass123!',
-      role: 'user'
     };
 
     // Act: API Request
@@ -78,7 +76,6 @@ describe('User Registration E2E Workflow', () => {
       email: `duplicate-simple-${Date.now()}@example.com`,
       name: 'Duplicate Simple Test User',
       password: 'ValidPass123!',
-      role: 'user'
     };
 
     // Act: First Registration (Success)
@@ -116,7 +113,6 @@ describe('User Registration E2E Workflow', () => {
           email: `perf-simple-${Date.now()}-${i}@example.com`,
           name: 'Performance Simple Test User',
           password: 'ValidPass123!',
-          role: 'user'
         };
 
         const startTime = performance.now();

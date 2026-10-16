@@ -1,5 +1,3 @@
-import { UserRole } from '../../../domain/entities/User';
-
 /**
  * DTO que encapsula los datos de entrada para el use case RegisterUserAccount.
  * Mantiene la capa de aplicación aislada de detalles HTTP o de persistencia.
@@ -8,17 +6,13 @@ export interface RegisterUserAccountCommand {
   email: string;
   name: string;
   password: string;
-  role: UserRole;
 }
 
 export interface RegisterUserAccountCommandProps {
   email: string;
   name: string;
   password: string;
-  role?: UserRole;
 }
-
-const ALLOWED_ROLES: ReadonlyArray<UserRole> = ['admin', 'user', 'guest'];
 
 /**
  * Normaliza/valida los datos de entrada y retorna un command inmutable.
@@ -29,13 +23,11 @@ export function buildRegisterUserAccountCommand(
   const normalizedEmail = normalizeEmail(props.email);
   const normalizedName = normalizeName(props.name);
   const normalizedPassword = normalizePassword(props.password);
-  const normalizedRole = normalizeRole(props.role);
 
   return Object.freeze({
     email: normalizedEmail,
     name: normalizedName,
     password: normalizedPassword,
-    role: normalizedRole,
   });
 }
 
@@ -67,19 +59,12 @@ function normalizeName(name: string): string {
 }
 
 function normalizePassword(password: string): string {
-  return ensureNonEmpty(password, 'password');
-}
-
-function normalizeRole(role?: UserRole): UserRole {
-  if (!role) {
-    return 'user';
+  // Passwords are opaque: reject blank input without trimming meaningful spaces.
+  if (!password) {
+    throw new Error('password cannot be empty');
   }
-
-  if (!ALLOWED_ROLES.includes(role)) {
-    throw new Error(
-      `role must be one of: ${ALLOWED_ROLES.map((value) => `"${value}"`).join(', ')}`
-    );
+  if (typeof password !== 'string' || !password.trim()) {
+    throw new Error('password cannot be blank');
   }
-
-  return role;
+  return password;
 }

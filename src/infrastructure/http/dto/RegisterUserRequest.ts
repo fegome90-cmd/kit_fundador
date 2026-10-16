@@ -1,13 +1,12 @@
 /**
- * Register User Request DTO
- * Input validation and sanitization for user registration endpoint
+ * Public registration DTO. Privileged properties are rejected.
  */
+import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_BYTES } from '../../../domain/value-objects/Password';
 
 export interface RegisterUserRequest {
   email: string;
   name: string;
   password: string;
-  role?: 'user' | 'admin';
 }
 
 export interface ValidationResult {
@@ -20,8 +19,7 @@ export class RegisterUserRequestValidator {
   private static readonly EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   private static readonly MAX_EMAIL_LENGTH = 255;
   private static readonly MAX_NAME_LENGTH = 100;
-  private static readonly MIN_PASSWORD_LENGTH = 8;
-  private static readonly ALLOWED_FIELDS = ['email', 'name', 'password', 'role'];
+  private static readonly ALLOWED_FIELDS = ['email', 'name', 'password'];
 
   static validate(input: unknown): ValidationResult {
     if (!this.isValidObject(input)) {
@@ -79,8 +77,6 @@ export class RegisterUserRequestValidator {
     if (data.name && typeof data.name !== 'string') errors.push('Name must be a string');
     if (data.password && typeof data.password !== 'string')
       errors.push('Password must be a string');
-    if (data.role !== undefined && typeof data.role !== 'string')
-      errors.push('Role must be a string');
     return errors;
   }
 
@@ -90,7 +86,6 @@ export class RegisterUserRequestValidator {
     this.validateEmailField(data, errors);
     this.validateNameField(data, errors);
     this.validatePasswordField(data, errors);
-    this.validateRoleField(data, errors);
 
     return errors;
   }
@@ -113,13 +108,6 @@ export class RegisterUserRequestValidator {
     if (typeof data.password === 'string') {
       const passwordValidation = this.validatePassword(data.password);
       errors.push(...passwordValidation);
-    }
-  }
-
-  private static validateRoleField(data: Record<string, unknown>, errors: string[]): void {
-    if (typeof data.role === 'string') {
-      const roleValidation = this.validateRole(data.role);
-      errors.push(...roleValidation);
     }
   }
 
@@ -154,20 +142,12 @@ export class RegisterUserRequestValidator {
   private static validatePassword(password: string): string[] {
     const errors: string[] = [];
 
-    if (password.length < this.MIN_PASSWORD_LENGTH) {
-      errors.push(`Password must be at least ${this.MIN_PASSWORD_LENGTH} characters long`);
-    } else if (password.length > 128) {
-      errors.push('Password must not exceed 128 characters');
+    if (password.trim().length < MIN_PASSWORD_LENGTH) {
+      errors.push(`Password must be at least ${MIN_PASSWORD_LENGTH} characters long`);
+    } else if (Buffer.byteLength(password, 'utf8') > MAX_PASSWORD_BYTES) {
+      errors.push(`Password must not exceed ${MAX_PASSWORD_BYTES} UTF-8 bytes`);
     }
 
-    return errors;
-  }
-
-  private static validateRole(role: string): string[] {
-    const errors: string[] = [];
-    if (!['user', 'admin'].includes(role)) {
-      errors.push('Role must be either "user" or "admin"');
-    }
     return errors;
   }
 
@@ -185,7 +165,6 @@ export class RegisterUserRequestValidator {
       email: (data.email as string).trim().toLowerCase(),
       name: (data.name as string).trim(),
       password: data.password as string,
-      role: data.role ? (data.role as 'user' | 'admin') : 'user',
     };
   }
 
@@ -194,7 +173,6 @@ export class RegisterUserRequestValidator {
       email: input.email.trim().toLowerCase(),
       name: input.name.trim(),
       password: input.password,
-      role: input.role || 'user',
     };
   }
 }

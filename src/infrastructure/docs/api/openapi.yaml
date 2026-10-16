@@ -10,7 +10,7 @@ info:
     
     ## Features
     - User account creation with email validation
-    - Role-based access control (user/admin)
+    - Public registration creates only nonprivileged user accounts
     - Comprehensive input validation and sanitization
     - Duplicate email prevention
     - Security headers and middleware
@@ -29,8 +29,6 @@ info:
 servers:
   - url: http://localhost:3000
     description: Development server
-  - url: https://api.kitfundador.com
-    description: Production server
 
 tags:
   - name: User Registration
@@ -41,13 +39,14 @@ paths:
     post:
       summary: Register a new user account
       description: |
-        Creates a new user account with the provided email, name, password, and optional role.
+        Creates a nonprivileged user account with email, name and password.
+        Unknown or privileged fields (including role) are rejected.
         
         The endpoint performs comprehensive validation including:
         - Email format and length validation
-        - Password strength requirements (minimum 8 characters)
+        - Password length at least 12 characters, at most 72 UTF-8 bytes (bcrypt demo limit)
         - Name length validation (maximum 100 characters)
-        - Role validation (user/admin, defaults to user)
+        - Privileged properties rejected; role is assigned internally
         - Duplicate email checking
         - Input sanitization and normalization
         
@@ -55,6 +54,7 @@ paths:
       tags:
         - User Registration
       operationId: registerUser
+      security: []
       requestBody:
         required: true
         description: User registration data
@@ -69,20 +69,6 @@ paths:
                   email: "user@example.com"
                   name: "John Doe"
                   password: "SecurePassword123!"
-                  role: "user"
-              adminRegistration:
-                summary: Admin user registration
-                value:
-                  email: "admin@example.com"
-                  name: "Admin User"
-                  password: "AdminPassword123!"
-                  role: "admin"
-              userWithoutRole:
-                summary: User registration with default role
-                value:
-                  email: "defaultuser@example.com"
-                  name: "Default User"
-                  password: "DefaultPassword123!"
       responses:
         '201':
           description: User registered successfully
@@ -136,7 +122,7 @@ paths:
                   value:
                     success: false
                     message: "Validation failed"
-                    errors: ["Password must be at least 8 characters long"]
+                    errors: ["Password must be at least 12 characters long"]
                     timestamp: "2025-11-18T10:30:00.000Z"
                     path: "/api/users/register"
         '409':
@@ -204,6 +190,7 @@ components:
   schemas:
     RegisterUserRequest:
       type: object
+      additionalProperties: false
       required:
         - email
         - name
@@ -218,25 +205,20 @@ components:
           example: "user@example.com"
         name:
           type: string
-          minLength: 2
+          minLength: 1
           maxLength: 100
           description: User's full name
           example: "John Doe"
         password:
           type: string
-          minLength: 8
-          maxLength: 128
+          minLength: 12
+          maxLength: 72
           description: |
-            User's password. Must be at least 8 characters long.
-            For better security, use a combination of uppercase, lowercase,
-            numbers, and special characters.
+            Demonstration password: at least 12 characters and no more than
+            72 UTF-8 bytes. The byte limit is additionally enforced by the
+            application because JSON Schema maxLength counts characters.
+            This example is not a production authentication service.
           example: "SecurePassword123!"
-        role:
-          type: string
-          enum: [user, admin]
-          default: user
-          description: User role (defaults to 'user' if not specified)
-          example: "user"
 
     RegisterUserResponse:
       type: object
@@ -270,8 +252,8 @@ components:
               example: "John Doe"
             role:
               type: string
-              enum: [user, admin]
-              description: User's role
+              enum: [user]
+              description: Public registration always assigns the user role
               example: "user"
             createdAt:
               type: string
@@ -324,16 +306,6 @@ components:
           type: string
           description: Running environment
           example: "development"
-
-  securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: X-API-Key
-      description: API key for authentication (future use)
-
-security:
-  - ApiKeyAuth: []
 
 externalDocs:
   description: Kit Fundador Documentation

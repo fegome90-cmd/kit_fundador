@@ -23,14 +23,8 @@ export class UserController {
     }
 
     try {
-      const { email, name, password, role } = validation.data;
-      const normalizedRole: UserRole = role === 'admin' ? 'admin' : 'user';
-      const command = buildRegisterUserAccountCommand({
-        email,
-        name,
-        password,
-        role: normalizedRole,
-      });
+      const { email, name, password } = validation.data;
+      const command = buildRegisterUserAccountCommand({ email, name, password });
       const result = await this.registerUserHandler.execute(command);
 
       this.sendSuccessResponse(res, result);
@@ -41,7 +35,7 @@ export class UserController {
 
   private validateRequest(body: unknown): {
     isValid: boolean;
-    data?: { email: string; name: string; password: string; role: string };
+    data?: { email: string; name: string; password: string };
     errors?: string[];
   } {
     const validation = RegisterUserRequestValidator.validate(body);
@@ -56,7 +50,6 @@ export class UserController {
         email: validation.data.email,
         name: validation.data.name,
         password: validation.data.password,
-        role: validation.data.role || 'user',
       },
     };
   }
@@ -74,12 +67,14 @@ export class UserController {
       };
     }
   ): void {
-    const role = result.userSnapshot.role === 'guest' ? 'user' : result.userSnapshot.role;
+    if (result.userSnapshot.role !== 'user') {
+      throw new Error('Public registration unexpectedly created a privileged account');
+    }
     const userData = {
       userId: result.userSnapshot.id,
       email: result.userSnapshot.email,
       name: result.userSnapshot.name,
-      role: role as 'user' | 'admin',
+      role: result.userSnapshot.role,
     };
 
     res.status(201).json(RegisterUserResponseBuilder.success(userData));

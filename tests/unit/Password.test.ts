@@ -62,6 +62,10 @@ describe('Password Value Object', () => {
     });
   });
 
+  it('rejects UTF-8 passwords longer than the bcrypt 72-byte limit', async () => {
+    await expect(Password.create('é'.repeat(40))).rejects.toThrow('72 UTF-8 bytes');
+  });
+
   describe('Password Verification (matches)', () => {
     it('should verify correct password', async () => {
       const password = await Password.create(VALID_PASSWORD);
@@ -97,6 +101,12 @@ describe('Password Value Object', () => {
 
       expect(isMatch).toBe(false);
     });
+  });
+
+  it('does not authenticate a password that only shares the first 72 bytes', async () => {
+    const prefix = 'x'.repeat(72);
+    const password = await Password.create(prefix);
+    expect(await password.matches(prefix + 'extra')).toBe(false);
   });
 
   describe('Password from Hash (fromHash)', () => {
@@ -251,6 +261,23 @@ describe('Password Value Object', () => {
         process.env.PASSWORD_SALT_ROUNDS = originalEnv;
       } else {
         delete process.env.PASSWORD_SALT_ROUNDS;
+      }
+    });
+
+    it('refuses insecure bcrypt rounds outside the test environment', async () => {
+      const oldRounds = process.env.PASSWORD_SALT_ROUNDS;
+      const oldMode = process.env.NODE_ENV;
+      try {
+        process.env.PASSWORD_SALT_ROUNDS = '4';
+        process.env.NODE_ENV = 'production';
+        await expect(Password.create(VALID_PASSWORD)).rejects.toThrow(
+          'must be between 10 and 31'
+        );
+      } finally {
+        if (oldRounds === undefined) delete process.env.PASSWORD_SALT_ROUNDS;
+        else process.env.PASSWORD_SALT_ROUNDS = oldRounds;
+        if (oldMode === undefined) delete process.env.NODE_ENV;
+        else process.env.NODE_ENV = oldMode;
       }
     });
 

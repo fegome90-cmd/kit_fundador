@@ -25,7 +25,6 @@ describe('User Registration API Contract', () => {
       email: `test${Date.now()}@example.com`,
       name: "TestUser",
       password: "SecurePass123!",
-      role: "user"
     };
 
     const response = await request(server.getApp())
@@ -49,12 +48,61 @@ describe('User Registration API Contract', () => {
     expect(response.body.data.email).toBe(uniqueUser.email);
   });
 
+  it.each([
+    { label: 'administrative role', unexpected: { role: 'admin' } },
+    { label: 'explicit regular role', unexpected: { role: 'user' } },
+    { label: 'isAdmin flag', unexpected: { isAdmin: true } },
+    { label: 'privileged permissions', unexpected: { permissions: ['admin'] } },
+    { label: 'email verification flag', unexpected: { emailVerified: true } },
+  ])('rejects $label from an anonymous registration request', async ({ unexpected }) => {
+    const response = await request(server.getApp())
+      .post('/api/users/register')
+      .send({
+        email: 'public-registration@example.com',
+        name: 'Test User',
+        password: 'SecurePass123!',
+        ...unexpected,
+      });
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
+    expect(response.body.errors).toEqual(expect.arrayContaining([
+      expect.stringContaining('Unexpected fields'),
+    ]));
+  });
+
+  it('returns 400 rather than 500 for an eight-character password', async () => {
+    const response = await request(server.getApp())
+      .post('/api/users/register')
+      .send({
+        email: 'short-password@example.com',
+        name: 'Test User',
+        password: 'Eight123',
+      });
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toEqual(expect.arrayContaining([
+      expect.stringContaining('Password must be at least 12 characters long'),
+    ]));
+  });
+
+  it('rejects UTF-8 passwords above the bcrypt 72-byte limit', async () => {
+    const response = await request(server.getApp())
+      .post('/api/users/register')
+      .send({
+        email: 'long-password@example.com',
+        name: 'Test User',
+        password: 'é'.repeat(40),
+      });
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toEqual(expect.arrayContaining([
+      expect.stringContaining('72 UTF-8 bytes'),
+    ]));
+  });
+
   it('should reject duplicate user registration', async () => {
     const user = {
       email: `test${Date.now()}@example.com`,
       name: "TestUser",
       password: "SecurePass123!",
-      role: "user"
     };
 
     // First registration
@@ -85,7 +133,6 @@ describe('User Registration API Contract', () => {
           email: 'invalid-email',
           name: 'TestUser',
           password: 'SecurePass123!',
-          role: 'user'
         });
 
       expect(response.status).toBe(400);
@@ -102,7 +149,7 @@ describe('User Registration API Contract', () => {
         .post('/api/users/register')
         .send({
           email: 'test@example.com'
-          // Faltan: password, role, name
+          // Faltan: password, name
         });
 
       expect(response.status).toBe(400);

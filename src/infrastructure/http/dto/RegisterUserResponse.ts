@@ -10,7 +10,7 @@ export interface RegisterUserResponse {
     userId: string;
     email: string;
     name: string;
-    role: 'user' | 'admin';
+    role: 'user';
     createdAt: string;
   };
   errors?: string[];
@@ -28,7 +28,7 @@ export interface UserData {
   userId: string;
   email: string;
   name: string;
-  role: 'user' | 'admin';
+  role: 'user';
 }
 
 export class RegisterUserResponseBuilder {
