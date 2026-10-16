@@ -25,7 +25,6 @@ describe('User Registration API Contract', () => {
       email: `test${Date.now()}@example.com`,
       name: "TestUser",
       password: "SecurePass123!",
-      role: "user"
     };
 
     const response = await request(server.getApp())
@@ -104,7 +103,6 @@ describe('User Registration API Contract', () => {
       email: `test${Date.now()}@example.com`,
       name: "TestUser",
       password: "SecurePass123!",
-      role: "user"
     };
 
     // First registration
@@ -135,7 +133,6 @@ describe('User Registration API Contract', () => {
           email: 'invalid-email',
           name: 'TestUser',
           password: 'SecurePass123!',
-          role: 'user'
         });
 
       expect(response.status).toBe(400);
@@ -152,7 +149,7 @@ describe('User Registration API Contract', () => {
         .post('/api/users/register')
         .send({
           email: 'test@example.com'
-          // Faltan: password, role, name
+          // Faltan: password, name
         });
 
       expect(response.status).toBe(400);

@@ -40,7 +40,6 @@ describe('RegisterUserAccountHandler', () => {
       email: 'user@example.com',
       name: 'Ada Lovelace',
       password: 'super-secure-pass',
-      role: 'user',
       ...overrides,
     });
   }

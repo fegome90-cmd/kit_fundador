@@ -14,7 +14,6 @@ function buildCommand(overrides: Partial<RegisterUserAccountCommandProps> = {}) 
     email: overrides.email ?? 'ada@example.com',
     name: overrides.name ?? 'Ada Lovelace',
     password: overrides.password ?? 'super-secure-pass',
-    role: overrides.role,
   });
 }
 
