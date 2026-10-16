@@ -7,7 +7,7 @@ const yaml = require('js-yaml');
 
 describe('Public registration OpenAPI contract', () => {
   it('documents a nonprivileged request and accurately scoped password rules', async () => {
-    const file = join(process.cwd(), 'src/infrastructure/docs/api/openapi.yaml');
+    const file = join(process.cwd(), 'examples/identity-access/src/infrastructure/docs/api/openapi.yaml');
     const api = yaml.load(readFileSync(file, 'utf8'));
     const operation = api.paths['/api/users/register'].post;
     const schema = api.components.schemas.RegisterUserRequest;

@@ -1,7 +1,7 @@
-import { DomainEvent } from '@domain/entities/DomainEvent';
-import { User, UserRole } from '@domain/entities/User';
-import { Email } from '@domain/value-objects/Email';
-import { Password } from '@domain/value-objects/Password';
+import { DomainEvent } from '../../../domain/entities/DomainEvent';
+import { User, UserRole } from '../../../domain/entities/User';
+import { Email } from '../../../domain/value-objects/Email';
+import { Password } from '../../../domain/value-objects/Password';
 
 import {
   UserAccountAlreadyExistsError,

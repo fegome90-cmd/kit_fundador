@@ -4,6 +4,6 @@
     "outDir": "./dist/test",
     "declaration": false
   },
-  "include": ["src/**/*", "tests/**/*"],
+  "include": ["src/**/*", "tests/**/*", "examples/identity-access/src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

@@ -1,19 +1,8 @@
 /* eslint-disable no-console */
 /**
  * Application Entry Point
- * Initializes and starts the HTTP server with all middleware, routes, and documentation
+ * Boots only the legacy health server; the identity demo is opt-in under examples/
  */
-
-import moduleAlias from 'module-alias';
-import { join } from 'node:path';
-
-// Register module aliases for path resolution at runtime
-moduleAlias.addAliases({
-  '@': join(__dirname),
-  '@domain': join(__dirname, 'domain'),
-  '@application': join(__dirname, 'application'),
-  '@infrastructure': join(__dirname, 'infrastructure'),
-});
 
 import { createServer } from './infrastructure/http/server';
 

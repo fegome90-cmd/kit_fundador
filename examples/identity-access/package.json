@@ -1,0 +1,26 @@
+{
+  "name": "kit-fundador-identity-access-example",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Opt-in Identity & Access demo, not a production authentication provider",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test tests/*.test.cjs",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "bcrypt": "6.0.0",
+    "express": "4.21.2",
+    "helmet": "8.1.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "6.0.0",
+    "@types/express": "5.0.5",
+    "@types/node": "20.19.25",
+    "typescript": "5.3.3"
+  }
+}

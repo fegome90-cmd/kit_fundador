@@ -1,6 +1,6 @@
 import request from 'supertest';
-import { InMemoryUserAccountRepository } from '../../../../src/infrastructure/_stubs/InMemoryUserAccountRepository';
-import { HttpServer } from '../../../../src/infrastructure/http/server';
+import { InMemoryUserAccountRepository } from '../../../../examples/identity-access/src/infrastructure/_stubs/InMemoryUserAccountRepository';
+import { HttpServer } from '../../../../examples/identity-access/src/infrastructure/http/server';
 import { OpenAPIValidator } from '../../../helpers/openapi-validator';
 
 describe('User Registration API Contract', () => {
@@ -179,6 +179,23 @@ describe('User Registration API Contract', () => {
       // ✅ Error response schema validation
       const errorValidation = validator.validateErrorStructure(response.body);
       expect(errorValidation.valid).toBe(true);
+    });
+
+    it('returns a sanitized JSON response for truly malformed request syntax', async () => {
+      const response = await request(server.getApp())
+        .post('/api/users/register')
+        .set('Content-Type', 'application/json')
+        .send('{"email":');
+
+      expect(response.status).toBe(400);
+      expect(response.headers['content-type']).toContain('application/json');
+      expect(response.body).toMatchObject({
+        success: false,
+        message: 'Validation failed',
+        errors: ['Malformed JSON'],
+      });
+      expect(response.text).not.toContain('SyntaxError');
+      expect(response.text).not.toContain('<html');
     });
 
     it('should return 400 for malformed JSON', async () => {
