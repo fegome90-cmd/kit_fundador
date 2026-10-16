@@ -68,6 +68,28 @@ test('Problem Details titles reflect 403 and 502 without leaking error messages'
   }
 });
 
+
+test('status-only 409 errors keep Conflict status without leaking diagnostics', async (t) => {
+  const app = buildApp();
+  t.after(() => app.close());
+  app.get('/status-only', async () => {
+    const error = new Error('PRIVATE_STATUS_ONLY_DIAGNOSTIC');
+    error.status = 409;
+    throw error;
+  });
+
+  const response = await app.inject({ method: 'GET', url: '/status-only' });
+  assert.equal(response.statusCode, 409);
+  assert.equal(response.headers['content-type'], 'application/problem+json; charset=utf-8');
+  assert.deepEqual(response.json(), {
+    type: 'about:blank',
+    title: 'Conflict',
+    status: 409,
+    requestId: response.headers['x-request-id'],
+  });
+  assert.ok(!response.body.includes('PRIVATE_STATUS_ONLY_DIAGNOSTIC'));
+});
+
 for (const signal of ['SIGTERM', 'SIGINT']) {
 test(`compiled JS listens and stops cleanly on ${signal}`, async () => {
   const child = spawn(process.execPath, ['dist/server.js'], {
