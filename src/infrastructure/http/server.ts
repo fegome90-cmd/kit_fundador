@@ -1,14 +1,11 @@
 /**
  * HTTP Server Configuration
- * Express server setup with middleware and routing
+ * Legacy health-only Express server. Identity demo routes are isolated under examples/.
  */
 
 import express from 'express';
-import cors from 'cors';
 import helmet from 'helmet';
 import { Server } from 'http';
-import { createUserRoutes } from './routes/userRoutes';
-import { specs, swaggerUi } from './swagger';
 
 export interface ServerConfig {
   port: number;
@@ -24,7 +21,6 @@ export class HttpServer {
     this.config = config;
     this.app = express();
     this.setupMiddleware();
-    this.setupSwagger();
     this.setupRoutes();
     this.setupErrorHandling();
   }
@@ -35,15 +31,8 @@ export class HttpServer {
     this.setupLogging();
   }
 
-  private setupSwagger(): void {
-    // Serve Swagger UI at /api-docs and handle redirect properly
-    this.app.get('/api-docs', swaggerUi.setup(specs));
-    this.app.use('/api-docs', swaggerUi.serve);
-  }
-
   private setupSecurityMiddleware(): void {
     this.app.use(helmet());
-    this.app.use(cors());
   }
 
   private setupBodyParsing(): void {
@@ -63,13 +52,8 @@ export class HttpServer {
   }
 
   private setupRoutes(): void {
-    this.setupApiRoutes();
     this.setupHealthCheck();
     this.setup404Handler();
-  }
-
-  private setupApiRoutes(): void {
-    this.app.use('/api/users', createUserRoutes());
   }
 
   private setupHealthCheck(): void {
@@ -108,7 +92,7 @@ export class HttpServer {
     res.status(404).json({
       success: false,
       message: 'Route not found',
-      path: req.originalUrl,
+      path: req.path,
     });
   }
 
@@ -128,7 +112,7 @@ export class HttpServer {
       timestamp,
       method: req.method,
       path: req.path,
-      error: error.message,
+      errorType: error.name,
       hasStack: !!error.stack,
     };
 
