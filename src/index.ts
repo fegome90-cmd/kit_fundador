@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /**
  * Application Entry Point
- * Initializes and starts the HTTP server with all middleware, routes, and documentation
+ * Boots only the legacy health server; the identity demo is opt-in under examples/
  */
 
 import { createServer } from './infrastructure/http/server';
