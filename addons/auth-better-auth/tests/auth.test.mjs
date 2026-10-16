@@ -72,22 +72,23 @@ test('Fastify Core never mounts auth or opens a pool unless the plugin is regist
   } finally { await app.close(); }
 });
 
-test('invalid secrets, URLs, origins and missing schemas fail before listening, without leaking configuration', async () => {
-  for (const options of [
-    { secret: 'short' },
-    { baseURL: 'http://evil.example' },
-    { baseURL: 'https://user:password@auth.example' },
-    { trustedOrigins: ['*'] },
-    { databaseUrl: 'postgresql://' },
-    { databaseUrl: 'postgresql://auth_user:SENSITIVE_TEST_PASSWORD@127.0.0.1:65432/no-server' },
-  ]) {
+test('invalid secrets, URLs and origins fail before listening without leaking credentials', async () => {
+  const scenarios = [
+    { options: { secret: 'short' }, expected: 'Auth secret must contain at least 32 characters' },
+    { options: { baseURL: 'http://evil.example' }, expected: 'Auth baseURL must be an exact HTTPS origin (or local loopback HTTP)' },
+    { options: { baseURL: 'https://user:password@auth.example' }, expected: 'Auth baseURL must be an exact HTTPS origin (or local loopback HTTP)' },
+    { options: { trustedOrigins: ['*'] }, expected: 'Auth trustedOrigins require explicit secure origins' },
+    { options: { databaseUrl: 'postgresql://' }, expected: 'Invalid Auth PostgreSQL databaseUrl' },
+    { options: { databaseUrl: 'postgresql://auth_user:SENSITIVE_TEST_PASSWORD@127.0.0.1:65432/no-server' }, expected: 'Auth add-on initialization failed' },
+  ];
+  for (const { options, expected } of scenarios) {
     const app = makeApp(options);
     try {
-      await assert.rejects(app.ready(), e => {
-        assert.ok(e instanceof Error);
-        assert.equal(e.message, 'Auth add-on initialization failed');
-        assert.ok(!e.message.includes('SENSITIVE_TEST_PASSWORD'));
-        assert.ok(!e.message.includes(secret));
+      await assert.rejects(app.ready(), error => {
+        assert.ok(error instanceof Error);
+        assert.equal(error.message, expected);
+        assert.ok(!error.message.includes('SENSITIVE_TEST_PASSWORD'));
+        assert.ok(!error.message.includes(secret));
         return true;
       });
     } finally { await app.close().catch(() => {}); }
