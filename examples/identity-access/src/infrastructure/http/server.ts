@@ -7,6 +7,7 @@ import express from 'express';
 import helmet from 'helmet';
 import { Server } from 'http';
 import { createUserRoutes } from './routes/userRoutes';
+import { RegisterUserResponseBuilder } from './dto/RegisterUserResponse';
 
 export interface ServerConfig {
   port: number;
@@ -71,9 +72,13 @@ export class HttpServer {
   }
 
   private setupErrorHandling(): void {
-    this.app.use((error: Error, req: express.Request, res: express.Response) =>
-      this.errorHandler(error, req, res)
-    );
+    // Express 4 detects error middleware by its four-argument signature.
+    this.app.use((
+      error: Error & { status?: number; statusCode?: number; type?: string },
+      req: express.Request,
+      res: express.Response,
+      _next: express.NextFunction
+    ) => this.errorHandler(error, req, res));
   }
 
   private requestLogger(
@@ -102,7 +107,20 @@ export class HttpServer {
     });
   }
 
-  private errorHandler(error: Error, req: express.Request, res: express.Response): void {
+  private errorHandler(
+    error: Error & { status?: number; statusCode?: number; type?: string },
+    req: express.Request,
+    res: express.Response
+  ): void {
+    // Body-parser malformed-JSON errors are client errors, not server failures.
+    // Never send the parser's raw message or request body to the client.
+    if (
+      error.type === 'entity.parse.failed' &&
+      (error.status === 400 || error.statusCode === 400)
+    ) {
+      res.status(400).json(RegisterUserResponseBuilder.validationError(['Malformed JSON']));
+      return;
+    }
     const timestamp = new Date().toISOString();
 
     this.logError(req, error, timestamp);

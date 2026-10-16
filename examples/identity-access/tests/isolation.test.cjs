@@ -61,6 +61,21 @@ test('invalid email, short password and unsafe bcrypt byte length return 400',as
   }
  });
 });
+test('malformed request JSON yields sanitized HTTP 400 JSON, not HTML', async()=>{
+ await withServer(async base=>{
+  const response=await fetch(base+'/api/users/register',{
+    method:'POST',headers:{'content-type':'application/json'},body:'{"email":'
+  });
+  assert.equal(response.status,400);
+  assert.match(response.headers.get('content-type'),/^application\\/json/);
+  const payload=await response.json();
+  assert.equal(payload.success,false);
+  assert.equal(payload.message,'Validation failed');
+  assert.ok(payload.errors.includes('Malformed JSON'));
+  assert.equal(JSON.stringify(payload).includes('SyntaxError'),false);
+  assert.equal(JSON.stringify(payload).includes('Unexpected end of JSON'),false);
+ });
+});
 test('application command refuses to promote even when forged at runtime',async()=>{
  const repo=new InMemoryUserAccountRepository();
  const handler=new RegisterUserAccountHandler({userAccountRepository:repo});

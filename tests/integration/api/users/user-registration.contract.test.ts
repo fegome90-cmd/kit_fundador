@@ -181,6 +181,23 @@ describe('User Registration API Contract', () => {
       expect(errorValidation.valid).toBe(true);
     });
 
+    it('returns a sanitized JSON response for truly malformed request syntax', async () => {
+      const response = await request(server.getApp())
+        .post('/api/users/register')
+        .set('Content-Type', 'application/json')
+        .send('{"email":');
+
+      expect(response.status).toBe(400);
+      expect(response.headers['content-type']).toContain('application/json');
+      expect(response.body).toMatchObject({
+        success: false,
+        message: 'Validation failed',
+        errors: ['Malformed JSON'],
+      });
+      expect(response.text).not.toContain('SyntaxError');
+      expect(response.text).not.toContain('<html');
+    });
+
     it('should return 400 for malformed JSON', async () => {
       const response = await request(server.getApp())
         .post('/api/users/register')
