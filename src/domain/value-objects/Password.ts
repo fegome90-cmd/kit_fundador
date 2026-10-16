@@ -15,8 +15,11 @@ import * as bcrypt from 'bcrypt';
  */
 
 export const MIN_PASSWORD_LENGTH = 12;
+// Bcrypt silently ignores input bytes beyond 72; never accept truncated credentials.
+export const MAX_PASSWORD_BYTES = 72;
 export const DEFAULT_SALT_ROUNDS = 12;
-export const MIN_SALT_ROUNDS = 4;
+export const MIN_SALT_ROUNDS = 10;
+const TEST_MIN_SALT_ROUNDS = 4;
 export const MAX_SALT_ROUNDS = 31;
 
 // Bcrypt hash format: $2[aby]$rounds$salthash (60 chars total)
@@ -38,8 +41,11 @@ export class Password {
    * @throws Error if password is too short or salt rounds invalid
    */
   static async create(plainPassword: string): Promise<Password> {
-    if (!plainPassword || plainPassword.trim().length < MIN_PASSWORD_LENGTH) {
+    if (typeof plainPassword !== 'string' || plainPassword.trim().length < MIN_PASSWORD_LENGTH) {
       throw new Error(`Password must be at least ${MIN_PASSWORD_LENGTH} characters long`);
+    }
+    if (Buffer.byteLength(plainPassword, 'utf8') > MAX_PASSWORD_BYTES) {
+      throw new Error(`Password must not exceed ${MAX_PASSWORD_BYTES} UTF-8 bytes`);
     }
 
     const saltRounds = this.getSaltRounds();
@@ -50,7 +56,7 @@ export class Password {
   /**
    * Gets validated salt rounds from environment or default.
    * @private
-   * @returns number - Valid salt rounds between 4-31
+   * @returns number - Valid salt rounds between 10-31 (4-31 in tests)
    * @throws Error if PASSWORD_SALT_ROUNDS is invalid
    */
   private static getSaltRounds(): number {
@@ -74,8 +80,8 @@ export class Password {
       throw new Error(`Invalid PASSWORD_SALT_ROUNDS: ${Math.floor(parsed)} must be an integer`);
     }
 
-    const saltRounds = parseInt(envValue, 10);
-    if (isNaN(saltRounds)) {
+    const saltRounds = Number(envValue);
+    if (!/^\d+$/.test(envValue) || !Number.isSafeInteger(saltRounds)) {
       throw new Error(`Invalid PASSWORD_SALT_ROUNDS: "${envValue}" is not a valid number`);
     }
 
@@ -87,9 +93,10 @@ export class Password {
    * @private
    */
   private static validateSaltRoundsRange(saltRounds: number): void {
-    if (saltRounds < MIN_SALT_ROUNDS || saltRounds > MAX_SALT_ROUNDS) {
+    const minimum = process.env.NODE_ENV === 'test' ? TEST_MIN_SALT_ROUNDS : MIN_SALT_ROUNDS;
+    if (saltRounds < minimum || saltRounds > MAX_SALT_ROUNDS) {
       throw new Error(
-        `Invalid PASSWORD_SALT_ROUNDS: ${saltRounds} must be between ${MIN_SALT_ROUNDS} and ${MAX_SALT_ROUNDS}`
+        `Invalid PASSWORD_SALT_ROUNDS: ${saltRounds} must be between ${minimum} and ${MAX_SALT_ROUNDS}`
       );
     }
   }
@@ -124,6 +131,10 @@ export class Password {
    * @returns Promise<boolean> - True if passwords match
    */
   async matches(plainPassword: string): Promise<boolean> {
+    // Prevent distinct credentials that share the first 72 bytes from matching.
+    if (typeof plainPassword !== 'string' || Buffer.byteLength(plainPassword, 'utf8') > MAX_PASSWORD_BYTES) {
+      return false;
+    }
     return bcrypt.compare(plainPassword, this._hashedValue);
   }
 
