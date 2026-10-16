@@ -90,7 +90,7 @@ jobs:
           else
             awk '
               /error TS[0-9]+/ {
-                if ($0 !~ /node_modules\\/\\.pnpm\\/drizzle-orm@0\\.45\\.4/) {
+                if (index($0, "node_modules/.pnpm/drizzle-orm@0.45.4") == 0) {
                   print "Unexpected TypeScript failure: " $0
                   bad=1
                 } else {
