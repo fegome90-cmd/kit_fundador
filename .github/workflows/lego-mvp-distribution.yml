@@ -1,0 +1,155 @@
+name: LEGO MVP distribution (isolated)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/fastify-lego-foundation]
+    paths:
+      - .github/workflows/lego-mvp-distribution.yml
+      - templates/fastify-core/**
+      - templates/fastify-openapi/**
+      - dev-docs/plans/lego-mvp-distribution-2026-10-15.md
+      - dev-docs/validation/2026-10-15-mvp-distribution/report.md
+      - LEGO-MVP.md
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/lego-mvp-distribution.yml
+      - templates/fastify-core/**
+      - templates/fastify-openapi/**
+      - LEGO-MVP.md
+      - dev-docs/plans/lego-mvp-distribution-2026-10-15.md
+      - dev-docs/validation/2026-10-15-mvp-distribution/**
+
+permissions:
+  contents: read
+
+# Review branches use pull_request checks; experimental research uses push.
+# Cancel superseded runs to avoid wasting hosted CI minutes.
+concurrency:
+  group: lego-mvp-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  template-validation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        template: [fastify-core, fastify-openapi]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Require committed and non-empty dependency lockfile
+        run: test -s "templates/${{ matrix.template }}/pnpm-lock.yaml"
+      - name: Verify dependency boundaries and install-script safety (before install)
+        run: |
+          cd "templates/${{ matrix.template }}"
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import fs from 'node:fs';
+          const p=JSON.parse(fs.readFileSync('package.json','utf8'));
+          const deps=Object.keys(p.dependencies).sort();
+          const expected=process.env.TEMPLATE==='fastify-core'
+            ? ['fastify']
+            : ['@fastify/swagger','@fastify/swagger-ui','fastify'];
+          if(JSON.stringify(deps)!==JSON.stringify(expected))throw new Error('Unexpected runtime deps: '+deps);
+          if(p.packageManager!=='pnpm@11.25.0'||p.type!=='module')throw new Error('Unexpected install/runtime config');
+          // Reject lifecycle hooks by name before pnpm install can execute them.
+          const allowedScripts = new Set(['build', 'dev', 'start', 'test', 'typecheck']);
+          function assertAllowedScripts(scripts) {
+            for (const name of Object.keys(scripts ?? {})) {
+              if (!allowedScripts.has(name)) throw new Error('Unexpected package script: '+name);
+            }
+          }
+          assertAllowedScripts(p.scripts);
+          // Negative regression: this install-time hook must be rejected without running it.
+          assert.throws(
+            () => assertAllowedScripts({ ...p.scripts, 'pnpm:devPreinstall': 'node setup.js' }),
+            /Unexpected package script: pnpm:devPreinstall/
+          );
+          const scripts=Object.values(p.scripts||{}).join(' ');
+          if(/postinstall|preinstall|prepare|degit|shadcn/.test(scripts))throw new Error('Unexpected install side effect');
+          console.log('BOUNDARY_PASS',p.name,JSON.stringify(deps));
+          NODE
+        env:
+          TEMPLATE: ${{ matrix.template }}
+      - name: Standalone frozen install
+        run: |
+          cd "templates/${{ matrix.template }}"
+          pnpm install --frozen-lockfile --strict-peer-dependencies
+      - name: Strict typecheck and compiled HTTP tests
+        run: |
+          cd "templates/${{ matrix.template }}"
+          pnpm run typecheck
+          pnpm test
+      - name: Check production dependency advisories (no optional deps)
+        run: |
+          cd "templates/${{ matrix.template }}"
+          pnpm audit --prod --no-optional
+      - name: Audit complete dependency tree, including development dependencies
+        run: |
+          cd "templates/${{ matrix.template }}"
+          pnpm audit
+      - name: Ensure both variants share exactly the same core source
+        run: |
+          set -euo pipefail
+          for relative in src/app.ts src/config.ts src/runtime.ts src/plugins/health.ts tests/config.test.mjs tests/http.test.mjs tests/logging.test.mjs tests/runtime.test.mjs tsconfig.json; do
+            cmp "templates/fastify-core/$relative" "templates/fastify-openapi/$relative"
+          done
+          echo "MVP_COMMON_CORE_PARITY_PASS"
+      - name: Download the published template by exact GitHub commit SHA (giget)
+        run: |
+          set -euo pipefail
+          test "$GITHUB_SHA" = "$(git rev-parse HEAD)"
+          # PR uses a synthetic merge commit; download the actual reviewed head
+          # while validating its contents against the checked-out merge tree.
+          SOURCE_SHA="${{ github.event.pull_request.head.sha || github.sha }}"
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          LAB="$(mktemp -d)"
+          trap 'rm -rf "$LAB"' EXIT
+          SOURCE="gh:$GITHUB_REPOSITORY/templates/${{ matrix.template }}#$SOURCE_SHA"
+          TARGET="$LAB/copied-backend"
+          pnpm dlx giget@3.3.1 "$SOURCE" "$TARGET"
+          for relative in package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json src/app.ts src/server.ts; do
+            cmp "templates/${{ matrix.template }}/$relative" "$TARGET/$relative"
+          done
+          test ! -f "$TARGET/../package.json"
+          test ! -e "$TARGET/node_modules"
+          (cd "$TARGET" &&
+            pnpm install --frozen-lockfile --strict-peer-dependencies &&
+            pnpm run typecheck &&
+            pnpm test)
+          echo "MVP_GIGET_SHA_BOOTSTRAP_PASS $SOURCE"
+          mkdir "$LAB/occupied"
+          echo PRESERVE_ME > "$LAB/occupied/consumer-file.txt"
+          if pnpm dlx giget@3.3.1 "$SOURCE" "$LAB/occupied" > "$LAB/giget-error.log" 2>&1; then
+            echo "Unexpected overwrite of nonempty target" >&2
+            exit 1
+          fi
+          test "$(cat "$LAB/occupied/consumer-file.txt")" = PRESERVE_ME
+          test "$(find "$LAB/occupied" -type f -printf '%P\n')" = "consumer-file.txt"
+          echo "MVP_OCCUPIED_DESTINATION_REJECTED"
+          ln -s "$LAB/occupied" "$LAB/occupied-symlink"
+          if pnpm dlx giget@3.3.1 "$SOURCE" "$LAB/occupied-symlink" > "$LAB/giget-symlink-error.log" 2>&1; then
+            echo "Unexpected installation through a symlink to an occupied folder" >&2
+            exit 1
+          fi
+          test "$(cat "$LAB/occupied/consumer-file.txt")" = PRESERVE_ME
+          test "$(find "$LAB/occupied" -type f -printf '%P\n')" = "consumer-file.txt"
+          echo "MVP_OCCUPIED_SYMLINK_REJECTED"
+      - name: Retain independently resolved lockfile
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mvp-${{ matrix.template }}-lock-${{ github.run_id }}
+          path: templates/${{ matrix.template }}/pnpm-lock.yaml
+          retention-days: 7
+          if-no-files-found: error
