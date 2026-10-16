@@ -15,7 +15,7 @@ Se preservaron los prototipos de PostgreSQL, Drizzle, Better Auth y BullMQ/Valke
 ## 2. Evidencia primaria
 
 - **Commit de plantillas efectivamente probado con giget:** `69b7873721a2693e58289631eea03482be8afe62`.
-- **Workflow completo:** [LEGO MVP distribution (isolated), run 38725632148](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38720093190), conclusión `success`, mismo SHA de commit.
+- **Workflow completo:** [LEGO MVP distribution (isolated), run 38725632148](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38725632148), conclusión `success`, mismo SHA de commit.
 - **Run previo:** [38719749137](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38719749137), primera prueba de giget por SHA y rechazo de directorio ocupado, `success`.
 - El lockfile de la variante OpenAPI se generó mediante un install auténtico de pnpm y quedó versionado; el workflow tuvo temporalmente permiso de escritura para ese único archivo y **se restauró a `contents: read`** inmediatamente después. La CI definitiva exige el lockfile existente; **no lo regenera**.
 - El pipeline tradicional de Express permanece separado del pipeline `lego-mvp-distribution.yml`.
@@ -25,7 +25,7 @@ Se preservaron los prototipos de PostgreSQL, Drizzle, Better Auth y BullMQ/Valke
 | Gate | Core | Core + OpenAPI | Evidencia y matiz |
 |---|---|---|---|
 | Node 24 y pnpm 11.25 | **PASS** | **PASS** | Ubuntu 24.04 Github-hosted, versiones pinneadas |
-| Descarga `giget@3.3.1` usando ref SHA completo | **PASS** | **PASS** | Proyecto nuevo fuera del repo; origen `gh:fegome90-cmd/kit_fundador/templates/...#b851...` |
+| Descarga `giget@3.3.1` usando ref SHA completo | **PASS** | **PASS** | Proyecto nuevo fuera del repo; origen `gh:fegome90-cmd/kit_fundador/templates/...#69b7873721a2693e58289631eea03482be8afe62` |
 | Rechazo de carpeta destino ocupada | **PASS** | **PASS** | Sin `--force`, sentinel intacto |
 | `pnpm install --frozen-lockfile --strict-peer-dependencies` | **PASS** | **PASS** | Sobre checkout y proyecto descargado |
 | `tsc --noEmit` con `strict` y `skipLibCheck:false` | **PASS** | **PASS** | Sin ocultar fallos en declaraciones de terceros |
@@ -82,13 +82,13 @@ Se preservaron los prototipos de PostgreSQL, Drizzle, Better Auth y BullMQ/Valke
 
 **Prueba concluyente de source y distribución tras fixes:** [run 38725632148](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38725632148) **PASS** (12/12 Core, 15/15 OpenAPI en checkout y proyecto descargado por SHA). La auditoría completa `pnpm audit` y el typecheck con `skipLibCheck:false` conservaron estado PASS. Esto no demuestra seguridad de producción ni ausencia universal de bugs.
 
-**CodeRabbit:** el PR estaba marcado `draft`; se solicitó manualmente un full review, pero el bot canceló ese intento porque la rama cambió mientras analizaba. Se requiere solicitar nuevamente cuando termine la corrección de los hallazgos, para que exista una revisión externa válida.
+**CodeRabbit (actualización 16-10-2026):** el primer intento se interrumpió al cambiar el HEAD; la revisión completa posterior sobre `e3ff504f3a818c38c3abdf810190af8d59e03020` detectó dos problemas: el gate de scripts se ejecutaba después de instalar y la evidencia mezclaba runs/SHA. Se corrigieron ambos; verificar la CI del nuevo HEAD en los [checks de la PR #79](https://github.com/fegome90-cmd/kit_fundador/pull/79/checks).
 
 ## 6. Aislamiento realizado para revisión
 
-**PASS:** se creó `feat/lego-mvp-scaffold` desde `main` en un único commit `ae8e6f232e996f9b75f8b36c3f4e5c80e04c0f0e`, con **34 archivos** y ningún archivo de los prototipos experimentales. La comparación GitHub confirmó `ahead=1`, `behind=0` y cero rutas fuera de las plantillas, el workflow MVP, el quickstart y los dos informes. El origen está en `feat/fastify-lego-foundation`; el backend Express existente permanece intacto.
+**PASS (aislamiento inicial):** `feat/lego-mvp-scaffold` nació de `main` en el commit `ae8e6f232e996f9b75f8b36c3f4e5c80e04c0f0e`, con **34 archivos** y sin prototipos experimentales. Los commits de revisión posteriores ampliaron la PR a **36 archivos**, todos dentro de plantillas, CI y documentación; el backend Express existente sigue intacto. El origen fue `feat/fastify-lego-foundation`.
 
-**Gate ejecutado:** PR #79 abierta en borrador; se revisaron errores HTTP, lifecycle y CI. **Pendiente:** revisión externa válida de CodeRabbit y eventual aprobación humana. No fusionar antes de review humano/CodeRabbit y verificación de seguridad. No integrar automáticamente el código de cuatro piezas A/B.
+**Gate ejecutado:** PR #79 continúa en borrador; la revisión externa de CodeRabbit ya se completó y sus dos hallazgos fueron atendidos. Comprobar las CI del HEAD actualizado y obtener aprobación humana antes del merge. No integrar automáticamente el código de cuatro piezas A/B.
 
 No autorizar despliegue público solo porque el starter de Fastify pase CI. Para ese objetivo requerir revisión de threat model, middleware/cabeceras de seguridad, control de acceso, rate limit y observabilidad, según la aplicación.
 
