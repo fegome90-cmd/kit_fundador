@@ -117,16 +117,23 @@ jobs:
             else
               awk '
                 /error TS[0-9]+/ {
-                  if (index($0, "node_modules/.pnpm/drizzle-orm@0.45.4") == 0) {
+                  if (index($0, "node_modules/.pnpm/drizzle-orm@0.45.4") > 0) {
+                    drizzle++
+                  } else if (
+                    index($0, "node_modules/.pnpm/@better-auth+core@1.7.10") > 0 &&
+                    index($0, "error TS2307") > 0 &&
+                    index($0, "Cannot find module") > 0 &&
+                    index($0, "bun:sqlite") > 0
+                  ) {
+                    optionalBun++
+                  } else {
                     print "Unexpected dependency/type error: " $0
                     unexpected=1
-                  } else {
-                    upstream++
                   }
                 }
                 END {
-                  if (upstream == 0 || unexpected) exit 1
-                  print "LEGO_AUTH_UPSTREAM_WAIVER", upstream, "Drizzle 0.45.4 declarations only"
+                  if (drizzle == 0 || optionalBun != 1 || unexpected) exit 1
+                  print "LEGO_AUTH_UPSTREAM_WAIVER", drizzle, "Drizzle declaration errors;", optionalBun, "optional Better Auth bun:sqlite declaration"
                 }
               ' "$RUNNER_TEMP/auth-declarations.log"
             fi
