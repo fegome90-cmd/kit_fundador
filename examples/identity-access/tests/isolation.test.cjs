@@ -67,7 +67,7 @@ test('malformed request JSON yields sanitized HTTP 400 JSON, not HTML', async()=
     method:'POST',headers:{'content-type':'application/json'},body:'{"email":'
   });
   assert.equal(response.status,400);
-  assert.match(response.headers.get('content-type'),/^application\\/json/);
+  assert.ok(response.headers.get('content-type')?.startsWith('application/json'));
   const payload=await response.json();
   assert.equal(payload.success,false);
   assert.equal(payload.message,'Validation failed');
