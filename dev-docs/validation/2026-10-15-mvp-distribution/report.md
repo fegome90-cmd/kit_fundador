@@ -1,6 +1,6 @@
 # Informe de auditoría y ejecución — Kit Fundador LEGO MVP
 
-**Fecha:** 15 de octubre de 2026 · **Rama auditada:** `feat/lego-mvp-scaffold` · **Dictamen:** **GO para bootstrap aislado de proyectos nuevos**; **NO-GO para sustituir Express en `main`, despliegue público o distribución productiva de los cuatro bloques**.
+**Fecha:** 15 de octubre de 2026 · **Última validación:** 16 de octubre de 2026 · **Rama auditada:** `feat/lego-mvp-scaffold` · **Dictamen:** **GO para bootstrap aislado de proyectos nuevos**; **NO-GO para sustituir Express en `main`, despliegue público o distribución productiva de los cuatro bloques**.
 
 ## 1. Objetivo y decisión revisada
 
@@ -14,24 +14,25 @@ Se preservaron los prototipos de PostgreSQL, Drizzle, Better Auth y BullMQ/Valke
 
 ## 2. Evidencia primaria
 
-- **Commit de plantillas efectivamente probado con giget:** `69b7873721a2693e58289631eea03482be8afe62`.
-- **Workflow completo:** [LEGO MVP distribution (isolated), run 38725632148](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38725632148), conclusión `success`, mismo SHA de commit.
+- **Commit de plantillas efectivamente probado con giget:** `c212571d500d737ed4d7527e41f1ae9287a3e777`.
+- **Workflow completo:** [LEGO MVP distribution (isolated), run 38902629413](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38902629413), conclusión `success`, sobre `c212571d500d737ed4d7527e41f1ae9287a3e777`.
+- **Run histórico anterior a la corrección `error.status`:** [38725632148](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38725632148), `success` sobre `69b7873721a2693e58289631eea03482be8afe62`.
 - **Run previo:** [38719749137](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38719749137), primera prueba de giget por SHA y rechazo de directorio ocupado, `success`.
 - El lockfile de la variante OpenAPI se generó mediante un install auténtico de pnpm y quedó versionado; el workflow tuvo temporalmente permiso de escritura para ese único archivo y **se restauró a `contents: read`** inmediatamente después. La CI definitiva exige el lockfile existente; **no lo regenera**.
-- El pipeline tradicional de Express permanece separado del pipeline `lego-mvp-distribution.yml`.
+- **CI Express heredada:** [run 38902629365](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38902629365), `success` sobre `c212571d500d737ed4d7527e41f1ae9287a3e777`. El pipeline permanece separado de `lego-mvp-distribution.yml`.
 
 ## 3. Matriz final de gates
 
 | Gate | Core | Core + OpenAPI | Evidencia y matiz |
 |---|---|---|---|
 | Node 24 y pnpm 11.25 | **PASS** | **PASS** | Ubuntu 24.04 Github-hosted, versiones pinneadas |
-| Descarga `giget@3.3.1` usando ref SHA completo | **PASS** | **PASS** | Proyecto nuevo fuera del repo; origen `gh:fegome90-cmd/kit_fundador/templates/...#69b7873721a2693e58289631eea03482be8afe62` |
+| Descarga `giget@3.3.1` usando ref SHA completo | **PASS** | **PASS** | Proyecto nuevo fuera del repo; origen `gh:fegome90-cmd/kit_fundador/templates/...#c212571d500d737ed4d7527e41f1ae9287a3e777` |
 | Rechazo de carpeta destino ocupada | **PASS** | **PASS** | Sin `--force`, sentinel intacto |
 | `pnpm install --frozen-lockfile --strict-peer-dependencies` | **PASS** | **PASS** | Sobre checkout y proyecto descargado |
 | `tsc --noEmit` con `strict` y `skipLibCheck:false` | **PASS** | **PASS** | Sin ocultar fallos en declaraciones de terceros |
-| Tests nativos Node sobre artefacto JS compilado | **12/12 PASS** | **15/15 PASS** | Los mismos se repitieron después de descargar con giget |
+| Tests nativos Node sobre artefacto JS compilado | **13/13 PASS** | **16/16 PASS** | Los mismos se repitieron después de descargar con giget |
 | Configuración `PORT`/`HOST` inválida | **PASS** | **PASS** | Fallo antes de `listen` |
-| Health, 400/404/413/500 y cuerpo 500 sanitizado | **PASS** | **PASS** | `app.inject` real de Fastify |
+| Health, 400/404/409/413/500 y cuerpo 500 sanitizado | **PASS** | **PASS** | `app.inject` real de Fastify |
 | Cabeceras de protección, request ID, CORS no permisivo | **PASS** | **PASS** | No implica seguridad de proxy ni `helmet` |
 | SIGTERM y SIGINT contra `node dist/server.js` | **PASS** | **PASS** | Se observó exit code 0 |
 | Token de consulta en logs de salida | **PASS** | **PASS** | Canary `CANARY_DO_NOT_LOG_849312` ausente; request logging automático deshabilitado |
@@ -43,14 +44,15 @@ Se preservaron los prototipos de PostgreSQL, Drizzle, Better Auth y BullMQ/Valke
 | `pnpm audit` completo (dev y opcionales incluidos) | **PASS** | **PASS** | `No known vulnerabilities found` en fecha de prueba |
 | Ausencia de PostgreSQL, Redis, BullMQ, Auth, React y Docker en Core | **PASS** | **PASS** | Sin servicios en boot, imports ni deps runtime |
 
-**Total:** 27 casos de prueba definidos a través de las dos variantes, más checks automáticos de distribución, paridad, typecheck y auditoría. No duplicar el conteo al ejecutarlos una segunda vez después de descargar.
+**Total:** 29 casos de prueba definidos a través de las dos variantes, más checks automáticos de distribución, paridad, typecheck y auditoría. No duplicar el conteo al ejecutarlos una segunda vez después de descargar.
 
 ## 4. Defectos reales encontrados y correcciones
 
-1. **TypeScript TS18046:** el error de Fastify en el error handler está tipado `unknown`. Se corrigió leyendo `statusCode` después de estrechar el tipo, sin habilitar `skipLibCheck`. Los primeros workflows rojos conservan evidencia.
+1. **TypeScript TS18046:** el error de Fastify en el error handler está tipado `unknown`. Se corrigió leyendo el estado HTTP tras estrechar el tipo (`statusCode` o `status`), sin habilitar `skipLibCheck`. Los primeros workflows rojos conservan evidencia.
 2. **Riesgo de filtración de parámetros URL:** el logging HTTP automático puede incluir query strings. Se deshabilitó el logging de accesos automático, conservando logs JSON estructurados y errores genéricos con request ID. Se añadió prueba de canary sobre stdout/stderr.
 3. **Lockfile OpenAPI ausente:** se generó mediante un `pnpm install --lockfile-only` real en CI, se versionó y se restituyó el permiso `contents:read` del workflow. El último run verificó instalación congelada y auditoría completa.
 4. **Riesgo de deriva entre variantes:** CI compara byte por byte todo archivo Core compartido. Solo `server.ts`, documentación, configuración de paquetes y pruebas OpenAPI difieren deliberadamente.
+5. **Error HTTP `status` sin `statusCode`:** Fastify acepta ambos campos, pero el starter respondía 500 para `status: 409`. Se añadió el fallback compatible y una prueba de regresión que confirma `409 Conflict` y la ausencia de mensajes privados en ambas plantillas.
 
 ## 5. Auditoría de seguridad y límites no negociables
 
@@ -80,15 +82,15 @@ Se preservaron los prototipos de PostgreSQL, Drizzle, Better Auth y BullMQ/Valke
 | giget en directorios ocupados no verificaba inventario completo/symlink | P1 / no destrucción | CI prueba archivo sentinel, inventario exacto y symlink hacia directorio poblado |
 | CI por push + PR duplicaba ejecución en la rama de revisión | P2 / coste CI | Sólo investigación por push; `pull_request: main` para branch de PR, `concurrency.cancel-in-progress` |
 
-**Prueba concluyente de source y distribución tras fixes:** [run 38725632148](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38725632148) **PASS** (12/12 Core, 15/15 OpenAPI en checkout y proyecto descargado por SHA). La auditoría completa `pnpm audit` y el typecheck con `skipLibCheck:false` conservaron estado PASS. Esto no demuestra seguridad de producción ni ausencia universal de bugs.
+**Prueba concluyente de source y distribución tras fixes:** [run 38902629413](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38902629413) **PASS** (13/13 Core, 16/16 OpenAPI en checkout y proyecto descargado por SHA). La auditoría completa `pnpm audit` y el typecheck con `skipLibCheck:false` conservaron estado PASS. Esto no demuestra seguridad de producción ni ausencia universal de bugs.
 
-**CodeRabbit (actualización 16-10-2026):** el primer intento se interrumpió al cambiar el HEAD; la revisión completa posterior sobre `e3ff504f3a818c38c3abdf810190af8d59e03020` detectó dos problemas: el gate de scripts se ejecutaba después de instalar y la evidencia mezclaba runs/SHA. Se corrigieron ambos; verificar la CI del nuevo HEAD en los [checks de la PR #79](https://github.com/fegome90-cmd/kit_fundador/pull/79/checks).
+**CodeRabbit (actualización 16-10-2026):** el primer intento se interrumpió al cambiar el HEAD; la revisión completa posterior sobre `e3ff504f3a818c38c3abdf810190af8d59e03020` detectó dos problemas: el gate de scripts se ejecutaba después de instalar y la evidencia mezclaba runs/SHA. Ambos quedaron corregidos en `b0f8bc0`. La siguiente revisión de CodeRabbit encontró el error `status: 409` (sin `statusCode`); se corrigió en `c212571d500d737ed4d7527e41f1ae9287a3e777` con prueba de regresión, y la [CI de distribución](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38902629413) aprobó.
 
 ## 6. Aislamiento realizado para revisión
 
 **PASS (aislamiento inicial):** `feat/lego-mvp-scaffold` nació de `main` en el commit `ae8e6f232e996f9b75f8b36c3f4e5c80e04c0f0e`, con **34 archivos** y sin prototipos experimentales. Los commits de revisión posteriores ampliaron la PR a **36 archivos**, todos dentro de plantillas, CI y documentación; el backend Express existente sigue intacto. El origen fue `feat/fastify-lego-foundation`.
 
-**Gate ejecutado:** PR #79 continúa en borrador; la revisión externa de CodeRabbit ya se completó y sus dos hallazgos fueron atendidos. Comprobar las CI del HEAD actualizado y obtener aprobación humana antes del merge. No integrar automáticamente el código de cuatro piezas A/B.
+**Gate ejecutado:** PR #79 continúa en borrador; los tres hallazgos de CodeRabbit hasta el 16-10-2026 fueron atendidos. CI de plantillas y CI Express aprobadas sobre `c212571d500d737ed4d7527e41f1ae9287a3e777`. Verificar las CI del HEAD final tras actualizar la documentación y obtener aprobación humana antes del merge. No integrar automáticamente el código de cuatro piezas A/B.
 
 No autorizar despliegue público solo porque el starter de Fastify pase CI. Para ese objetivo requerir revisión de threat model, middleware/cabeceras de seguridad, control de acceso, rate limit y observabilidad, según la aplicación.
 
