@@ -113,6 +113,25 @@ test('runtime role can access auth tables but cannot create schemas, read migrat
   } finally { await pool.end(); }
 });
 
+test('passwords below the 15-character policy are rejected before account creation', async () => {
+  const app = makeApp();
+  try {
+    await app.ready();
+    const email = 'weak-password@example.test';
+    const weak = await authRequest(app, '/sign-up/email', {
+      method: 'POST',
+      body: { email, name: 'Weak Password', password: 'Only-14-letters' .slice(0, 14) },
+    });
+    assert.ok(weak.statusCode >= 400 && weak.statusCode < 500, weak.body.slice(0, 220));
+    assert.ok(!cookies(weak).includes('session_token'));
+    const pool = new Pool({ connectionString: migrationUrl });
+    try {
+      const record = await pool.query('SELECT 1 FROM auth."user" WHERE email=$1', [email]);
+      assert.equal(record.rowCount, 0);
+    } finally { await pool.end(); }
+  } finally { await app.close(); }
+});
+
 test('two independent signup/login sessions cannot cross accounts or promote public role', async () => {
   const app = makeApp();
   try {
