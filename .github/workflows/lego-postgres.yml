@@ -1,0 +1,165 @@
+name: LEGO PostgreSQL add-on (isolated)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - addons/db-postgres/**
+      - .github/workflows/lego-postgres.yml
+      - dev-docs/plans/lego-postgres-2026-10-16.md
+      - dev-docs/validation/2026-10-16-lego-postgres/**
+  pull_request:
+    branches: [main]
+    paths:
+      - addons/db-postgres/**
+      - .github/workflows/lego-postgres.yml
+      - dev-docs/plans/lego-postgres-2026-10-16.md
+      - dev-docs/validation/2026-10-16-lego-postgres/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lego-postgres-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  postgres-addon:
+    name: PostgreSQL 16 + Drizzle + Fastify Core
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    services:
+      postgres:
+        image: postgres:16.15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: lego-ci-temporary-admin
+          POSTGRES_DB: lego_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d lego_test"
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 15
+    env:
+      MIGRATION_DATABASE_URL: postgresql://postgres:lego-ci-temporary-admin@127.0.0.1:5432/lego_test
+      APP_DATABASE_URL: postgresql://lego_app_ci:lego-ci-temporary-password@127.0.0.1:5432/lego_test
+      APP_DB_TEST_PASSWORD: lego-ci-temporary-password
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Enforce dependency, script and package boundaries before install
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import fs from 'node:fs';
+          const dir = 'addons/db-postgres/';
+          const p = JSON.parse(fs.readFileSync(dir + 'package.json', 'utf8'));
+          assert.equal(p.packageManager, 'pnpm@11.25.0');
+          assert.equal(p.type, 'module');
+          assert.deepEqual(p.dependencies, { 'drizzle-orm': '0.45.4', pg: '8.23.1' });
+          assert.deepEqual(p.peerDependencies, { fastify: '^5.0.0' });
+          const allowed = new Set(['typecheck','build','test','db:generate','db:check','db:migrate','test:ci']);
+          for (const name of Object.keys(p.scripts)) {
+            assert.ok(allowed.has(name), 'Unexpected script: ' + name);
+          }
+          assert.ok(!Object.keys(p.scripts).some(name => /^(pre|post|prepare)/.test(name)));
+          assert.ok(fs.statSync(dir + 'pnpm-lock.yaml').size > 1000);
+          assert.ok(fs.statSync(dir + 'drizzle/meta/_journal.json').size > 0);
+          assert.ok(!JSON.stringify(p).includes('workspace:'));
+          console.log('PG_DEPENDENCY_BOUNDARY_PASS');
+          NODE
+      - name: Real PostgreSQL E2E from an independent copied directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          LAB="$(mktemp -d)"
+          trap 'rm -rf "$LAB"' EXIT
+          cp -a addons/db-postgres "$LAB/addon"
+          test ! -e "$LAB/package.json"
+          cd "$LAB/addon"
+          pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
+          pnpm run typecheck
+          # Drizzle ORM 0.45.4 ships 70 broken .d.ts lines across other dialects.
+          # Run a strict declaration audit but accept only these known upstream
+          # node_modules errors. NEVER treat this as a strict-declaration PASS.
+          if pnpm exec tsc --noEmit --skipLibCheck false > "$RUNNER_TEMP/drizzle-declarations.log" 2>&1; then
+            echo 'PG_UPSTREAM_DECLARATIONS_PASS'
+          else
+            awk '
+              /error TS[0-9]+/ {
+                if (index($0, "node_modules/.pnpm/drizzle-orm@0.45.4") == 0) {
+                  print "Unexpected TypeScript failure: " $0
+                  bad=1
+                } else {
+                  upstream++
+                }
+              }
+              END {
+                if (upstream == 0 || bad) exit 1
+                print "PG_UPSTREAM_DECLARATION_WAIVER", upstream, "errors (Drizzle ORM 0.45.4 only)"
+              }
+            ' "$RUNNER_TEMP/drizzle-declarations.log"
+          fi
+          pnpm run db:check
+          pnpm run build
+          pnpm run db:migrate
+          pnpm run db:migrate
+          node scripts/setup-ci-db.mjs
+          pnpm test
+          mkdir "$LAB/core"
+          cp -a "$GITHUB_WORKSPACE/templates/fastify-core/." "$LAB/core/"
+          (
+            cd "$LAB/core"
+            pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
+            pnpm run typecheck
+            pnpm run build
+          )
+          node scripts/verify-core.mjs "$LAB/core/dist/app.js"
+          echo 'PG_INDEPENDENT_FASTIFY_COMPOSITION_PASS'
+      - name: Production dependencies security audit (blocking)
+        run: |
+          cd addons/db-postgres
+          pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
+          pnpm audit --prod --no-optional
+      - name: Complete dependency security audit (block high or critical)
+        run: |
+          cd addons/db-postgres
+          pnpm audit --audit-level high
+      - name: Record full dependency audit, including moderate advisories
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd addons/db-postgres
+          pnpm audit --json > "$RUNNER_TEMP/lego-postgres-audit.json" || echo 'FULL_TREE_AUDIT_HAS_ADVISORIES'
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const path=process.env.RUNNER_TEMP+'/lego-postgres-audit.json';
+          const data=JSON.parse(fs.readFileSync(path,'utf8'));
+          console.log('FULL_TREE_AUDIT_SUMMARY', JSON.stringify(data.metadata?.vulnerabilities ?? {}));
+          // Print only package, advisory and severity; no environment secrets.
+          const affected = Object.values(data.advisories ?? {}).map(a => ({
+            advisory: a.github_advisory_id, package: a.module_name, severity: a.severity,
+            devOnly: (a.findings ?? []).every(f => f.dev === true),
+          }));
+          console.log('FULL_TREE_AUDIT_DETAILS', JSON.stringify(affected));
+          NODE
+      - name: Preserve dependency security audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lego-postgres-audit-${{ github.run_id }}
+          path: ${{ runner.temp }}/lego-postgres-audit.json
+          if-no-files-found: warn
+          retention-days: 7
