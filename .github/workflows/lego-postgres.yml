@@ -1,12 +1,20 @@
 name: LEGO PostgreSQL add-on (isolated)
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - addons/db-postgres/**
+      - .github/workflows/lego-postgres.yml
+      - dev-docs/plans/lego-postgres-2026-10-16.md
+      - dev-docs/validation/2026-10-16-lego-postgres/**
   pull_request:
     branches: [main]
     paths:
       - addons/db-postgres/**
       - .github/workflows/lego-postgres.yml
       - dev-docs/plans/lego-postgres-2026-10-16.md
+      - dev-docs/validation/2026-10-16-lego-postgres/**
   workflow_dispatch:
 
 permissions:
@@ -140,6 +148,12 @@ jobs:
           const path=process.env.RUNNER_TEMP+'/lego-postgres-audit.json';
           const data=JSON.parse(fs.readFileSync(path,'utf8'));
           console.log('FULL_TREE_AUDIT_SUMMARY', JSON.stringify(data.metadata?.vulnerabilities ?? {}));
+          // Print only package, advisory and severity; no environment secrets.
+          const affected = Object.values(data.advisories ?? {}).map(a => ({
+            advisory: a.github_advisory_id, package: a.module_name, severity: a.severity,
+            devOnly: (a.findings ?? []).every(f => f.dev === true),
+          }));
+          console.log('FULL_TREE_AUDIT_DETAILS', JSON.stringify(affected));
           NODE
       - name: Preserve dependency security audit
         if: always()
