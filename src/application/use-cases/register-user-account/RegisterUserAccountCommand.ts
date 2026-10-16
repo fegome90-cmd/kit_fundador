@@ -60,6 +60,9 @@ function normalizeName(name: string): string {
 
 function normalizePassword(password: string): string {
   // Passwords are opaque: reject blank input without trimming meaningful spaces.
+  if (!password) {
+    throw new Error('password cannot be empty');
+  }
   if (typeof password !== 'string' || !password.trim()) {
     throw new Error('password cannot be blank');
   }
