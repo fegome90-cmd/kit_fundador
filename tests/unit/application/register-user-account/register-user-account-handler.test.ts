@@ -66,6 +66,16 @@ describe('RegisterUserAccountHandler', () => {
     expect(result.domainEvents[0].eventType).toBe('UserCreated');
   });
 
+  it('cannot elevate privileges with a forged command from a future adapter', async () => {
+    const { handler, repository } = buildHandler();
+    const forgedCommand = { ...buildCommand(), role: 'admin' as const };
+    const result = await handler.execute(forgedCommand);
+
+    expect(result.userSnapshot.role).toBe('user');
+    expect(repository.values).toHaveLength(1);
+    expect(repository.values[0].role).toBe('user');
+  });
+
   it('throws when the email already exists', async () => {
     const repository = new InMemoryUserAccountRepository();
     const existingUser = User.create({

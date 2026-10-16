@@ -37,6 +37,17 @@ describe('RegisterUserAccountCommand', () => {
     expect(command.role).toBe('admin');
   });
 
+  it('does not retain caller-supplied role in the public command', () => {
+    const command = buildRegisterUserAccountCommand(buildPayload({ role: 'admin' }));
+    expect(command).not.toHaveProperty('role');
+  });
+
+  it('does not trim meaningful whitespace from a password', () => {
+    const rawPassword = '  SecurePass123!  ';
+    const command = buildRegisterUserAccountCommand(buildPayload({ password: rawPassword }));
+    expect(command.password).toBe(rawPassword);
+  });
+
   it('throws when email is empty', () => {
     expect(() =>
       buildRegisterUserAccountCommand(buildPayload({ email: '   ' }))
