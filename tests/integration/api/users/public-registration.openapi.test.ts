@@ -1,13 +1,14 @@
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-// The project's existing Swagger Parser dependency can parse the documented
-// contract; this catches schema drift without adding production dependencies.
-const SwaggerParser = require('swagger-parser');
+// The pinned Swagger Parser 10 only handles OpenAPI 3.0; parse YAML directly
+// rather than incorrectly downgrading the published OpenAPI 3.1 contract.
+const yaml = require('js-yaml');
 
 describe('Public registration OpenAPI contract', () => {
   it('documents a nonprivileged request and accurately scoped password rules', async () => {
     const file = join(process.cwd(), 'src/infrastructure/docs/api/openapi.yaml');
-    const api = await SwaggerParser.parse(file);
+    const api = yaml.load(readFileSync(file, 'utf8'));
     const operation = api.paths['/api/users/register'].post;
     const schema = api.components.schemas.RegisterUserRequest;
     const responseRole = api.components.schemas.RegisterUserResponse.properties.data.properties.role;
