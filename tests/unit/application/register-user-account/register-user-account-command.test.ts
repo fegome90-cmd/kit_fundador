@@ -29,12 +29,14 @@ describe('RegisterUserAccountCommand', () => {
   });
 
   it('ignores an administrative role supplied at runtime', () => {
-    const command = buildRegisterUserAccountCommand({ ...buildPayload(), role: 'admin' });
+    const untrustedInput = { ...buildPayload(), role: 'admin' };
+    const command = buildRegisterUserAccountCommand(untrustedInput);
     expect(command).not.toHaveProperty('role');
   });
 
   it('does not retain caller-supplied role in the public command', () => {
-    const command = buildRegisterUserAccountCommand({ ...buildPayload(), role: 'user' });
+    const untrustedInput = { ...buildPayload(), role: 'user' };
+    const command = buildRegisterUserAccountCommand(untrustedInput);
     expect(command).not.toHaveProperty('role');
   });
 
@@ -64,7 +66,8 @@ describe('RegisterUserAccountCommand', () => {
   });
 
   it('does not retain arbitrary role values supplied at runtime', () => {
-    const command = buildRegisterUserAccountCommand({ ...buildPayload(), role: 'manager' });
+    const untrustedInput = { ...buildPayload(), role: 'manager' };
+    const command = buildRegisterUserAccountCommand(untrustedInput);
     expect(command).not.toHaveProperty('role');
   });
 
