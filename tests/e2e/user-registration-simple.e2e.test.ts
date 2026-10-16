@@ -4,7 +4,7 @@
  */
 
 import request from 'supertest';
-import { HttpServer } from '../../src/infrastructure/http/server';
+import { HttpServer } from '../../examples/identity-access/src/infrastructure/http/server';
 
 describe('User Registration E2E Workflow', () => {
   let server: HttpServer;

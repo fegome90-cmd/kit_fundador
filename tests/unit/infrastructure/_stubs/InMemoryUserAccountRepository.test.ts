@@ -1,7 +1,7 @@
-import { InMemoryUserAccountRepository } from '../../../../src/infrastructure/_stubs/InMemoryUserAccountRepository';
-import { User } from '../../../../src/domain/entities/User';
-import { Email } from '../../../../src/domain/value-objects/Email';
-import { Password } from '../../../../src/domain/value-objects/Password';
+import { InMemoryUserAccountRepository } from '../../../../examples/identity-access/src/infrastructure/_stubs/InMemoryUserAccountRepository';
+import { User } from '../../../../examples/identity-access/src/domain/entities/User';
+import { Email } from '../../../../examples/identity-access/src/domain/value-objects/Email';
+import { Password } from '../../../../examples/identity-access/src/domain/value-objects/Password';
 
 describe('InMemoryUserAccountRepository', () => {
   // MCQS Prevention: Test edge cases for empty constructor

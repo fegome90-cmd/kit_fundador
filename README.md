@@ -1,44 +1,29 @@
-# Kit Fundador Project
+# Kit Fundador LEGO
 
-## Overview
-This is a full- **Backend**: A Node.js application built with TypeScript, Express.js, PostgreSQL for data persistence, and Redis for caching/messaging. It includes a comprehensive setup for observability with Prometheus, Grafana, and Jaeger.
- fully containerized development environment.
-## Prerequisites
-- Docker & Docker Compose
-- Node.js (optional, for local tooling)
+Las dos plantillas Fastify constituyen el **MVP distribuible**. Ninguna necesita autenticación, base de datos, colas ni un generador propio. Instrucciones: [LEGO-MVP.md](LEGO-MVP.md).
 
-## Getting Started
+## Estructura y límites
 
-### Quick Start
-```bash
-make dev  # Start backend, db, redis
-make up   # Start all services (including observability)
+- `templates/fastify-core/`: API TypeScript autónoma, health, errores y tests.
+- `templates/fastify-openapi/`: mismo core con documentación opt-in.
+- `examples/identity-access/`: **demostración independiente** del registro público, con Express, bcrypt y repositorio temporal en memoria.
+- `src/`: servidor Express histórico, ahora **solo health**, sin registro ni Swagger montados.
+- `dev-docs/`: investigación y prototipos experimentales, no aprobados para producción.
+
+El ejemplo de Identity & Access se instala, compila y prueba fuera del repositorio raíz. Lee [su documentación](examples/identity-access/README.md) antes de probarlo. El registro público nunca puede elegir roles: asigna exclusivamente `user`.
+
+No publiques el ejemplo como servicio real: no implementa login/sesiones, recuperación de cuentas, persistencia duradera, autorización por recursos, rate limiting ni las medidas operativas de un proveedor de identidad.
+
+## Verificación del proyecto raíz
+
+```sh
+npm ci
+npm run lint
+npm run type-check
+npm test
+npm run build
 ```
 
-### Common Commands
-- `make test`: Run tests inside Docker
-- `make lint`: Run linter
-- `make format`: Format code
-- `make migrate`: Run database migrations
-- `make seed`: Seed development data
-- `make down`: Stop all services
+`GET /health` sigue funcionando. `POST /api/users/register` y `GET /api-docs` deben devolver 404 en la aplicación raíz. Las pruebas de regresión de cuentas apuntan al ejemplo separado.
 
-## Project Structure
-- `src/`: Backend source code
-- `web/`: Frontend application
-- `tests/`: Test suites (Unit, Integration, E2E)
-- `dev-docs/`: Developer documentation
-- `scripts/`: Utility scripts
-
-For more detailed information, please refer to [GEMINI.md](GEMINI.md).
-
-## ⚠️ Limitaciones Conocidas
-
-### JSON Parsing en User Registration
-
-El endpoint POST /api/users/register tiene una limitation conocida con JSON complejo.
-
-**Documentación completa en:** [dev-docs/known-limitations/JSON-Parsing-Limitation.md](dev-docs/known-limitations/JSON-Parsing-Limitation.md)
-
-**Status actual:** Server 95% funcional con workaround disponible para Phase 2.
-
+Los prototipos PostgreSQL/Better Auth/BullMQ y el instalador transaccional del laboratorio permanecen fuera del MVP.

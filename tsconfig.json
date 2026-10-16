@@ -21,9 +21,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@domain/*": ["src/domain/*"],
-      "@application/*": ["src/application/*"],
-      "@infrastructure/*": ["src/infrastructure/*"]
+      "@domain/*": ["examples/identity-access/src/domain/*"],
+      "@application/*": ["examples/identity-access/src/application/*"],
+      "@infrastructure/*": ["examples/identity-access/src/infrastructure/*"]
     }
   },
   "include": ["src/**/*"],

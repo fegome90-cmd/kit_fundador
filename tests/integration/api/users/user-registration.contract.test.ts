@@ -1,6 +1,6 @@
 import request from 'supertest';
-import { InMemoryUserAccountRepository } from '../../../../src/infrastructure/_stubs/InMemoryUserAccountRepository';
-import { HttpServer } from '../../../../src/infrastructure/http/server';
+import { InMemoryUserAccountRepository } from '../../../../examples/identity-access/src/infrastructure/_stubs/InMemoryUserAccountRepository';
+import { HttpServer } from '../../../../examples/identity-access/src/infrastructure/http/server';
 import { OpenAPIValidator } from '../../../helpers/openapi-validator';
 
 describe('User Registration API Contract', () => {
