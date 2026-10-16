@@ -40,6 +40,34 @@ test('enabled add-on validates its connection before the server can listen and s
   }
 });
 
+test('Unix socket-style DSNs pass syntax validation but fail safely if the socket is unavailable', async () => {
+  const socketUrl = 'postgresql:///not-a-real-ci-db?host=/tmp/lego-pg-missing-socket';
+  const app = Fastify({ logger: false });
+  app.register(createPostgresPlugin({ databaseUrl: socketUrl, connectionTimeoutMs: 200 }));
+  try {
+    await assert.rejects(app.ready(), error => {
+      assert.equal(error.message, 'PostgreSQL add-on initialization failed');
+      assert.equal(error.message.includes(socketUrl), false);
+      return true;
+    });
+  } finally {
+    await app.close().catch(() => {});
+  }
+});
+
+test('empty hostname without a host query parameter is rejected before connecting', async () => {
+  const app = Fastify({ logger: false });
+  app.register(createPostgresPlugin({ databaseUrl: 'postgresql:///no-host' }));
+  try {
+    await assert.rejects(app.ready(), error => {
+      assert.equal(error.message, 'Invalid PostgreSQL databaseUrl');
+      return true;
+    });
+  } finally {
+    await app.close().catch(() => {});
+  }
+});
+
 test('Drizzle migration journal and isolated application schema exist', async () => {
   const admin = new Pool({ connectionString: migrateUrl });
   try {

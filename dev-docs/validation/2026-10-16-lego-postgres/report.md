@@ -32,3 +32,7 @@ No se modificaron `templates/fastify-core`, `templates/fastify-openapi` ni `exam
 ## Dictamen
 
 **GO limitado:** primer add-on optativo integrable, reproducible y probado con PostgreSQL verdadero y cuenta de mínimo privilegio. **NO-GO de release:** depende de resolver/aceptar explícitamente D-01 y D-02, además de seguridad, restore y operaciones del despliegue real. El *Core* mantiene 0 dependencias de persistencia y no crea pools al iniciar.
+
+## CodeRabbit CR-01 (16-10-2026)
+
+La revisión de [PR #82](https://github.com/fegome90-cmd/kit_fundador/pull/82) detectó que las URLs de socket Unix `postgresql:///db?host=/var/run/postgresql` (soportadas por `pg-connection-string`) no superaban el gate que exigía `hostname`. Se corrigió la validación para admitir un `host` query no vacío cuando no existe hostname, conservando rechazo cuando faltan ambos. Se añadieron dos pruebas negativas: socket inexistente produce error seguro de inicialización sin DSN, y URL vacía sin host falla antes de conectar. No se habilita ningún socket por defecto ni se amplía el conjunto de protocolos.

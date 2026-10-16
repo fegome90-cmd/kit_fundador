@@ -22,7 +22,13 @@ function validateOptions(options: PostgresOptions): Required<Pick<PostgresOption
   }
   try {
     const parsed = new URL(url);
-    if (!['postgres:', 'postgresql:'].includes(parsed.protocol) || !parsed.hostname) {
+    // node-postgres also accepts a Unix socket via the host query parameter.
+    // Do not accept missing/empty host in either position (PG env fallback).
+    const queryHost = parsed.searchParams.get('host')?.trim();
+    if (
+      !['postgres:', 'postgresql:'].includes(parsed.protocol) ||
+      (!parsed.hostname && !queryHost)
+    ) {
       throw new Error('Invalid protocol or hostname');
     }
   } catch {
