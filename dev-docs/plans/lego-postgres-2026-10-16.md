@@ -14,7 +14,7 @@
 ## Gates para GO de PR (NO es GO-producción)
 
 - G0: fuentes pinneadas; CI read-only, checkout sin credenciales; instalación congelada en directorio limpio.
-- G1: TypeScript NodeNext estricto, `skipLibCheck:false`, artefacto JS compilado y node:test.
+- G1: TypeScript NodeNext estricto para código propio, artefacto JS compilado y node:test. La declaración completa `skipLibCheck:false` es una condición pendiente **bloqueada por Drizzle #5187**; no afirmar aprobación completa hasta corregir upstream o aprobar un cambio de arquitectura documentado.
 - G2: plugin apagado: core /health sin DB ni credenciales. Activado sin URL, DSN inválida o servidor caído: error de startup legible sin secretos.
 - G3: PostgreSQL 16 real efímero; migrar dos veces, comprobar historial inalterado y modelo Drizzle consistente; no migrar automáticamente al arranque.
 - G4: conexión con credenciales de aplicación no administradoras; CRUD tipado; rechazar CREATE en esquema y acceso al journal; sanitización de errores/logs.
@@ -39,3 +39,9 @@
 - Drizzle migrate: https://orm.drizzle.team/docs/drizzle-kit-migrate
 - Fastify encapsulación: https://fastify.dev/docs/latest/Reference/Encapsulation/
 - Laboratorio E2E: `dev-docs/validation/2026-10-14-gh-actions/report.md` en `feat/fastify-lego-foundation`.
+
+## Hallazgo de auditoría (16-10-2026, primera CI)
+
+La CI inicial [run 38957279002](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38957279002) falló en TypeScript **antes de migrar**, con 70 errores en `drizzle-orm@0.45.4` (70/70 procedentes de `node_modules`; dialectos ajenos como MySQL, SingleStore, SQLite, Gel y parte de PG). Se reprodujo en Node 24 / TypeScript 5.9.3 sin `skipLibCheck`. Coincide con el issue upstream [drizzle-team/drizzle-orm#5187](https://github.com/drizzle-team/drizzle-orm/issues/5187), abierto a octubre de 2026.
+
+**Waiver trazable y limitado al laboratorio:** `skipLibCheck:true` evita comprobar las declaraciones defectuosas; `strict:true` sigue validando el código propio. La CI ejecuta `tsc --skipLibCheck false` en un gate de diagnóstico que **exige que todos los errores sean exclusivamente de Drizzle ORM 0.45.4**, registra el conteo y falla si aparece cualquier error externo a ese paquete, o si no consigue diagnosticar el problema. Este gate NO equivale a TypeScript de dependencias aprobado: estado G1 completo **NO-GO**, incluso con el resto de tests verdes. No instalar paquetes ficticios para ocultar errores, no parchear `.d.ts` en `node_modules`.

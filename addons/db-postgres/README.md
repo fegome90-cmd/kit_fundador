@@ -58,3 +58,7 @@ Este ejemplo **no implementa autenticación, autorización ni redacción de dato
 En Ubuntu 24.04, Node 24 y PostgreSQL 16.15 efímero: lockfile congelado, Drizzle Kit `check`, migrations `migrate` dos veces, cuenta de aplicación sin DDL, CRUD Drizzle, inyección de SQL como dato, ausencia de rutas por defecto, cierre del pool, rechazo de URL inválida y composición con el Core original compilado. No se requieren bases personales ni claves reales.
 
 No garantiza respaldos, failover, upgrades online ni configuración TLS de proveedores. **El despliegue real exige TLS/CA, restauración probada, gestión externa de secretos y migraciones planificadas.** Los fixtures de laboratorio anteriores no constituyen una distribución de producción.
+
+## Gate de tipado upstream — pendiente
+
+Drizzle ORM 0.45.4 genera 70 errores externos en `.d.ts` cuando `skipLibCheck:false` ([issue #5187](https://github.com/drizzle-team/drizzle-orm/issues/5187)). El repositorio conserva `strict:true` para su propio código pero establece `skipLibCheck:true` solo para las declaraciones de bibliotecas. En CI se ejecuta además el chequeo completo, se contabilizan los errores y se exige que estén confinados a Drizzle. **La validación completa de declaraciones no está aprobada; no declarar esta receta apta para producción ni distribuirla sin cerrar o aceptar formalmente ese riesgo.**

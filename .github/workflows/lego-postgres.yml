@@ -82,6 +82,27 @@ jobs:
           cd "$LAB/addon"
           pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
           pnpm run typecheck
+          # Drizzle ORM 0.45.4 ships 70 broken .d.ts lines across other dialects.
+          # Run a strict declaration audit but accept only these known upstream
+          # node_modules errors. NEVER treat this as a strict-declaration PASS.
+          if pnpm exec tsc --noEmit --skipLibCheck false > "$RUNNER_TEMP/drizzle-declarations.log" 2>&1; then
+            echo 'PG_UPSTREAM_DECLARATIONS_PASS'
+          else
+            awk '
+              /error TS[0-9]+/ {
+                if ($0 !~ /node_modules\\/\\.pnpm\\/drizzle-orm@0\\.45\\.4/) {
+                  print "Unexpected TypeScript failure: " $0
+                  bad=1
+                } else {
+                  upstream++
+                }
+              }
+              END {
+                if (upstream == 0 || bad) exit 1
+                print "PG_UPSTREAM_DECLARATION_WAIVER", upstream, "errors (Drizzle ORM 0.45.4 only)"
+              }
+            ' "$RUNNER_TEMP/drizzle-declarations.log"
+          fi
           pnpm run db:check
           pnpm run build
           pnpm run db:migrate
