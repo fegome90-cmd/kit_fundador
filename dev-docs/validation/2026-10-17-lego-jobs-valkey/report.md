@@ -25,3 +25,14 @@
 - Worker en red externa requiere TLS, ACL mínimas, límites de red y tratamiento de secretos; la URL valida esquema TLS remoto pero **no certifica** certificados/infraestructura.
 - Ausentes: límites de tasa distribuidos, alertas, métricas, tenant isolation, DLQ operativo, retención por categoría y migraciones de payload. `maxmemory-policy=noeviction` debe verificarse en el entorno.
 - Sin registro de componentes ni despliegue; **solo add-on experimental**. Revisar CodeRabbit sobre el HEAD final, corregir hallazgos y fusionar únicamente por instrucción del usuario.
+
+## Addendum TDD — carrera entre completed y returnvalue
+
+La segunda CI del paquete [39034673904](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39034673904) detectó una carrera real: `Queue.getJob()` cargaba `returnvalue=null` mientras el Worker aún estaba procesando, pero luego `job.getState()` devolvía `completed`; consultar la propiedad del objeto antiguo ofrecía erróneamente resultado `null` para un job completado.
+
+**Corrección:** `getDigestStatus()` vuelve a consultar `Queue.getJob(jobId)` después de observar `completed`, para leer un objeto actualizado. En ausencia transitoria de retorno, muestra estado sin resultado; el consumidor continúa sondeando hasta tener resultado. La prueba `waitDone()` no considera completado un job sin resultado calculado. No se alteró la política de reintentos ni se amplió el scope.
+
+**GREEN:** [run 39034830724](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39034830724) **PASS** en commit `e72688114287c69f9b3b2d2d1b55183d181c3f94` con **7/7 E2E**, SIGKILL/recovery, dedup, AOF/noeviction, typecheck NodeNext y composición Fastify. Auditorías `pnpm audit --prod --no-optional` y full `pnpm audit --audit-level high`: **cero vulnerabilidades conocidas**, incluido moderado. La CI raíz sigue protegiendo los starters y el ejemplo Identity.
+
+**Revisión pendiente:** auditoría CodeRabbit sobre HEAD final y pruebas de comportamiento bajo redistribución/failover del servidor Valkey; es un laboratorio, **NO-GO para producción**. Las pruebas de recuperación son de **SIGKILL del worker**, no de reinicio de Valkey ni de exactamente-una-vez.
+
