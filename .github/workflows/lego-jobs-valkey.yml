@@ -1,0 +1,138 @@
+name: LEGO BullMQ Valkey (isolated)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - addons/jobs-valkey/**
+      - templates/fastify-core/**
+      - .github/workflows/lego-jobs-valkey.yml
+      - dev-docs/plans/lego-jobs-valkey-2026-10-17.md
+      - dev-docs/validation/2026-10-17-lego-jobs-valkey/**
+  push:
+    branches: [main]
+    paths:
+      - addons/jobs-valkey/**
+      - templates/fastify-core/**
+      - .github/workflows/lego-jobs-valkey.yml
+      - dev-docs/plans/lego-jobs-valkey-2026-10-17.md
+      - dev-docs/validation/2026-10-17-lego-jobs-valkey/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lego-valkey-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  valkey-jobs:
+    name: BullMQ worker + Valkey 8 (isolated)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      valkey:
+        image: valkey:8.1.4
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "valkey-cli ping"
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 15
+    env:
+      VALKEY_URL: redis://127.0.0.1:6379
+    steps:
+      - name: Checkout no credentials
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Prepare ephemeral Valkey AOF and noeviction
+        run: |
+          set -euo pipefail
+          docker exec "${{ job.services.valkey.id }}" valkey-cli CONFIG SET appendonly yes
+          docker exec "${{ job.services.valkey.id }}" valkey-cli CONFIG SET maxmemory-policy noeviction
+          docker exec "${{ job.services.valkey.id }}" valkey-cli CONFIG GET appendonly
+          docker exec "${{ job.services.valkey.id }}" valkey-cli CONFIG GET maxmemory-policy
+      - name: Verify independent dependency and script boundary
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import fs from 'node:fs';
+          const dir='addons/jobs-valkey/';
+          const p=JSON.parse(fs.readFileSync(dir+'package.json','utf8'));
+          assert.equal(p.packageManager,'pnpm@11.25.0');
+          assert.equal(p.type,'module');
+          assert.deepEqual(p.dependencies,{bullmq:'6.3.15',ioredis:'6.0.0'});
+          assert.deepEqual(p.peerDependencies,{fastify:'^5.0.0'});
+          const allow=new Set(['typecheck','build','test','test:ci','worker']);
+          for(const name of Object.keys(p.scripts)) assert.ok(allow.has(name));
+          assert.ok(!Object.keys(p.scripts).some(x=>/^(pre|post|prepare)/.test(x)));
+          assert.ok(!JSON.stringify(p).includes('workspace:'));
+          console.log('LEGO_JOBS_BOUNDARY_PASS');
+          NODE
+      - name: Bootstrap only — generate pinned lockfile from real registry
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd addons/jobs-valkey
+          pnpm install --lockfile-only --strict-peer-dependencies --ignore-scripts
+          printf 'LEGO_LOCK_B64_START\n'
+          base64 -w0 pnpm-lock.yaml | fold -w 400 | sed 's/^/LEGO_LOCK_B64_CHUNK:/'
+          printf '\nLEGO_LOCK_B64_END\n'
+      - name: Build and exercise real Valkey from independent copy
+        shell: bash
+        run: |
+          set -euo pipefail
+          LAB="$(mktemp -d)"
+          trap 'rm -rf "$LAB"' EXIT
+          cp -a addons/jobs-valkey "$LAB/addon"
+          test ! -e "$LAB/package.json"
+          cd "$LAB/addon"
+          pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
+          pnpm run typecheck
+          pnpm test
+          mkdir "$LAB/core"
+          cp -a "$GITHUB_WORKSPACE/templates/fastify-core/." "$LAB/core/"
+          (
+            cd "$LAB/core"
+            pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
+            pnpm run typecheck
+            pnpm run build
+          )
+          node tests/verify-core.mjs "$LAB/core/dist/app.js"
+          echo 'LEGO_JOBS_VALKEY_E2E_PASS'
+      - name: Audit production dependency advisories (blocking)
+        shell: bash
+        run: |
+          cd addons/jobs-valkey
+          pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
+          pnpm audit --prod --no-optional
+      - name: Audit full dependency tree for high/critical advisories
+        shell: bash
+        run: |
+          cd addons/jobs-valkey
+          pnpm audit --audit-level high
+      - name: Record complete dependency advisory summary
+        shell: bash
+        if: always()
+        run: |
+          set -euo pipefail
+          cd addons/jobs-valkey
+          pnpm audit --json > "$RUNNER_TEMP/lego-jobs-valkey-audit.json" || echo 'JOB_AUDIT_ADVISORIES_RECORDED'
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const file=process.env.RUNNER_TEMP+'/lego-jobs-valkey-audit.json';
+          if(fs.existsSync(file)){
+            const json=JSON.parse(fs.readFileSync(file,'utf8'));
+            console.log('JOBS_AUDIT_SUMMARY', JSON.stringify(json.metadata?.vulnerabilities ?? {}));
+          }
+          NODE
