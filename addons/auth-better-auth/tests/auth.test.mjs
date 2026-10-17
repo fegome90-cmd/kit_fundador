@@ -132,6 +132,46 @@ test('passwords below the 15-character policy are rejected before account creati
   } finally { await app.close(); }
 });
 
+test('cross-origin sign-out cannot revoke another-origin session', async () => {
+  const app = makeApp();
+  try {
+    await app.ready();
+    const account = {
+      email: 'csrf-signout@example.test',
+      name: 'CSRF test account',
+      password: 'Separate-strong-passphrase-2026!',
+    };
+    const signed = await authRequest(app, '/sign-up/email', {
+      method: 'POST', body: account,
+    });
+    assert.ok([200, 201].includes(signed.statusCode), signed.body.slice(0, 220));
+    const cookie = cookies(signed);
+    assert.ok(cookie.includes('session_token'));
+    assert.equal((await app.inject({
+      method: 'GET', url: '/private', headers: { cookie },
+    })).statusCode, 200);
+
+    // A hostile website may submit a cross-origin form with the victim's
+    // cookie; it must not be allowed to revoke their authenticated session.
+    const crossOrigin = await authRequest(app, '/sign-out', {
+      method: 'POST', cookie, origin: 'https://attacker.example', body: {},
+    });
+    assert.ok(crossOrigin.statusCode >= 400 && crossOrigin.statusCode < 500,
+      `Cross-origin sign-out unexpectedly succeeded: ${crossOrigin.statusCode}`);
+    assert.equal((await app.inject({
+      method: 'GET', url: '/private', headers: { cookie },
+    })).statusCode, 200);
+
+    const valid = await authRequest(app, '/sign-out', {
+      method: 'POST', cookie, body: {},
+    });
+    assert.equal(valid.statusCode, 200);
+    assert.equal((await app.inject({
+      method: 'GET', url: '/private', headers: { cookie },
+    })).statusCode, 401);
+  } finally { await app.close(); }
+});
+
 test('two independent signup/login sessions cannot cross accounts or promote public role', async () => {
   const app = makeApp();
   try {
@@ -244,46 +284,6 @@ test('wrong password and untrusted browser origin do not grant a session', async
       const rows = await pool.query('SELECT 1 FROM auth."user" WHERE email=$1', ['attacker@example.test']);
       assert.equal(rows.rowCount, 0);
     } finally { await pool.end(); }
-  } finally { await app.close(); }
-});
-
-test('cross-origin sign-out cannot revoke another-origin session', async () => {
-  const app = makeApp();
-  try {
-    await app.ready();
-    const account = {
-      email: 'csrf-signout@example.test',
-      name: 'CSRF test account',
-      password: 'Separate-strong-passphrase-2026!',
-    };
-    const signed = await authRequest(app, '/sign-up/email', {
-      method: 'POST', body: account,
-    });
-    assert.ok([200, 201].includes(signed.statusCode), signed.body.slice(0, 220));
-    const cookie = cookies(signed);
-    assert.ok(cookie.includes('session_token'));
-    assert.equal((await app.inject({
-      method: 'GET', url: '/private', headers: { cookie },
-    })).statusCode, 200);
-
-    // A hostile website may submit a cross-origin form with the victim's
-    // cookie; it must not be allowed to revoke their authenticated session.
-    const crossOrigin = await authRequest(app, '/sign-out', {
-      method: 'POST', cookie, origin: 'https://attacker.example', body: {},
-    });
-    assert.ok(crossOrigin.statusCode >= 400 && crossOrigin.statusCode < 500,
-      `Cross-origin sign-out unexpectedly succeeded: ${crossOrigin.statusCode}`);
-    assert.equal((await app.inject({
-      method: 'GET', url: '/private', headers: { cookie },
-    })).statusCode, 200);
-
-    const valid = await authRequest(app, '/sign-out', {
-      method: 'POST', cookie, body: {},
-    });
-    assert.equal(valid.statusCode, 200);
-    assert.equal((await app.inject({
-      method: 'GET', url: '/private', headers: { cookie },
-    })).statusCode, 401);
   } finally { await app.close(); }
 });
 
