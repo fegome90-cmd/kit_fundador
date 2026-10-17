@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - addons/auth-better-auth/**
+      - addons/db-postgres/**
+      - templates/fastify-core/**
       - .github/workflows/lego-auth.yml
       - dev-docs/plans/lego-auth-2026-10-16.md
       - dev-docs/validation/2026-10-16-lego-auth/**
@@ -12,6 +14,8 @@ on:
     branches: [main]
     paths:
       - addons/auth-better-auth/**
+      - addons/db-postgres/**
+      - templates/fastify-core/**
       - .github/workflows/lego-auth.yml
       - dev-docs/plans/lego-auth-2026-10-16.md
       - dev-docs/validation/2026-10-16-lego-auth/**

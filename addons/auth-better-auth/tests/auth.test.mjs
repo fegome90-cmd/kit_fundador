@@ -204,6 +204,27 @@ test('untrusted forwarded IP must not be persisted as the authenticated client I
   } finally { await app.close(); }
 });
 
+test('rotating forged forwarded IPs cannot evade Better Auth sign-in throttling', async () => {
+  const app = makeApp();
+  try {
+    await app.ready();
+    const status = [];
+    for (let attempt = 1; attempt <= 7; attempt++) {
+      const result = await authRequest(app, '/sign-in/email', {
+        method: 'POST',
+        body: { email: userA.email, password: 'Clearly-wrong-password-2026!' },
+        headers: {
+          'x-forwarded-for': `203.0.113.${attempt}`,
+          'x-kit-auth-client-ip': `198.51.100.${attempt}`,
+        },
+      });
+      status.push(result.statusCode);
+      assert.ok(!cookies(result).includes('session_token'));
+    }
+    assert.ok(status.includes(429), `Forwarded IP rotation bypassed auth throttle: ${status.join(',')}`);
+  } finally { await app.close(); }
+});
+
 test('wrong password and untrusted browser origin do not grant a session', async () => {
   const app = makeApp();
   try {

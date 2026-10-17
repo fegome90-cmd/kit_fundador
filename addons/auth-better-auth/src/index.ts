@@ -6,6 +6,18 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from './auth-schema.js';
 
+// Fastify resolves request.ip according to its trusted-proxy configuration.
+// Never let an untrusted forwarded header control Better Auth's rate limiter or session IP.
+const CLIENT_IP_HEADER = 'x-kit-auth-client-ip';
+function trustedHeaders(request: FastifyRequest): Headers {
+  const headers = fromNodeHeaders(request.headers);
+  for (const name of ['x-forwarded-for', 'x-real-ip', 'cf-connecting-ip', 'forwarded', CLIENT_IP_HEADER]) {
+    headers.delete(name);
+  }
+  headers.set(CLIENT_IP_HEADER, request.ip);
+  return headers;
+}
+
 export interface AuthPrincipal {
   id: string;
   email: string;
@@ -114,7 +126,10 @@ export function createAuthPlugin(options: AuthOptions): FastifyPluginAsync {
         // For the sample, explicitly enable limits in development/test too.
         // In-memory rate limiting is not multi-instance production protection.
         rateLimit: { enabled: true, window: 60, max: 100 },
-        advanced: { useSecureCookies: config.baseURL.startsWith('https:') },
+        advanced: {
+          useSecureCookies: config.baseURL.startsWith('https:'),
+          ipAddress: { ipAddressHeaders: [CLIENT_IP_HEADER] },
+        },
       });
 
       app.route({
@@ -125,7 +140,7 @@ export function createAuthPlugin(options: AuthOptions): FastifyPluginAsync {
             const url = new URL(request.url, config.baseURL);
             const response = await auth.handler(new Request(url, {
               method: request.method,
-              headers: fromNodeHeaders(request.headers),
+              headers: trustedHeaders(request),
               ...(request.method === 'POST' && request.body !== undefined
                 ? { body: JSON.stringify(request.body) }
                 : {}),
@@ -147,7 +162,7 @@ export function createAuthPlugin(options: AuthOptions): FastifyPluginAsync {
       });
       await options.registerRoutes?.(app, {
         async getPrincipal(request) {
-          const data = await auth.api.getSession({ headers: fromNodeHeaders(request.headers) });
+          const data = await auth.api.getSession({ headers: trustedHeaders(request) });
           if (!data) return null;
           return { id: data.user.id, email: data.user.email, role: data.user.role ?? 'user' };
         },
