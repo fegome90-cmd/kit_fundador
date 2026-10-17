@@ -179,6 +179,31 @@ test('two independent signup/login sessions cannot cross accounts or promote pub
   } finally { await app.close(); }
 });
 
+test('untrusted forwarded IP must not be persisted as the authenticated client IP', async () => {
+  const app = makeApp();
+  try {
+    await app.ready();
+    const forged = '203.0.113.71';
+    const loggedIn = await authRequest(app, '/sign-in/email', {
+      method: 'POST',
+      body: { email: userA.email, password: userA.password },
+      headers: { 'x-forwarded-for': forged, 'x-kit-auth-client-ip': '203.0.113.72' },
+    });
+    assert.equal(loggedIn.statusCode, 200, loggedIn.body.slice(0, 250));
+    const pool = new Pool({ connectionString: migrationUrl });
+    try {
+      const rows = await pool.query(
+        'SELECT ip_address FROM auth."session" WHERE user_id = (SELECT id FROM auth."user" WHERE email=$1) ORDER BY created_at DESC LIMIT 1',
+        [userA.email],
+      );
+      assert.equal(rows.rowCount, 1);
+      assert.notEqual(rows.rows[0].ip_address, forged);
+      assert.notEqual(rows.rows[0].ip_address, '203.0.113.72');
+      assert.equal(rows.rows[0].ip_address, '127.0.0.1');
+    } finally { await pool.end(); }
+  } finally { await app.close(); }
+});
+
 test('wrong password and untrusted browser origin do not grant a session', async () => {
   const app = makeApp();
   try {
