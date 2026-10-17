@@ -41,10 +41,13 @@ try {
   let resultState;
   while(Date.now()<deadline){
     resultState=await external.getDigestStatus(result.json().jobId);
-    if(resultState?.state==='completed')break;
+    // A completed status can precede re-hydration of BullMQ returnvalue.
+    if(resultState?.state==='completed' && resultState.result)break;
+    if(resultState?.state==='failed')break;
     await new Promise(resolve=>setTimeout(resolve,150));
   }
   assert.equal(resultState?.state,'completed');
+  assert.ok(resultState.result, 'completed job must include a result');
 }finally{
   await composed.close();
   await external?.close();

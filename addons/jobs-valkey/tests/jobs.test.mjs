@@ -167,9 +167,9 @@ test('a killed process does not lose its active job; a new worker recovers it', 
       VALKEY_URL: url, JOBS_QUEUE_NAME: queueName,
     }, 'LEGO_CRASH_WORKER_READY');
     const payload = data('recovery fixture ' + randomUUID());
-    const { jobId } = await producer.enqueueDigest(payload);
-    // Child acknowledges processing before being SIGKILLed, so the job was active.
-    const started = await new Promise((resolve, reject) => {
+    // Attach the listener before queue.add: the child may start a job before
+    // the enqueue reply arrives and stdout events are not replayed.
+    const startedPromise = new Promise((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error('Child never processed job')), 5500);
       dying.stdout.on('data', bytes => {
         if (String(bytes).includes('LEGO_CRASH_WORKER_ACTIVE')) {
@@ -178,6 +178,8 @@ test('a killed process does not lose its active job; a new worker recovers it', 
       });
       dying.once('exit', () => { clearTimeout(timer); reject(new Error('Child exited early')); });
     });
+    const { jobId } = await producer.enqueueDigest(payload);
+    const started = await startedPromise;
     assert.equal(started, true);
     const end = once(dying, 'exit');
     dying.kill('SIGKILL');
