@@ -43,6 +43,7 @@ async function authRequest(app, path, opts = {}) {
   return app.inject({
     method: opts.method ?? 'GET',
     url: '/api/auth' + path,
+    ...(opts.remoteAddress ? { remoteAddress: opts.remoteAddress } : {}),
     headers: {
       origin: opts.origin ?? baseURL,
       ...(opts.cookie ? { cookie: opts.cookie } : {}),
@@ -134,6 +135,8 @@ test('passwords below the 15-character policy are rejected before account creati
 
 test('cross-origin sign-out cannot revoke another-origin session', async () => {
   const app = makeApp();
+  // Isolate this scenario from the deliberate global sign-in throttle tests.
+  const clientAddress = '198.51.100.25';
   try {
     await app.ready();
     const account = {
@@ -142,32 +145,32 @@ test('cross-origin sign-out cannot revoke another-origin session', async () => {
       password: 'Separate-strong-passphrase-2026!',
     };
     const signed = await authRequest(app, '/sign-up/email', {
-      method: 'POST', body: account,
+      method: 'POST', body: account, remoteAddress: clientAddress,
     });
     assert.ok([200, 201].includes(signed.statusCode), signed.body.slice(0, 220));
     const cookie = cookies(signed);
     assert.ok(cookie.includes('session_token'));
     assert.equal((await app.inject({
-      method: 'GET', url: '/private', headers: { cookie },
+      method: 'GET', url: '/private', headers: { cookie }, remoteAddress: clientAddress,
     })).statusCode, 200);
 
     // A hostile website may submit a cross-origin form with the victim's
     // cookie; it must not be allowed to revoke their authenticated session.
     const crossOrigin = await authRequest(app, '/sign-out', {
-      method: 'POST', cookie, origin: 'https://attacker.example', body: {},
+      method: 'POST', cookie, origin: 'https://attacker.example', body: {}, remoteAddress: clientAddress,
     });
-    assert.ok(crossOrigin.statusCode >= 400 && crossOrigin.statusCode < 500,
+    assert.equal(crossOrigin.statusCode, 403,
       `Cross-origin sign-out unexpectedly succeeded: ${crossOrigin.statusCode}`);
     assert.equal((await app.inject({
-      method: 'GET', url: '/private', headers: { cookie },
+      method: 'GET', url: '/private', headers: { cookie }, remoteAddress: clientAddress,
     })).statusCode, 200);
 
     const valid = await authRequest(app, '/sign-out', {
-      method: 'POST', cookie, body: {},
+      method: 'POST', cookie, body: {}, remoteAddress: clientAddress,
     });
     assert.equal(valid.statusCode, 200);
     assert.equal((await app.inject({
-      method: 'GET', url: '/private', headers: { cookie },
+      method: 'GET', url: '/private', headers: { cookie }, remoteAddress: clientAddress,
     })).statusCode, 401);
   } finally { await app.close(); }
 });
