@@ -33,7 +33,7 @@ jobs:
     timeout-minutes: 20
     services:
       valkey:
-        image: valkey:8.1.4
+        image: valkey/valkey:8.1.4
         ports:
           - 6379:6379
         options: >-
