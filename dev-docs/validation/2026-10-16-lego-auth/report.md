@@ -61,3 +61,44 @@ El schema Drizzle de Better Auth se inspiró en el prototipo de octubre y fue **
 - **Modelo de confianza:** `request.ip` depende de la configuración de Fastify: `trustProxy:false` en el test y en el Core; si hay proxy de producción, **solo se podrá confiar en proxies específicos** con cabeceras sobrescritas. Esta mitigación no certifica la topología de red ni el rate limiting multiinstancia.
 - **Pendientes no cerrados:** waiver upstream de 70 errores Drizzle + referencia opcional Better Auth `bun:sqlite`; advisory moderado `GHSA-67mh-4wv8-2f99` (esbuild) sin fix upstream validado en el lockfile; límites en memoria, MFA/recuperación/tenancy, TLS/proxy y restore no probados. **GO-LAB; NO-GO publicación o producción**. Código no instalado en los starters y sin deploy.
 
+## Auditoría pre-merge: comprobación CSRF y resolución de dependencias (17-10-2026)
+
+El control final añade una prueba que intenta cerrar una sesión autenticada desde
+`Origin: https://attacker.example`. El proveedor debe responder **403**,
+mantener la sesión de la víctima utilizable y permitir el cierre legítimo desde
+`baseURL`, tras el que la misma cookie retorna **401**. Se utiliza
+`remoteAddress: '198.51.100.25'` exclusivo del test (API oficial de
+`light-my-request`) para separar el bucket de limitación de tasa de las
+pruebas que agotan voluntariamente el bloqueo 429. Esta dirección procede del
+socket simulado, **no** de una cabecera externa que el cliente pudiera falsear.
+
+**Evidencia:**
+- [Run 39032533080](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39032533080): primera prueba de regresión inválida por colisión con rate limiting global (la preparación de sesión obtuvo 429).
+- [Run 39032671110](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39032671110): la prueba aislada de origen rechazado pasó, pero causó 429 en otra prueba posterior; **error de aislamiento del harness**, no vulnerabilidad ni justificación para desactivar los límites.
+- [Run 39032848625](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39032848625): **11/11 E2E PASS** con PostgreSQL 16.15, incluyendo CSRF, rechazo de IP falsas, 429 anti-bruteforce, revocación, roles y mínimos privilegios.
+- [CI heredada 39032848622](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39032848622): **PASS**. No hubo cambios en el código de Core, PostgreSQL o Identity Access.
+
+**Revisión de dependencias antes del merge:** `GHSA-67mh-4wv8-2f99`
+([advisory oficial](https://github.com/advisories/GHSA-67mh-4wv8-2f99))
+afecta al **servidor de desarrollo** de `esbuild` hasta 0.24.2, corregido en
+0.25.0. Este árbol mantiene `esbuild@0.18.20` bajo
+`@esbuild-kit/core-utils@3.3.2`, arrastrado por `drizzle-kit`. Forzar
+una versión 0.25+ fuera de la dependencia pre-1.0 requiere una matriz de
+compatibilidad de tooling y un lockfile regenerado, no un parche textual o un
+override especulativo. La auditoría completa aún reporta **un moderado**,
+aunque `pnpm audit --prod --no-optional` no identifica vulnerabilidades.
+No se ha encontrado un servidor de desarrollo esbuild arrancado en este
+laboratorio; esto **no elimina** el advisory de la cadena ni certifica uso
+productivo.
+
+Los 70 errores de declaraciones Drizzle 0.45.4 y una referencia opcional
+`bun:sqlite` de Better Auth 1.7.10 continúan en el waiver upstream trazado,
+con `strict:true` para fuentes propias. No se modificaron declaraciones de
+terceros ni se presentó `skipLibCheck:true` como typecheck integral.
+
+**Dictamen:** GO para fusionar únicamente como **add-on experimental
+opt-in**, con documentación explícita de los riesgos; **NO-GO para publicar,
+desplegar o dar credenciales reales**, y sin eliminar los gates de producción
+pendientes (rate limit centralizado, TLS/proxy real, MFA, tenant authorization,
+restore y cambios de migración versionados).
+
