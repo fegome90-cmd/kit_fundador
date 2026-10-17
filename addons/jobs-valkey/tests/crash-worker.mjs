@@ -1,5 +1,5 @@
 import { Worker } from 'bullmq';
-import Redis from 'ioredis';
+import { Redis } from 'ioredis';
 const url = process.env.VALKEY_URL;
 const queueName = process.env.JOBS_QUEUE_NAME;
 if (!url || !queueName) throw new Error('Synthetic worker settings missing');

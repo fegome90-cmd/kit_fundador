@@ -1,4 +1,4 @@
-import Redis from 'ioredis';
+import { Redis } from 'ioredis';
 import { Worker, type Job } from 'bullmq';
 import { digestText, DIGEST_JOB_NAME, type DigestResult } from './contract.js';
 import { resolveJobsConfig, type JobsValkeyOptions } from './config.js';
@@ -30,7 +30,7 @@ export async function startDigestWorker(options: DigestWorkerOptions): Promise<D
     maxRetriesPerRequest: null,
     enableOfflineQueue: true,
     connectTimeout: 1500,
-    retryStrategy: attempts => Math.min(attempts * 500, 2000),
+    retryStrategy: (attempts: number) => Math.min(attempts * 500, 2000),
   });
   redis.on('error', () => {});
   let worker: Worker | undefined;

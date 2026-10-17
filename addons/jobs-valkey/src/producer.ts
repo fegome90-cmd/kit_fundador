@@ -1,4 +1,4 @@
-import Redis from 'ioredis';
+import { Redis } from 'ioredis';
 import { Queue } from 'bullmq';
 import type { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import { digestJobId, DIGEST_JOB_NAME, validateDigestInput, type DigestInput, type DigestResult } from './contract.js';

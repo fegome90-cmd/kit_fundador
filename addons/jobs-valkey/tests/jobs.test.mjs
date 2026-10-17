@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { randomUUID, createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
-import Redis from 'ioredis';
+import { Redis } from 'ioredis';
 import Fastify from 'fastify';
 import { Worker } from 'bullmq';
 import {

@@ -79,15 +79,11 @@ jobs:
           assert.ok(!JSON.stringify(p).includes('workspace:'));
           console.log('LEGO_JOBS_BOUNDARY_PASS');
           NODE
-      - name: Bootstrap only — generate pinned lockfile from real registry
-        shell: bash
+      - name: Require committed lockfile (no network resolution)
         run: |
           set -euo pipefail
-          cd addons/jobs-valkey
-          pnpm install --lockfile-only --strict-peer-dependencies --ignore-scripts
-          printf 'LEGO_LOCK_B64_START\n'
-          base64 -w0 pnpm-lock.yaml | fold -w 400 | sed 's/^/LEGO_LOCK_B64_CHUNK:/'
-          printf '\nLEGO_LOCK_B64_END\n'
+          test -s addons/jobs-valkey/pnpm-lock.yaml
+          test ! -e addons/jobs-valkey/package-lock.json
       - name: Build and exercise real Valkey from independent copy
         shell: bash
         run: |
