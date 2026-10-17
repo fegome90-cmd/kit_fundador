@@ -21,7 +21,9 @@ async function waitDone(producer, jobId, timeout = 16000) {
   const until = Date.now() + timeout;
   while (Date.now() < until) {
     const status = await producer.getDigestStatus(jobId);
-    if (status?.state === 'completed') return status;
+    // Completed may become visible before our earlier hydrated Job gained
+    // its returnvalue. Do not treat a missing result as a valid completion.
+    if (status?.state === 'completed' && status.result) return status;
     if (status?.state === 'failed') throw new Error('Synthetic job failed');
     await sleep(160);
   }

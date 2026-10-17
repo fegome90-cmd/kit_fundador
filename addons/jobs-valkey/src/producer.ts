@@ -65,7 +65,11 @@ export async function openDigestProducer(options: JobsValkeyOptions): Promise<Di
       if (!job) return null;
       const state = await job.getState();
       if (state !== 'completed') return { state };
-      return { state, result: job.returnvalue as DigestResult };
+      // A job may finish between getJob() and getState(). Re-hydrate its
+      // returnvalue only AFTER the completed state was observed.
+      const completed = await boundQueue.getJob(jobId);
+      const value = completed?.returnvalue as DigestResult | null | undefined;
+      return value ? { state, result: value } : { state };
     },
     async close() {
       if (closed) return;
