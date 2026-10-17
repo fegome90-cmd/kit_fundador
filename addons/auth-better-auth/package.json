@@ -1,0 +1,35 @@
+{
+  "name": "@kit-fundador/auth-better-auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Optional Fastify 5 + Better Auth with a dedicated PostgreSQL namespace (experimental only)",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "test": "pnpm run build && node --test tests/*.test.mjs",
+    "db:generate": "drizzle-kit generate",
+    "db:check": "drizzle-kit check",
+    "db:migrate": "node scripts/require-migration-url.mjs && drizzle-kit migrate"
+  },
+  "dependencies": {
+    "better-auth": "1.7.10",
+    "@better-auth/drizzle-adapter": "1.7.10",
+    "drizzle-orm": "0.45.4",
+    "pg": "8.23.1"
+  },
+  "peerDependencies": {
+    "fastify": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "@types/pg": "8.23.1",
+    "drizzle-kit": "0.31.11",
+    "fastify": "5.12.7",
+    "typescript": "5.9.3"
+  }
+}
