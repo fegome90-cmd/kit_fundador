@@ -95,8 +95,12 @@ export function createAuthPlugin(options: AuthOptions): FastifyPluginAsync {
     app.addHook('onClose', close);
 
     try {
-      // Fail closed when the explicit migration has not run; never auto-migrate.
-      await pool.query('SELECT 1 FROM auth."user" LIMIT 0');
+      // Fail closed before listen for an absent OR partially applied auth schema.
+      // Check every required table with the runtime DML role; never read the
+      // migrator-only journal and never create tables implicitly on boot.
+      for (const table of ['user', 'session', 'account', 'verification']) {
+        await pool.query(`SELECT 1 FROM auth."${table}" LIMIT 0`);
+      }
       const db = drizzle(pool, { schema });
       const auth = betterAuth({
         baseURL: config.baseURL,
