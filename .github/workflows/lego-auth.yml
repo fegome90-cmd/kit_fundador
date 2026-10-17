@@ -151,6 +151,21 @@ jobs:
           await x.close().catch(()=>{});
           const table=await p.query("SELECT COUNT(*)::integer AS n FROM pg_tables WHERE schemaname='auth'");
           assert.equal(table.rows[0].n,0);
+          // A partial manual migration must also fail before listen.
+          // This would have incorrectly passed when startup checked only auth.user.
+          await p.query('CREATE SCHEMA auth');
+          await p.query('CREATE TABLE auth."user" (id text)');
+          const partial=Fastify({logger:false});
+          partial.register(createAuthPlugin({
+            databaseUrl:connectionString,baseURL:'http://127.0.0.1:4310',
+            secret:process.env.AUTH_TEST_SECRET
+          }));
+          try {
+            await assert.rejects(partial.ready(), /Auth add-on initialization failed/);
+          } finally {
+            await partial.close().catch(()=>{});
+            await p.query('DROP SCHEMA auth CASCADE');
+          }
           await p.end();
           console.log('AUTH_NEVER_AUTOMIGRATES_PASS');
           NODE
