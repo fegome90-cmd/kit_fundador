@@ -12,6 +12,8 @@ Add-on de autenticación para **Fastify 5 + PostgreSQL + Drizzle**, opcional y *
 
 ## Migraciones y permisos
 
+El plugin comprueba `auth.user`, `auth.session`, `auth.account` y `auth.verification` antes de aceptar su inicialización. Un esquema ausente o parcialmente creado provoca un error de arranque sin filtrar secretos; la cuenta de ejecución no consulta el journal del migrador ni ejecuta DDL.
+
 Nunca se migran tablas durante el arranque. Primero deben ejecutarse las migraciones de `addons/db-postgres` (si se utiliza ese add-on) y luego las de auth:
 
 ```sh

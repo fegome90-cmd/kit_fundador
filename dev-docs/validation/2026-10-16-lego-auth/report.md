@@ -39,3 +39,14 @@ El schema Drizzle de Better Auth se inspiró en el prototipo de octubre y fue **
 ## Dictamen
 
 **GO para laboratorio y revisión del add-on opcional**, con conexión PostgreSQL real, sesiones y checks ejecutados. **NO-GO para despliegue público ni publicación como componente estable**; además, no llevar la PR a merge sin revisar AUTH-01..06 y comprobar el estado de CodeRabbit/CI sobre el HEAD final. No alterar la garantía de aislamiento del Core.
+
+## Addendum: regresión TDD de esquema parcial (17-10-2026)
+
+**Defecto reproducido:** el preflight original comprobaba solamente `SELECT 1 FROM auth."user" LIMIT 0`. Con un esquema `auth` creado manualmente y únicamente esa tabla, Fastify aceptaba `ready()`, aunque faltasen `session`, `account` y `verification`. Ese arranque permitía fallos posteriores durante solicitudes con cookies y sesiones.
+
+- **RED:** [run 39030643063](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39030643063) falló con `AssertionError: Missing expected rejection` en la comprobación de migración parcial.
+- **Fix:** `createAuthPlugin` comprueba explícitamente las cuatro tablas, con `LIMIT 0` y el rol de acceso ordinario. Sigue sin leer `auth_meta.__drizzle_migrations`, crear esquemas, insertar datos ni ejecutar migraciones durante el arranque.
+- **GREEN:** [run 39030755551](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39030755551) PASS sobre `067b30b87eea184fd35a7b6bd45da3155601f264`, 8/8 tests E2E, migraciones repetidas, privilegios mínimos, Core independiente, diagnóstico de typings y auditoría. [CI heredada 39030755575](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39030755575) PASS.
+- **Limitación:** estas comprobaciones no sustituyen el control formal de versiones de migración; el rol runtime carece deliberadamente de permiso para leer el journal. Un esquema incompleto con tablas pero columnas obsoletas podría superar este smoke; los upgrades requieren gates de despliegue dedicados.
+- **Pendientes inalterados:** Drizzle 0.45.4 falla verificaciones `.d.ts` externas, Better Auth 1.7.10 hace referencia opcional a `bun:sqlite`; advisory moderado `GHSA-67mh-4wv8-2f99` en esbuild, límites de tasa en memoria, TLS/proxy y controles de producción no validados. **GO-LAB, NO-GO publicación/producción**. La revisión CodeRabbit del HEAD final continúa como gate de admisión.
+
