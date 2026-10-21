@@ -42,5 +42,13 @@
     "drizzle-kit": "0.31.11",
     "fastify": "5.12.7",
     "typescript": "5.9.3"
-  }
+  },
+  "files": [
+    "dist",
+    "src",
+    "drizzle",
+    "drizzle.config.ts",
+    "scripts/require-migration-url.mjs",
+    "README.md"
+  ]
 }

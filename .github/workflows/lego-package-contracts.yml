@@ -1,0 +1,53 @@
+name: LEGO package consumer contracts (isolated)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - addons/db-postgres/**
+      - addons/auth-better-auth/**
+      - addons/jobs-valkey/**
+      - scripts/verify-lego-package-consumer.mjs
+      - .github/workflows/lego-package-contracts.yml
+  push:
+    branches: [main]
+    paths:
+      - addons/db-postgres/**
+      - addons/auth-better-auth/**
+      - addons/jobs-valkey/**
+      - scripts/verify-lego-package-consumer.mjs
+      - .github/workflows/lego-package-contracts.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lego-package-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  external-package:
+    name: External package / ${{ matrix.addon }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      matrix:
+        addon: [db-postgres, auth-better-auth, jobs-valkey]
+    steps:
+      - name: Checkout without credentials
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Build, pack, install and typecheck outside repository
+        env:
+          ADDON: ${{ matrix.addon }}
+        run: node scripts/verify-lego-package-consumer.mjs "$ADDON"
