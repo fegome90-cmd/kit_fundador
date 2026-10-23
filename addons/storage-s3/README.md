@@ -15,3 +15,5 @@ Los datos de prueba y claves se mantienen sintéticos.
 `.github/workflows/lego-storage-s3.yml` ejecuta Node 24, SDK S3 fijado y Silo compatible con S3 en un servicio efímero. No utiliza las imágenes retiradas `minio/minio`. El resultado se demuestra por contenido byte a byte, errores negativos, aislamiento de rutas de laboratorio y cierre de conexiones. La licencia del servidor usado en CI es diferente de la licencia del cliente AWS SDK; este módulo no redistribuye el servidor.
 
 Fuente técnica: [RFC LEGO S3](../../dev-docs/plans/lego-storage-s3-2026-10-23.md).
+
+El backend de CI es **Silo RELEASE.2026-10-18T00-00-00Z**, fijado además por digest OCI; sus imágenes y licencias no se distribuyen con este paquete. El cliente TypeScript usa `@aws-sdk/client-s3@3.1149.0` y un lockfile comprometido. [Auditoría R3](AUDIT.md).

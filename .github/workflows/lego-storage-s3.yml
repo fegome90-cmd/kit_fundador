@@ -62,15 +62,16 @@ jobs:
           assertNoLifecycleHooks(p.scripts);
           console.log('LEGO_R3_PRIVATE_BOUNDARY_PASS');
           NODE
-      - name: Start pinned Silo S3 in ephemeral container
+      # Silo RELEASE.2026-10-18T00-00-00Z; OCI digest recorded in a passing CI pull.
+      - name: Start digest-pinned Silo S3 in ephemeral container
         shell: bash
         run: |
           set -euo pipefail
-          docker pull docker.io/pgsty/silo:RELEASE.2026-10-18T00-00-00Z
+          docker pull docker.io/pgsty/silo@sha256:2636fc4155d9a7e41ff58cdb65ddd13ba9304e67184e13c25bc5cb34016269d7
           CID="$(docker run -d --rm -p 127.0.0.1:9000:9000 \
             -e MINIO_ROOT_USER="$R3_S3_ACCESS_KEY" \
             -e MINIO_ROOT_PASSWORD="$R3_S3_SECRET_KEY" \
-            docker.io/pgsty/silo:RELEASE.2026-10-18T00-00-00Z server /data)"
+            docker.io/pgsty/silo@sha256:2636fc4155d9a7e41ff58cdb65ddd13ba9304e67184e13c25bc5cb34016269d7 server /data)"
           echo "R3_SILO_CONTAINER=$CID" >> "$GITHUB_ENV"
           for attempt in $(seq 1 30); do
             if docker exec "$CID" silo healthcheck ready >/dev/null 2>&1; then
