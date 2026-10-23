@@ -1,6 +1,6 @@
 # R2 · LEGO Full B (laboratorio)
 
-**Estado:** diseño y pruebas en progreso. NO-GO para publicación y producción. Solo datos sintéticos.
+**Estado:** GO de laboratorio validado en CI; PR #87 pendiente de merge. NO-GO para publicación y producción. Solo datos sintéticos. [Auditoría y riesgos residuales](AUDIT.md).
 
 ## Arquitectura
 
