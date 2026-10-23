@@ -86,6 +86,8 @@ jobs:
           test "$(docker exec "${{ job.services.valkey.id }}" valkey-cli --raw CONFIG GET maxmemory-policy | tail -1)" = "noeviction"
       - name: Refuse external or non-synthetic R2 service URLs
         run: node --test recipes/full-b/ci/lab-safety.test.mjs
+      - name: Verify R2 package lifecycle boundary before building tarballs
+        run: node --test recipes/full-b/ci/pack-boundary.test.mjs
       - name: Build isolated packages and execute Full B integration
         run: node recipes/full-b/ci/run.mjs
       - name: Upload resolved consumer lockfile (synthetic only)
