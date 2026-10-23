@@ -81,12 +81,12 @@ jobs:
           done
           echo 'Ephemeral S3 service unavailable'
           exit 1
-      - name: Install pinned dependencies (RED; lockfile resolution pending)
+      - name: Install committed dependency graph with frozen lockfile
         shell: bash
         run: |
           set -euo pipefail
           cd addons/storage-s3
-          pnpm install --no-frozen-lockfile --strict-peer-dependencies --ignore-scripts
+          pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
       - name: Verify strict types and real S3 object operations
         shell: bash
         run: |
@@ -104,12 +104,6 @@ jobs:
       - name: Verify private S3 package from clean consumer
         shell: bash
         run: node addons/storage-s3/scripts/verify-external.mjs
-      - name: Emit lockfile for reproducible source commit (temporary)
-        shell: bash
-        run: |
-          echo 'LEGO_R3_LOCKFILE_BEGIN'
-          base64 -w76 addons/storage-s3/pnpm-lock.yaml
-          echo 'LEGO_R3_LOCKFILE_END'
       - name: Clean up ephemeral S3 server
         if: always()
         shell: bash
