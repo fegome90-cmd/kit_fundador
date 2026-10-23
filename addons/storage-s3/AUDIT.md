@@ -35,3 +35,32 @@ La compatibilidad S3 queda probada con el backend **señalado arriba**, no con t
 6. **Datos:** no usar registros clínicos, secretos reales, información personal ni objetos sensibles en este laboratorio. Los mensajes de error son deliberadamente opacos.
 
 **GO-laboratorio condicionado al CI del HEAD final y revisión CodeRabbit; NO-GO para producción/publicación.** La aprobación para fusionar este complemento sigue siendo responsabilidad del usuario; no ejecutar merge ni despliegue por esta PR.
+
+
+## Reauditoría de hallazgos del review #5629809375
+
+**Alcance:** PR #88, sin alterar Fastify Core ni módulos integrados de R1–R2. Evaluación del contrato contra documentación oficial AWS y pruebas en GitHub Actions.
+
+| ID | Severidad | Hallazgo y corrección |
+|---|---|---|
+| P1 — IAM | Bloqueante | El HeadBucket obligatorio exigía s3:ListBucket y bloqueaba credenciales solo Put/Get/Delete. Se añadió verifyBucketOnOpen opcional (default false); un stub S3 deniega HEAD y GET con 403 y demuestra que abrir el cliente no hace HEAD, mientras GET 403 nunca se trata como null. |
+| P2 — nombres | Importante | Validación de AWS S3 general-purpose: rechazo de IPv4 literales, etiquetas con punto/guion adyacentes, puntos dobles y prefijos/sufijos reservados. 12 pruebas negativas antes de hacer red. |
+| P2 — prueba Core | Importante | El test Fastify() genérico no demostraba independencia del Core real. El nuevo verify-core-off.mjs copia templates/fastify-core a un directorio limpio de Node 24, reproduce lockfile, typecheck y tests de la plantilla, importa dist/app.js y confirma /health y ausencia de rutas/dependencias S3. |
+| P3 — abort | Documental | Un PUT cancelado puede quedar persistido aunque el cliente informe aborted. Un servidor HTTP de prueba recibe y almacena todos los bytes y retrasa la respuesta; el cliente agota el timeout, pero el objeto remoto está comprometido. El README/RFC exige reconciliación e idempotencia. |
+
+### Recibos RED/GREEN
+
+- **RED:** [39976333240](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39976333240) falló 2/10 casos previstos: bucket 192.168.5.4 y HeadBucket preflight obligatorio.
+- **GREEN cliente:** [39976658054](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39976658054), SHA 5f50631: 10/10 PASS, incluyendo stub 403 y Silo real.
+- **Core real y PUT indeterminado:** [39977377890](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39977377890), SHA 84fa843: **13/13 pruebas propias de Core y 11/11 pruebas S3**. Tarball privado, ESM/TypeScript y lockfile congelado también validados; ambas auditorías de dependencias: No known vulnerabilities found en ese corte.
+- **HEAD documental final:** comprobar otra vez CI y CodeRabbit sobre el SHA de este anexo. Los resultados de un commit anterior no bastan para certificar el nuevo.
+
+### Límites que permanecen
+
+- El stub HTTP simula una respuesta S3 403; **no constituye prueba contra políticas IAM reales en AWS**.
+- Desactivar HeadBucket por defecto implica que existencia del bucket y credenciales **no se verifican al abrir**: fallan durante la primera operación si no tienen permiso. Con preflight habilitado se requiere s3:ListBucket; sin permiso ListBucket un GET sobre objeto ausente puede devolver 403, no 404.
+- El prefijo de objeto es defensa adicional, no autenticación por usuario ni política IAM completa; no hay TLS externo, backups, failover, retención ni cumplimiento verificados.
+- Abort de PUT significa interrupción del cliente, **no rollback remoto**. La aplicación debe conciliar estado y usar claves estables e idempotencia antes de reintentar.
+- Resultado propuesto: GO de laboratorio solo con pruebas del HEAD final, respuesta a los hilos y revisión, sin fusionar ni desplegar por defecto.
+
+**Fuentes oficiales:** [HeadBucket](https://docs.aws.amazon.com/AmazonS3/latest/API/API_HeadBucket.html), [GetObject](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html), [Bucket naming](https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html).

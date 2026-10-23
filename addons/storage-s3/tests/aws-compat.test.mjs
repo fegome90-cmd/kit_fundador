@@ -33,7 +33,7 @@ test('AWS general purpose bucket names are rejected before contacting S3', async
   }
 });
 
-test('object-only IAM works without HeadBucket and keeps GetObject AccessDenied distinct from 404', async () => {
+test('simulated object-only IAM avoids HeadBucket and preserves GetObject 403 as error', async () => {
   const received = [];
   const server = createServer((request, response) => {
     received.push(request.method);
