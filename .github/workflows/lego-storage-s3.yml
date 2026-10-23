@@ -88,6 +88,8 @@ jobs:
           set -euo pipefail
           cd addons/storage-s3
           pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
+      - name: Prove unmodified Fastify Core remains standalone
+        run: node addons/storage-s3/scripts/verify-core-off.mjs
       - name: Verify strict types and real S3 object operations
         shell: bash
         run: |
