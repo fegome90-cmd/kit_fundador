@@ -8,6 +8,8 @@ on:
       - addons/auth-better-auth/**
       - addons/jobs-valkey/**
       - scripts/verify-lego-package-consumer.mjs
+      - scripts/lego-package-lifecycle-policy.mjs
+      - scripts/lego-package-lifecycle-policy.test.mjs
       - .github/workflows/lego-package-contracts.yml
   push:
     branches: [main]
@@ -16,6 +18,8 @@ on:
       - addons/auth-better-auth/**
       - addons/jobs-valkey/**
       - scripts/verify-lego-package-consumer.mjs
+      - scripts/lego-package-lifecycle-policy.mjs
+      - scripts/lego-package-lifecycle-policy.test.mjs
       - .github/workflows/lego-package-contracts.yml
   workflow_dispatch:
 
@@ -47,6 +51,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - name: Verify forbidden npm lifecycle hooks (regression)
+        run: node --test scripts/lego-package-lifecycle-policy.test.mjs
       - name: Build, pack, install and typecheck outside repository
         env:
           ADDON: ${{ matrix.addon }}
