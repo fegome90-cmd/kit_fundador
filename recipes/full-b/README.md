@@ -18,6 +18,8 @@ El orquestador `ci/run.mjs` copia y compila cada add-on aislado, aplica explíci
 
 La instalación congelada supera también una auditoría runtime y otra del árbol completo, bloqueando vulnerabilidades altas/críticas y conservando visibles las moderadas.
 
+El rol DML de Full B recibe permisos **solo** para sus tablas `fullb_notes` y `fullb_jobs`; la tabla demostrativa `lego_app.notes` del add-on DB permanece inaccesible. La CI comprueba el rechazo SQL `42501`.
+
 El paso `ci/init-db.mjs` aplica la migración de ejemplo **dos veces**, crea roles DML de aplicación y autenticación separados y exige un único asiento por cada journal de Drizzle. Nada ejecuta migraciones al iniciar el servidor.
 
 Las pruebas exigen Core solo sin servicios, docs OFF/ON, sesiones reales, autorización 401/403, dos usuarios con texto idéntico y un job deduplicado, verificación de SHA-256, worker en proceso separado, trabajos pendientes y cierre seguro.
