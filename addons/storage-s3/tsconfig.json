@@ -11,7 +11,8 @@
     "skipLibCheck": false,
     "types": [
       "node"
-    ]
+    ],
+    "declaration": true
   },
   "include": [
     "src/**/*.ts"
