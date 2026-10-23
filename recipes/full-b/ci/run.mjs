@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertFullBLaboratoryEndpoints } from './lab-safety.mjs';
+import { assertNoLifecycleHooks } from '../../../scripts/lego-package-lifecycle-policy.mjs';
 
 assertFullBLaboratoryEndpoints(process.env);
 
@@ -33,6 +34,10 @@ try {
   for (const addon of ['db-postgres', 'auth-better-auth', 'jobs-valkey']) {
     const dir = join(lab, 'isolated-' + addon);
     copy('addons/' + addon, dir);
+    // R1 policy must run before install, build, migration or pnpm pack.
+    const addonManifest = json(join(dir, 'package.json'));
+    assert.equal(addonManifest.private, true, 'R2 must never publish an add-on');
+    assertNoLifecycleHooks(json(join(dir, 'package.json')).scripts);
     assert.ok(!existsSync(join(dirname(dir), 'package.json')));
     run(dir, 'pnpm', ['install', '--frozen-lockfile', '--strict-peer-dependencies', '--ignore-scripts']);
     run(dir, 'pnpm', ['run', 'typecheck']);
