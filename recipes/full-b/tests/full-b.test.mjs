@@ -135,10 +135,19 @@ test('Full B: real HTTP, ownership, shared hash, worker restart and pool isolati
       await assert.rejects(authRole.query('SELECT * FROM lego_app.fullb_notes'),{code:'42501'});
       await assert.rejects(appRole.query('CREATE TABLE lego_app.exploit (n integer)'),{code:'42501'});
     }finally{await admin.end();await appRole.end();await authRole.end();}
+    const hostile=await call(base,'/api/auth/sign-out',{method:'POST',cookie:cookieA,origin:'https://evil.example',body:{}});
+    assert.equal(hostile.status,403);
+    assert.equal((await call(base,'/fullb/notes/'+a.json.id,{cookie:cookieA})).status,200);
     const logout=await call(base,'/api/auth/sign-out',{method:'POST',cookie:cookieA,origin:conf.baseURL,body:{}});
     assert.equal(logout.status,200);
     assert.equal((await call(base,'/fullb/notes/'+a.json.id,{cookie:cookieA})).status,401);
     assert.equal((await call(base,'/fullb/notes/'+b.json.id,{cookie:cookieB})).status,200);
+    const login=await call(base,'/api/auth/sign-in/email',{method:'POST',origin:conf.baseURL,body:{
+      email:'fullb-a@example.test',password:'Synthetic-lab-passphrase-2026!'
+    }});
+    assert.equal(login.status,200,login.hint);
+    assert.match(login.cookies,/session_token=/);
+    assert.equal((await call(base,'/fullb/notes/'+a.json.id,{cookie:login.cookies})).status,200);
   }finally{
     await stopWorker(child);
     await app.close().catch(()=>{});
@@ -155,4 +164,30 @@ test('Full B fails closed if enabled Valkey does not respond',async()=>{
   const app=buildFullB({...conf,docsEnabled:false,valkeyUrl:'redis://127.0.0.1:6397'});
   try{await assert.rejects(app.ready(),/Valkey|Jobs|unavailable|plugin/i);}
   finally{await app.close().catch(()=>{});}
+});
+
+test('compiled Full B API runs as a separate entrypoint and shuts down cleanly', async () => {
+  const child = spawn(process.execPath,['dist/full-b-server.js'],{
+    cwd:process.cwd(),env:{...process.env,HOST:'127.0.0.1',PORT:'0',FULLB_DOCS_ENABLED:'0'},
+    stdio:['ignore','pipe','pipe']
+  });
+  let base;
+  try {
+    base = await new Promise((resolve,reject)=>{
+      let buffer='';
+      const timer=setTimeout(()=>{child.kill('SIGKILL');reject(new Error('API start timeout'));},10000);
+      child.stdout.on('data',d=>{
+        buffer+=String(d);
+        const match=buffer.match(/KIT_LISTEN (http:\/\/127\.0\.0\.1:[0-9]+)/);
+        if(match){clearTimeout(timer);resolve(match[1]);}
+      });
+      child.once('exit',code=>{clearTimeout(timer);reject(new Error('API exited before listening: '+code));});
+      child.once('error',err=>{clearTimeout(timer);reject(err);});
+    });
+    assert.equal((await call(base,'/health')).status,200);
+    assert.equal((await call(base,'/docs/json')).status,404);
+    assert.equal((await call(base,'/fullb/notes')).status,401);
+  } finally {
+    await stopWorker(child);
+  }
 });
