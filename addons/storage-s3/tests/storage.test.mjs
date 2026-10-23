@@ -211,3 +211,57 @@ test('in-flight upload aborts and unknown-length response cannot bypass the stre
     await new Promise(resolve=>server.close(resolve));
   }
 });
+
+test('an aborted PUT can still be committed by the remote server before its reply',async()=>{
+  const expected=Buffer.from('synthetic-committed-before-timeout');
+  let persisted=null;
+  let resolveReceived;
+  const received=new Promise(resolve=>{resolveReceived=resolve;});
+  const server=createServer((req,res)=>{
+    if(req.method!=='PUT'){
+      res.writeHead(200);
+      res.end();
+      return;
+    }
+    const parts=[];
+    req.on('data',chunk=>parts.push(Buffer.from(chunk)));
+    req.on('end',()=>{
+      persisted=Buffer.concat(parts);
+      resolveReceived();
+      // The S3-compatible server has already accepted and stored the bytes,
+      // but deliberately never acknowledges the request.
+      // This models an ambiguous client-side timeout, not S3 rollback.
+    });
+  });
+  await new Promise((resolve,reject)=>{
+    server.once('error',reject);
+    server.listen(0,'127.0.0.1',resolve);
+  });
+  const address=server.address();
+  assert.ok(address&&typeof address==='object');
+  let storage;
+  try{
+    storage=await openStorageS3({
+      ...options,
+      endpoint:'http://127.0.0.1:'+address.port,
+      keyPrefix:'ambiguous/',
+      operationTimeoutMs:350,
+    });
+    await Promise.all([
+      new Promise((resolve,reject)=>{
+        const timer=setTimeout(()=>reject(new Error('Mock S3 did not receive PUT bytes')),2000);
+        received.then(()=>{clearTimeout(timer);resolve();});
+      }),
+      assert.rejects(
+        ()=>storage.putObject('example/record',expected,'text/plain'),
+        /Storage S3 aborted/,
+      ),
+    ]);
+    assert.deepEqual(persisted,expected,
+      'Remote acceptance can precede the client timeout; no automatic rollback');
+  }finally{
+    storage?.close();
+    server.closeAllConnections();
+    await new Promise(resolve=>server.close(resolve));
+  }
+});

@@ -18,6 +18,7 @@ export interface StorageS3Options {
   endpoint: string; region: string; bucket: string;
   accessKeyId: string; secretAccessKey: string; keyPrefix: string;
   maxObjectBytes?: number; operationTimeoutMs?: number;
+  verifyBucketOnOpen?: boolean; // opt-in; HeadBucket requires s3:ListBucket on AWS
   registerRoutes?: (scope: FastifyInstance, storage: StorageS3) => void | Promise<void>;
 }
 export interface StorageS3 {
@@ -36,8 +37,9 @@ export function createStorageS3Plugin(options: StorageS3Options): FastifyPluginA
 - `keyPrefix` debe ser un prefijo ASCII explícito, no vacío, y termina en `/`. El consumidor aporta una clave relativa (`a/report`); el add-on la valida, concatena y nunca acepta traversal, barras invertidas, `..`, % escapes, control chars o claves absolutas. Dos propietarios se aíslan **por el consumidor** usando un principal autenticado para escoger la clave, nunca por confianza en un identificador HTTP. Un prefijo no reemplaza IAM de bucket.
 - Tamaño máximo configurable, hasta 1 MiB en v1; bytes no vacíos; `get` valida `ContentLength` y además limita cada chunk recibido para evitar descargas sin longitud declarada. MIME permitido: `application/octet-stream`, `application/json`, `text/plain`. Ningún HTML/SVG servido por defecto.
 - Credenciales, bucket, región y endpoint explícitos; no recurrir a credenciales AWS implícitas ni logs sensibles. HTTP solo loopback; un endpoint remoto requiere HTTPS. Puerto, query, username, password, fragment y ruta extraños en URL se rechazan.
+- La cancelación de PUT **no garantiza rollback** de objetos: si el servidor acepta bytes antes de perderse la respuesta, el consumidor debe conciliar su estado antes de reintentar.
 - `maxAttempts:1` y `AbortSignal.timeout` acotan latencia; errores de SDK se normalizan y nunca se reenvían con raw stack, DSN ni credenciales. `get` devuelve `null` solo para ausencia real de objeto, no para 403 o pérdida de conexión.
-- El cliente se crea y verifica con `HeadBucket` **al registrar el plugin** o al llamar la factoría; un Core sin registro no conecta ni crea recursos. `app.close()` destruye conexiones administradas por el add-on.
+- El cliente se crea **sin `HeadBucket` por defecto** para admitir credenciales de objeto sin `s3:ListBucket`. `verifyBucketOnOpen: true` exige explícitamente ese permiso en AWS y falla al inicializar si falta bucket/permisos. Sin preflight, la validez se determina al operar; un Core sin registro no conecta. `app.close()` destruye recursos del add-on.
 - El servicio externo se crea **solo en el runner de CI**, junto con un bucket exclusivo de prueba. El ejemplo del consumidor prueba dos usuarios con tokens sintéticos que poseen distintas claves; no es un ejemplo de autenticación real.
 
 ## Red/Green y gates
@@ -55,3 +57,5 @@ S3 compatible no implica paridad perfecta AWS, política IAM, retención y borra
 Al no almacenar propietario ni ofrecer rutas, Storage S3 nunca sustituye la autorización por recurso del consumidor. Controles de prefijo son defensa adicional, no una frontera IAM si se comparten credenciales.
 
 **GO** solo si artefacto de consumo, Node24, S3 real, negatividad, destrucción de conexiones, auditoría y CI se prueban sobre un SHA.
+
+**Auditoría adicional 23-10-2026:** reglas AWS de nombre de bucket, preflight IAM opt-in y 403 vs 404 verificados con pruebas de regresión; la CI ejecuta la plantilla Fastify Core real desde una copia autónoma y una prueba sintética reproduce PUT confirmado remotamente pese a aborto del cliente. No equivalen a una evaluación de IAM en AWS productivo.
