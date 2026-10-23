@@ -76,7 +76,7 @@ test('large object stored outside the plugin cannot exhaust its read limit',asyn
   const store=await openStorageS3(options);
   await admin.send(new PutObjectCommand({Bucket:bucket,Key:'lab/binary/oversize',
     Body:Buffer.alloc(400,35),ContentType:'application/octet-stream'}));
-  try {await assert.rejects(()=>store.getObject('binary/oversize'),/Storage S3 (size exceeded|operation failed)/);}
+  try {await assert.rejects(()=>store.getObject('binary/oversize'),/Storage S3 size exceeded/);}
   finally {await store.deleteObject('binary/oversize');store.close();}
 });
 
@@ -264,4 +264,26 @@ test('an aborted PUT can still be committed by the remote server before its repl
     server.closeAllConnections();
     await new Promise(resolve=>server.close(resolve));
   }
+});
+
+test('registration errors remain opaque even when consumer callbacks contain sensitive strings',async()=>{
+  const app=Fastify({logger:false});
+  const sentinel='PRIVATE_CREDENTIAL_FROM_CONSUMER_CALLBACK_NEVER_LOG';
+  app.register(createStorageS3Plugin({
+    ...options,
+    registerRoutes(){
+      throw new Error(sentinel);
+    },
+  }));
+  try{
+    await assert.rejects(
+      app.ready(),
+      error=>{
+        assert.equal(error.message,'Storage S3 registration failed');
+        assert.ok(!error.message.includes(sentinel));
+        assert.ok(!('cause' in error),'Raw underlying errors must not be re-exposed');
+        return true;
+      },
+    );
+  }finally{await app.close().catch(()=>{});}
 });
