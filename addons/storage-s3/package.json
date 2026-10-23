@@ -1,0 +1,40 @@
+{
+  "name": "@kit-fundador/storage-s3",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Optional Fastify S3 object storage capability (laboratory only)",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "packageManager": "pnpm@11.25.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "test": "pnpm run build && node --test tests/*.test.mjs",
+    "test:ci": "pnpm run typecheck && pnpm test"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1149.0"
+  },
+  "peerDependencies": {
+    "fastify": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "fastify": "5.12.7",
+    "typescript": "5.9.3"
+  }
+}
