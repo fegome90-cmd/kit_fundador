@@ -51,3 +51,22 @@ La solución R2-A03 es un **guard de uso accidental**, no una barrera de segurid
 El PR introduce **una receta consumidora** y su workflow, no un cuarto framework ni un nuevo runtime obligatorio. No modifica `templates/**`, `addons/**` ni el backend heredado. La prueba del Core solo sigue siendo requisito.
 
 **Decisión propuesta:** mantener la PR #87 lista para revisión; fusionar solo si el usuario autoriza y la CI del commit final permanece verde. Registrar el SHA exacto del merge y volver a correr pruebas sobre `main`. No publicar ni desplegar como consecuencia del merge.
+
+
+## 6. Reauditoría de empaquetado (23-10-2026)
+
+**Hallazgo R2-A05 — validación de lifecycle hooks entre R1 y R2.** Antes de esta revisión, `ci/run.mjs` ejecutaba `pnpm pack` sin comprobar en su propio flujo la lista de hooks npm que R1 prohíbe. Un cambio futuro en un manifiesto de add-on podría activar `prepack`/otros hooks antes de que un workflow separado bloqueara el cambio. Además, el workflow Full B no incluía al validador compartido entre las rutas que activan CI.
+
+**Corrección:** R2 importa `assertNoLifecycleHooks` desde `scripts/lego-package-lifecycle-policy.mjs`, valida cada manifiesto privado **antes de instalar, compilar, migrar o empaquetar**, y añade esa política compartida a los filtros push/PR. No se cambió el código de los add-ons ni se permitió publicar paquetes.
+
+**TDD, recibos:**
+
+- **RED:** [Actions 39952568285](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39952568285), commit `1574053`: **2/4 pruebas del boundary PASS**; dos fallaron específicamente por ausencia de llamada al guard antes de `pack` y ausencia de trigger del helper en CI.
+- **GREEN:** [Actions 39952730757](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39952730757), commit `7a4d21d`: **4/4 pruebas de packaging + 5/5 pruebas de aislamiento + 7/7 pruebas E2E PASS**, con `LEGO_R2_FULL_B_E2E_PASS`.
+- El log del mismo run registró `No known vulnerabilities found` en ambas auditorías de dependencias del consumidor combinado; no es garantía para otros periodos.
+- [CI raíz 39952730540](https://github.com/fegome90-cmd/kit_fundador/actions/runs/39952730540): **SUCCESS** sobre `7a4d21d`.
+- CodeRabbit y mergeability se vuelven a evaluar sobre el **HEAD final** después de anexar esta documentación; no se extiende la calificación de una ejecución a otro SHA.
+
+**Alcance:** medida preventiva de suministro/CI, no prueba de ausencia de scripts maliciosos en dependencias transitivas. `pnpm install --ignore-scripts` sigue aplicado en el entorno de ensayo; los riesgos L1–L6 descritos arriba permanecen fuera del GO-laboratorio.
+
+**Criterio de cierre actualizado:** A01–A05 tienen reparación y evidencia reproducible en la rama; la decisión de merge continúa separada y requiere autorización. No desplegar ni publicar paquetes.
