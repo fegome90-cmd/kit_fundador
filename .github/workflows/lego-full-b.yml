@@ -1,0 +1,102 @@
+name: LEGO Full B integration (isolated)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - recipes/full-b/**
+      - addons/db-postgres/**
+      - addons/auth-better-auth/**
+      - addons/jobs-valkey/**
+      - scripts/lego-package-lifecycle-policy.mjs
+      - templates/fastify-openapi/**
+      - .github/workflows/lego-full-b.yml
+  push:
+    branches: [main]
+    paths:
+      - recipes/full-b/**
+      - addons/db-postgres/**
+      - addons/auth-better-auth/**
+      - addons/jobs-valkey/**
+      - scripts/lego-package-lifecycle-policy.mjs
+      - templates/fastify-openapi/**
+      - .github/workflows/lego-full-b.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lego-full-b-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  full-b:
+    name: Core + Docs + DB + Auth + Jobs (Full B)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    services:
+      postgres:
+        image: postgres:16.15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: synthetic-fullb-admin-only
+          POSTGRES_DB: lego_fullb_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d lego_fullb_ci"
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 15
+      valkey:
+        image: valkey/valkey:8.1.4
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "valkey-cli ping"
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 15
+    env:
+      PG_ADMIN_URL: postgresql://postgres:synthetic-fullb-admin-only@127.0.0.1:5432/lego_fullb_ci
+      MIGRATION_DATABASE_URL: postgresql://postgres:synthetic-fullb-admin-only@127.0.0.1:5432/lego_fullb_ci
+      AUTH_MIGRATION_DATABASE_URL: postgresql://postgres:synthetic-fullb-admin-only@127.0.0.1:5432/lego_fullb_ci
+      FULLB_DB_URL: postgresql://lego_fullb_app:synthetic-fullb-app-only@127.0.0.1:5432/lego_fullb_ci
+      FULLB_AUTH_URL: postgresql://lego_fullb_auth:synthetic-fullb-auth-only@127.0.0.1:5432/lego_fullb_ci
+      FULLB_APP_PASSWORD: synthetic-fullb-app-only
+      FULLB_AUTH_PASSWORD: synthetic-fullb-auth-only
+      FULLB_AUTH_SECRET: synthetic-lab-r2-auth-secret-not-for-production-2026
+      VALKEY_URL: redis://127.0.0.1:6379
+    steps:
+      - name: Checkout source without credentials
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Prepare ephemeral Valkey AOF and noeviction
+        run: |
+          set -euo pipefail
+          docker exec "${{ job.services.valkey.id }}" valkey-cli CONFIG SET appendonly yes
+          docker exec "${{ job.services.valkey.id }}" valkey-cli CONFIG SET maxmemory-policy noeviction
+          test "$(docker exec "${{ job.services.valkey.id }}" valkey-cli --raw CONFIG GET appendonly | tail -1)" = "yes"
+          test "$(docker exec "${{ job.services.valkey.id }}" valkey-cli --raw CONFIG GET maxmemory-policy | tail -1)" = "noeviction"
+      - name: Refuse external or non-synthetic R2 service URLs
+        run: node --test recipes/full-b/ci/lab-safety.test.mjs
+      - name: Verify R2 package lifecycle boundary before building tarballs
+        run: node --test recipes/full-b/ci/pack-boundary.test.mjs
+      - name: Build isolated packages and execute Full B integration
+        run: node recipes/full-b/ci/run.mjs
+      - name: Upload resolved consumer lockfile (synthetic only)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lego-fullb-pnpm-lock-${{ github.run_id }}
+          path: ${{ runner.temp }}/full-b-pnpm-lock.yaml
+          retention-days: 7
+          if-no-files-found: warn
