@@ -12,6 +12,8 @@ Las notas `lego_app.fullb_notes` almacenan `owner_id`. La tabla `lego_app.fullb_
 
 ## Reproducibilidad y CI
 
+El arnés y su migrador rechazan antes de conectarse cualquier URL que no coincida con los servicios efímeros **GitHub Actions / 127.0.0.1 / `lego_fullb_ci` / puertos 5432 y 6379** y los nombres exactos de roles de laboratorio; no admiten ejecución local ni destinos externos. Es una barrera contra uso accidental, no sustituye las credenciales y la seguridad de infraestructura.
+
 El workflow `.github/workflows/lego-full-b.yml` usa Node 24, pnpm 11.25, PostgreSQL 16.15 y Valkey 8.1.4 efímeros con AOF y noeviction.
 
 El orquestador `ci/run.mjs` copia y compila cada add-on aislado, aplica explícitamente dos veces sus migraciones, crea tres tarballs privados, y los instala por sus entradas públicas en una copia de la plantilla OpenAPI. Los archivos propios de R2 se agregan al consumidor, se resuelve un lockfile y se repite una instalación `--frozen-lockfile` en una segunda carpeta nueva. El lockfile se registra como artefacto de CI.

@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { Pool } from 'pg';
+import { assertFullBLaboratoryEndpoints } from './lab-safety.mjs';
+
+assertFullBLaboratoryEndpoints(process.env);
 
 const url = process.env.PG_ADMIN_URL;
 const passwordApp = process.env.FULLB_APP_PASSWORD;

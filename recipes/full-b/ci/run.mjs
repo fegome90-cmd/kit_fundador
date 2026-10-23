@@ -6,6 +6,9 @@ import { cpSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync,
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { assertFullBLaboratoryEndpoints } from './lab-safety.mjs';
+
+assertFullBLaboratoryEndpoints(process.env);
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const lab = mkdtempSync(join(tmpdir(), 'lego-full-b-'));
@@ -51,7 +54,7 @@ try {
   for (const name of ['ci', 'tests', 'migrations']) {
     mkdirSync(join(build, name), { recursive: true });
   }
-  for (const name of ['tests/full-b.test.mjs', 'ci/init-db.mjs', 'migrations/0001_fullb.sql']) {
+  for (const name of ['tests/full-b.test.mjs', 'ci/init-db.mjs', 'ci/lab-safety.mjs', 'migrations/0001_fullb.sql']) {
     copyFileSync(join(recipe, name), join(build, name));
   }
   for (const name of ['src/full-b.ts', 'src/full-b-server.ts', 'worker.mjs']) {
