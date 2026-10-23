@@ -2,10 +2,13 @@
 
 Las dos plantillas Fastify constituyen el **MVP distribuible**. Ninguna necesita autenticación, base de datos, colas ni un generador propio. Instrucciones: [LEGO-MVP.md](LEGO-MVP.md).
 
+El [roadmap LEGO](LEGO-ROADMAP.md) reúne la visión original, las decisiones del MVP y los hitos posteriores a la PR #84. La planificación histórica de `dev-docs/plan.md` y `.context/` no debe interpretarse como el estado actual de LEGO.
+
 ## Estructura y límites
 
 - `templates/fastify-core/`: API TypeScript autónoma, health, errores y tests.
 - `templates/fastify-openapi/`: mismo core con documentación opt-in.
+- `addons/db-postgres/`, `addons/auth-better-auth/` y `addons/jobs-valkey/`: piezas opt-in integradas para laboratorio, fuera de la distribución MVP y sin aprobación de producción.
 - `examples/identity-access/`: **demostración independiente** del registro público, con Express, bcrypt y repositorio temporal en memoria.
 - `src/`: servidor Express histórico, ahora **solo health**, sin registro ni Swagger montados.
 - `dev-docs/`: investigación y prototipos experimentales, no aprobados para producción.

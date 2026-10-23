@@ -1,8 +1,10 @@
 # Kit Fundador LEGO — MVP para proyectos nuevos
 
-**Estado:** GO para descargar y probar las dos plantillas mínimas; **no equivale a aprobación de producción**. Sin merge a `main`. Última validación funcional: [GitHub Actions](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38902629413).
+**Estado:** GO para descargar y probar las dos plantillas mínimas; **no equivale a aprobación de producción**. Integradas en `main` mediante la [PR #79](https://github.com/fegome90-cmd/kit_fundador/pull/79). Validación funcional del SHA de descarga documentado: [GitHub Actions](https://github.com/fegome90-cmd/kit_fundador/actions/runs/38902629413).
 
 Kit Fundador ya no necesita un instalador propietario para iniciar un backend. Usa **giget**, una carpeta del repositorio en un **commit SHA completo** y `pnpm` con un lockfile reproducible.
+
+La visión completa, las piezas experimentales integradas y los próximos hitos están en el [roadmap LEGO](LEGO-ROADMAP.md). Este documento conserva el alcance y el SHA del bootstrap ya probado.
 
 ## Requisitos
 
