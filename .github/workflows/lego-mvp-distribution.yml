@@ -3,7 +3,7 @@ name: LEGO MVP distribution (isolated)
 on:
   workflow_dispatch:
   push:
-    branches: [feat/fastify-lego-foundation]
+    branches: [feat/fastify-lego-foundation, main]
     paths:
       - .github/workflows/lego-mvp-distribution.yml
       - templates/fastify-core/**
