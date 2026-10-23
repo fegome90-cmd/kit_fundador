@@ -133,6 +133,8 @@ test('Full B: real HTTP, ownership, shared hash, worker restart and pool isolati
       assert.deepEqual(roles.rows.map(x=>x.role),['user','user']);
       assert.equal((await admin.query('SELECT COUNT(*)::integer AS n FROM lego_app.fullb_jobs')).rows[0].n,3);
       await assert.rejects(appRole.query('SELECT * FROM auth."user"'),{code:'42501'});
+      await assert.rejects(appRole.query('SELECT * FROM lego_app.notes'),{code:'42501'},
+        'The Full B runtime role must not read unrelated DB add-on tables');
       await assert.rejects(authRole.query('SELECT * FROM lego_app.fullb_notes'),{code:'42501'});
       await assert.rejects(appRole.query('CREATE TABLE lego_app.exploit (n integer)'),{code:'42501'});
     }finally{await admin.end();await appRole.end();await authRole.end();}
