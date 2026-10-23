@@ -185,11 +185,14 @@ test('standalone Full B refuses to start without an explicit trusted base origin
   const env={...process.env,HOST:'127.0.0.1',PORT:'0',FULLB_DOCS_ENABLED:'0'};
   delete env.FULLB_BASE_URL;
   const child=spawn(process.execPath,['dist/full-b-server.js'],{cwd:process.cwd(),env,stdio:['ignore','pipe','pipe']});
+  let stderr='';
+  child.stderr.on('data',bytes=>{stderr+=String(bytes);});
   const exit=await new Promise(resolve=>{
-    const timer=setTimeout(()=>{child.kill('SIGKILL');resolve({timeout:true});},2000);
+    const timer=setTimeout(()=>{child.kill('SIGKILL');resolve({timeout:true});},5000);
     child.once('exit',(code,signal)=>{clearTimeout(timer);resolve({code,signal});});
   });
   assert.equal(exit.code,1,'Full B must not start with a guessed auth origin');
+  assert.match(stderr,/FULLB_BASE_URL/,'Failed startup must identify missing origin');
 });
 
 test('compiled Full B HTTP process supports session and shuts down cleanly',async()=>{
@@ -225,4 +228,32 @@ test('compiled Full B HTTP process supports session and shuts down cleanly',asyn
     const notes=await call(base,'/fullb/notes',{cookie:signup.cookies});
     assert.equal(notes.status,200,notes.hint);
   }finally{await stopWorker(child);}
+});
+
+async function expectOriginMismatch({ host, port, baseUrl }) {
+  const child=spawn(process.execPath,['dist/full-b-server.js'],{
+    cwd:process.cwd(),
+    env:{...process.env,HOST:host,PORT:String(port),FULLB_BASE_URL:baseUrl,FULLB_DOCS_ENABLED:'0'},
+    stdio:['ignore','pipe','pipe']
+  });
+  let stderr='';
+  child.stderr.on('data',bytes=>{stderr+=String(bytes);});
+  const exit=await new Promise(resolve=>{
+    const timer=setTimeout(()=>{child.kill('SIGKILL');resolve({timeout:true});},4000);
+    child.once('exit',(code,signal)=>{clearTimeout(timer);resolve({code,signal});});
+    child.once('error',error=>{clearTimeout(timer);resolve({error});});
+  });
+  assert.equal(exit.code,1,'Server must fail before listening for an origin mismatch');
+  assert.match(stderr,/FULLB_BASE_URL must match the loopback HTTP listener origin/,
+    'Exit must be caused by the origin/listener mismatch, not a dependency failure');
+}
+
+test('standalone Full B rejects different loopback hostname before starting plugins',async()=>{
+  const port=await freePort();
+  await expectOriginMismatch({host:'127.0.0.1',port,baseUrl:'http://localhost:'+port});
+});
+
+test('standalone Full B rejects an auth-origin port different from PORT',async()=>{
+  const port=await freePort();
+  await expectOriginMismatch({host:'127.0.0.1',port,baseUrl:'http://127.0.0.1:'+(port===65535?port-1:port+1)});
 });
