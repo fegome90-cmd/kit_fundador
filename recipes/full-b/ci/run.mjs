@@ -80,7 +80,7 @@ try {
   save(configFile, config);
 
   // First install resolves pinned dependencies into a new, consumer-owned lockfile.
-  run(build, 'pnpm', ['install', '--strict-peer-dependencies', '--ignore-scripts']);
+  run(build, 'pnpm', ['install', '--no-frozen-lockfile', '--strict-peer-dependencies', '--ignore-scripts']);
   assert.ok(existsSync(join(build, 'pnpm-lock.yaml')));
   const omit = new Set(['node_modules', 'dist']);
   cpSync(build, replay, {
