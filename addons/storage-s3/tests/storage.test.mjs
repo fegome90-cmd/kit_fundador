@@ -98,7 +98,7 @@ test('wrong credentials, missing bucket and disconnected endpoint fail without s
     {...options,endpoint:'http://127.0.0.1:19007',operationTimeoutMs:250},
   ]){
     const start=Date.now();
-    await assert.rejects(()=>openStorageS3(opt),error=>{
+    await assert.rejects(()=>openStorageS3({...opt,verifyBucketOnOpen:true}),error=>{
       assert.match(error.message,/Storage S3 (initialization|operation) failed/);
       assert.ok(!error.message.includes('PRIVATE-S3-SECRET-NEVER-LOG'));
       assert.ok(!error.message.includes('127.0.0.1:19007'));
