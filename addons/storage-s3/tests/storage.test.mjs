@@ -1,6 +1,7 @@
 import test, { before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import Fastify from 'fastify';
+import { createServer } from 'node:http';
 import { S3Client, HeadBucketCommand, CreateBucketCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { createStorageS3Plugin, openStorageS3 } from '../dist/index.js';
 
@@ -163,4 +164,50 @@ test('consumer enforces ownership before using S3, including equal keys for two 
     await call('DELETE','b','shared','ci-b');
   }finally{await app.close();}
   await assert.rejects(()=>captured.getObject('a/shared'),/Storage S3 closed/);
+});
+
+test('in-flight upload aborts and unknown-length response cannot bypass the streaming cap',async()=>{
+  const server=createServer((req,res)=>{
+    if(req.method==='HEAD'){
+      res.writeHead(200);
+      res.end();
+      return;
+    }
+    if(req.method==='GET'){
+      res.writeHead(200,{'content-type':'application/octet-stream'});
+      res.end(Buffer.alloc(400,0x35)); // Intentionally no Content-Length header
+      return;
+    }
+    // S3 upload accepted at TCP level, but response is deliberately delayed
+    // beyond the caller's deadline to exercise a REAL in-flight abort.
+    req.resume();
+  });
+  await new Promise((resolve,reject)=>{
+    server.once('error',reject);
+    server.listen(0,'127.0.0.1',resolve);
+  });
+  const address=server.address();
+  assert.ok(address&&typeof address==='object');
+  let store;
+  try{
+    store=await openStorageS3({
+      ...options,
+      endpoint:'http://127.0.0.1:'+address.port,
+      operationTimeoutMs:250,
+    });
+    const start=Date.now();
+    await assert.rejects(
+      ()=>store.putObject('stream/interrupted',Buffer.from('synthetic'),'text/plain'),
+      /Storage S3 aborted/
+    );
+    assert.ok(Date.now()-start<2500,'In-flight PUT did not observe abort deadline');
+    await assert.rejects(
+      ()=>store.getObject('stream/unknown-length'),
+      /Storage S3 size exceeded/
+    );
+  }finally{
+    store?.close();
+    server.closeAllConnections();
+    await new Promise(resolve=>server.close(resolve));
+  }
 });
