@@ -87,13 +87,29 @@ jobs:
           set -euo pipefail
           cd addons/storage-s3
           pnpm install --no-frozen-lockfile --strict-peer-dependencies --ignore-scripts
-      - name: Strict TypeScript and real S3 integration (GREEN candidate)
+      - name: Verify strict types and real S3 object operations
         shell: bash
         run: |
           set -euo pipefail
           cd addons/storage-s3
           pnpm run typecheck
           pnpm test
+      - name: Audit package dependency tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd addons/storage-s3
+          pnpm audit --prod --no-optional
+          pnpm audit --audit-level high
+      - name: Verify private S3 package from clean consumer
+        shell: bash
+        run: node addons/storage-s3/scripts/verify-external.mjs
+      - name: Emit lockfile for reproducible source commit (temporary)
+        shell: bash
+        run: |
+          echo 'LEGO_R3_LOCKFILE_BEGIN'
+          base64 -w76 addons/storage-s3/pnpm-lock.yaml
+          echo 'LEGO_R3_LOCKFILE_END'
       - name: Clean up ephemeral S3 server
         if: always()
         shell: bash
