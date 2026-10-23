@@ -23,7 +23,7 @@ try {
   await db.query(migration);
   await db.query(migration);
   await db.query('GRANT USAGE ON SCHEMA lego_app TO lego_fullb_app');
-  await db.query('GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA lego_app TO lego_fullb_app');
+  await db.query('GRANT SELECT, INSERT, UPDATE, DELETE ON lego_app.fullb_notes, lego_app.fullb_jobs TO lego_fullb_app');
   await db.query('GRANT USAGE ON SCHEMA auth TO lego_fullb_auth');
   await db.query('GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA auth TO lego_fullb_auth');
 
