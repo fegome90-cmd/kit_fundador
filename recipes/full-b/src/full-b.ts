@@ -16,7 +16,7 @@ export interface FullBOptions {
   docsEnabled: boolean;
 }
 
-interface OwnedNote { id: string; owner_id: string; content: string }
+type OwnedNote = { id: string; owner_id: string; content: string };
 interface NoteIdParams { id: string }
 interface JobParams extends NoteIdParams { jobId: string }
 
