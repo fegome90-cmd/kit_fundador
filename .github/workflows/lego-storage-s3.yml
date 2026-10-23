@@ -87,11 +87,13 @@ jobs:
           set -euo pipefail
           cd addons/storage-s3
           pnpm install --no-frozen-lockfile --strict-peer-dependencies --ignore-scripts
-      - name: RED — test S3 contract before writing implementation
+      - name: Strict TypeScript and real S3 integration (GREEN candidate)
         shell: bash
         run: |
+          set -euo pipefail
           cd addons/storage-s3
-          node --test tests/storage.test.mjs
+          pnpm run typecheck
+          pnpm test
       - name: Clean up ephemeral S3 server
         if: always()
         shell: bash
