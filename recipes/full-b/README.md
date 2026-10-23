@@ -25,3 +25,7 @@ Las pruebas exigen Core solo sin servicios, docs OFF/ON, sesiones reales, autori
 Los paquetes siguen privados; nunca se publican en npm o shadcn ni se despliegan. El API de laboratorio escucha solamente en loopback. No hay outbox transaccional, exactly-once, protección multi-tenant general, backup/restore ni failover probado. Los errores de declaraciones upstream de Drizzle y Better Auth justifican `skipLibCheck:true` **solo en el consumidor** y no equivalen a certificación de tipos externos.
 
 **Fuente:** [LEGO-ROADMAP.md](../../LEGO-ROADMAP.md), R2. GO de laboratorio no autoriza merge ni producción.
+
+## Arranque independiente del consumidor de laboratorio
+
+La copia del proyecto generada por el workflow dispone de dos comandos explícitos: `pnpm run start:full-b` para iniciar la API y `pnpm run worker:full-b` para ejecutar el worker en otro proceso. El `pnpm start` del starter permanece Core-only; R2 no altera la plantilla original. La API Full B exige `FULLB_DB_URL`, `FULLB_AUTH_URL`, `FULLB_AUTH_SECRET`, `VALKEY_URL` y opcionalmente `FULLB_BASE_URL`/ `FULLB_DOCS_ENABLED`; solo acepta HOST loopback. Las migraciones y roles deben existir **antes** del arranque.

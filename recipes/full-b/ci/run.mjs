@@ -54,7 +54,7 @@ try {
   for (const name of ['tests/full-b.test.mjs', 'ci/init-db.mjs', 'migrations/0001_fullb.sql']) {
     copyFileSync(join(recipe, name), join(build, name));
   }
-  for (const name of ['src/full-b.ts', 'worker.mjs']) {
+  for (const name of ['src/full-b.ts', 'src/full-b-server.ts', 'worker.mjs']) {
     if (existsSync(join(recipe, name))) {
       copyFileSync(join(recipe, name), join(build, name));
     }
@@ -70,6 +70,7 @@ try {
     'pg': '8.23.1',
   };
   manifest.devDependencies = { ...manifest.devDependencies, '@types/pg': '8.23.1' };
+  manifest.scripts = { ...manifest.scripts, 'start:full-b': 'node dist/full-b-server.js', 'worker:full-b': 'node worker.mjs' };
   assert.equal(manifest.private, true);
   assert.ok(Object.values(manifest.dependencies).every(d => !String(d).startsWith('workspace:')));
   save(manifestFile, manifest);
