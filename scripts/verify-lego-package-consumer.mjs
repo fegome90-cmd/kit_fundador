@@ -7,6 +7,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, 
 import { basename, dirname, join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
+import { assertNoLifecycleHooks } from './lego-package-lifecycle-policy.mjs';
 
 const expected = Object.freeze({
   'db-postgres': {
@@ -79,10 +80,7 @@ if (addon === 'db-postgres') {
   assert.equal(manifest.exports?.['./schema']?.types, './dist/schema.d.ts');
   assert.equal(manifest.exports?.['./schema']?.default, './dist/schema.js');
 }
-for (const name of Object.keys(manifest.scripts ?? {})) {
-  assert.ok(!/^(preinstall|postinstall|prepare|prepack|postpack|publish|prepublish)/.test(name),
-    'Lifecycle side effect forbidden: ' + name);
-}
+assertNoLifecycleHooks(manifest.scripts);
 
 const scratch = mkdtempSync(join(tmpdir(), 'lego-r1-contract-'));
 try {
