@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
+import { createServer } from 'node:net';
 import { Pool } from 'pg';
 import { buildApp } from '../dist/app.js';
 
@@ -166,28 +167,62 @@ test('Full B fails closed if enabled Valkey does not respond',async()=>{
   finally{await app.close().catch(()=>{});}
 });
 
-test('compiled Full B API runs as a separate entrypoint and shuts down cleanly', async () => {
-  const child = spawn(process.execPath,['dist/full-b-server.js'],{
-    cwd:process.cwd(),env:{...process.env,HOST:'127.0.0.1',PORT:'0',FULLB_DOCS_ENABLED:'0'},
+async function freePort() {
+  const listener = createServer();
+  return await new Promise((resolve,reject)=>{
+    listener.once('error',reject);
+    listener.listen(0,'127.0.0.1',()=>{
+      const address=listener.address();
+      listener.close(error=>{
+        if(error) reject(error);
+        else resolve(address.port);
+      });
+    });
+  });
+}
+
+test('standalone Full B refuses to start without an explicit trusted base origin',async()=>{
+  const env={...process.env,HOST:'127.0.0.1',PORT:'0',FULLB_DOCS_ENABLED:'0'};
+  delete env.FULLB_BASE_URL;
+  const child=spawn(process.execPath,['dist/full-b-server.js'],{cwd:process.cwd(),env,stdio:['ignore','pipe','pipe']});
+  const exit=await new Promise(resolve=>{
+    const timer=setTimeout(()=>{child.kill('SIGKILL');resolve({timeout:true});},2000);
+    child.once('exit',(code,signal)=>{clearTimeout(timer);resolve({code,signal});});
+  });
+  assert.equal(exit.code,1,'Full B must not start with a guessed auth origin');
+});
+
+test('compiled Full B HTTP process supports session and shuts down cleanly',async()=>{
+  const port=await freePort();
+  const expected='http://127.0.0.1:'+port;
+  const child=spawn(process.execPath,['dist/full-b-server.js'],{
+    cwd:process.cwd(),
+    env:{...process.env,HOST:'127.0.0.1',PORT:String(port),FULLB_BASE_URL:expected,FULLB_DOCS_ENABLED:'0'},
     stdio:['ignore','pipe','pipe']
   });
-  let base;
-  try {
-    base = await new Promise((resolve,reject)=>{
-      let buffer='';
+  try{
+    const base=await new Promise((resolve,reject)=>{
+      let output='';
       const timer=setTimeout(()=>{child.kill('SIGKILL');reject(new Error('API start timeout'));},10000);
-      child.stdout.on('data',d=>{
-        buffer+=String(d);
-        const match=buffer.match(/KIT_LISTEN (http:\/\/127\.0\.0\.1:[0-9]+)/);
+      child.stdout.on('data',data=>{
+        output+=String(data);
+        const match=output.match(/KIT_LISTEN (http:\/\/127\.0\.0\.1:[0-9]+)/);
         if(match){clearTimeout(timer);resolve(match[1]);}
       });
-      child.once('exit',code=>{clearTimeout(timer);reject(new Error('API exited before listening: '+code));});
-      child.once('error',err=>{clearTimeout(timer);reject(err);});
+      child.once('exit',code=>{clearTimeout(timer);reject(new Error('API exited before ready: '+code));});
+      child.once('error',error=>{clearTimeout(timer);reject(error);});
     });
+    assert.equal(base,expected);
     assert.equal((await call(base,'/health')).status,200);
     assert.equal((await call(base,'/docs/json')).status,404);
     assert.equal((await call(base,'/fullb/notes')).status,401);
-  } finally {
-    await stopWorker(child);
-  }
+    const signup=await call(base,'/api/auth/sign-up/email',{
+      method:'POST',origin:base,
+      body:{email:'standalone-r2@example.test',name:'Standalone',password:'Synthetic-lab-passphrase-2026!'}
+    });
+    assert.ok([200,201].includes(signup.status),signup.hint);
+    assert.match(signup.cookies,/session_token=/);
+    const notes=await call(base,'/fullb/notes',{cookie:signup.cookies});
+    assert.equal(notes.status,200,notes.hint);
+  }finally{await stopWorker(child);}
 });
