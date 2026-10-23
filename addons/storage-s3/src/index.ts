@@ -17,10 +17,12 @@ export interface StorageS3Options {
   keyPrefix: string;
   maxObjectBytes?: number;
   operationTimeoutMs?: number;
+  /** Opt-in bucket preflight; requires s3:ListBucket with AWS. Default false. */
+  verifyBucketOnOpen?: boolean;
   registerRoutes?: (scope: FastifyInstance, storage: StorageS3) => Promise<void> | void;
 }
-type Config = Omit<StorageS3Options,'maxObjectBytes'|'operationTimeoutMs'|'registerRoutes'> & {
-  maxObjectBytes: number; operationTimeoutMs: number;
+type Config = Omit<StorageS3Options,'maxObjectBytes'|'operationTimeoutMs'|'registerRoutes'|'verifyBucketOnOpen'> & {
+  maxObjectBytes: number; operationTimeoutMs: number; verifyBucketOnOpen: boolean;
 };
 const TYPES = new Set<StorageContentType>(['text/plain','application/json','application/octet-stream']);
 const SEGMENT = /^[a-z0-9][a-z0-9_-]{0,79}$/;
@@ -33,6 +35,19 @@ function checkedKey(value: string, prefix = false): string {
   if (!source || !source.split('/').every(part => SEGMENT.test(part))) throw new Error(message);
   return value;
 }
+function validAwsBucketName(value: unknown): value is string {
+  // AWS S3 general-purpose names: DNS-compatible, no reserved aliases or IPv4 literals.
+  if (typeof value !== 'string' || value.length < 3 || value.length > 63 ||
+      !/^[a-z0-9][a-z0-9.-]*[a-z0-9]$/.test(value) ||
+      value.includes('..') || value.includes('.-') || value.includes('-.') ||
+      /^\d{1,3}(?:\.\d{1,3}){3}$/.test(value)) {
+    return false;
+  }
+  const reservedPrefixes = ['xn--', 'sthree-', 'amzn-s3-demo-'];
+  const reservedSuffixes = ['-s3alias', '--ol-s3', '.mrap', '--x-s3', '--table-s3'];
+  return !reservedPrefixes.some(prefix => value.startsWith(prefix)) &&
+    !reservedSuffixes.some(suffix => value.endsWith(suffix));
+}
 function configuration(opts: StorageS3Options): Config {
   if (!opts || typeof opts !== 'object') throw new Error('Storage S3 invalid configuration');
   let endpoint: URL;
@@ -44,8 +59,7 @@ function configuration(opts: StorageS3Options): Config {
       endpoint.search || endpoint.hash || endpoint.pathname !== '/') {
     throw new Error('Storage S3 invalid configuration');
   }
-  if (typeof opts.bucket !== 'string' || opts.bucket.length < 3 || opts.bucket.length > 63 ||
-      !/^[a-z0-9][a-z0-9.-]*[a-z0-9]$/.test(opts.bucket) || opts.bucket.includes('..') ||
+  if (!validAwsBucketName(opts.bucket) ||
       typeof opts.region !== 'string' || !/^[a-z][a-z0-9-]{1,31}$/.test(opts.region) ||
       typeof opts.accessKeyId !== 'string' || !opts.accessKeyId.trim() ||
       typeof opts.secretAccessKey !== 'string' || !opts.secretAccessKey.trim()) {
@@ -58,11 +72,15 @@ function configuration(opts: StorageS3Options): Config {
       operationTimeoutMs<100 || operationTimeoutMs>30000) {
     throw new Error('Storage S3 invalid configuration');
   }
+  if (opts.verifyBucketOnOpen !== undefined && typeof opts.verifyBucketOnOpen !== 'boolean') {
+    throw new Error('Storage S3 invalid configuration');
+  }
   checkedKey(opts.keyPrefix,true);
   return {
     endpoint:endpoint.origin,region:opts.region,bucket:opts.bucket,
     accessKeyId:opts.accessKeyId,secretAccessKey:opts.secretAccessKey,
     keyPrefix:opts.keyPrefix,maxObjectBytes,operationTimeoutMs,
+    verifyBucketOnOpen:opts.verifyBucketOnOpen ?? false,
   };
 }
 function activeSignal(signal: AbortSignal | undefined, timeoutMs: number): AbortSignal {
@@ -86,13 +104,17 @@ export async function openStorageS3(opts: StorageS3Options): Promise<StorageS3> 
     maxAttempts:1,requestChecksumCalculation:'WHEN_REQUIRED',
     responseChecksumValidation:'WHEN_REQUIRED',
   });
-  try {
-    await client.send(new HeadBucketCommand({Bucket:cfg.bucket}),{
-      abortSignal:AbortSignal.timeout(cfg.operationTimeoutMs),
-    });
-  } catch {
-    client.destroy();
-    throw new Error('Storage S3 initialization failed');
+  // Default to object-scoped IAM: HeadBucket requires s3:ListBucket in AWS.
+  // Callers may opt in if their IAM policy grants that additional permission.
+  if (cfg.verifyBucketOnOpen) {
+    try {
+      await client.send(new HeadBucketCommand({Bucket:cfg.bucket}),{
+        abortSignal:AbortSignal.timeout(cfg.operationTimeoutMs),
+      });
+    } catch {
+      client.destroy();
+      throw new Error('Storage S3 initialization failed');
+    }
   }
   let closed=false;
   const objectKey=(relative: string)=>{
