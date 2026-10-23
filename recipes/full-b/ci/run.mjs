@@ -89,6 +89,9 @@ try {
     filter: path => !path.slice(build.length).split(sep).some(part => omit.has(part)),
   });
   run(replay, 'pnpm', ['install', '--frozen-lockfile', '--strict-peer-dependencies', '--ignore-scripts']);
+  // Combined dependency risk gate for the fully resolved consumer tree.
+  run(replay, 'pnpm', ['audit', '--prod', '--no-optional']);
+  run(replay, 'pnpm', ['audit', '--audit-level', 'high']);
   run(replay, 'pnpm', ['run', 'typecheck']);
   run(replay, 'pnpm', ['run', 'build']);
   if (process.env.RUNNER_TEMP) {

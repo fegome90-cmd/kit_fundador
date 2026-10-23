@@ -16,6 +16,8 @@ El workflow `.github/workflows/lego-full-b.yml` usa Node 24, pnpm 11.25, Postgre
 
 El orquestador `ci/run.mjs` copia y compila cada add-on aislado, aplica explícitamente dos veces sus migraciones, crea tres tarballs privados, y los instala por sus entradas públicas en una copia de la plantilla OpenAPI. Los archivos propios de R2 se agregan al consumidor, se resuelve un lockfile y se repite una instalación `--frozen-lockfile` en una segunda carpeta nueva. El lockfile se registra como artefacto de CI.
 
+La instalación congelada supera también una auditoría runtime y otra del árbol completo, bloqueando vulnerabilidades altas/críticas y conservando visibles las moderadas.
+
 El paso `ci/init-db.mjs` aplica la migración de ejemplo **dos veces**, crea roles DML de aplicación y autenticación separados y exige un único asiento por cada journal de Drizzle. Nada ejecuta migraciones al iniciar el servidor.
 
 Las pruebas exigen Core solo sin servicios, docs OFF/ON, sesiones reales, autorización 401/403, dos usuarios con texto idéntico y un job deduplicado, verificación de SHA-256, worker en proceso separado, trabajos pendientes y cierre seguro.
