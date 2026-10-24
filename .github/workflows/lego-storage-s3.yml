@@ -1,0 +1,116 @@
+name: LEGO Storage S3 (isolated)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - addons/storage-s3/**
+      - templates/fastify-core/**
+      - scripts/lego-package-lifecycle-policy.mjs
+      - .github/workflows/lego-storage-s3.yml
+      - dev-docs/plans/lego-storage-s3-2026-10-23.md
+  push:
+    branches: [main]
+    paths:
+      - addons/storage-s3/**
+      - templates/fastify-core/**
+      - scripts/lego-package-lifecycle-policy.mjs
+      - .github/workflows/lego-storage-s3.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lego-storage-s3-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  storage:
+    name: Real S3 round-trip and isolated consumer
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    env:
+      R3_S3_ENDPOINT: http://127.0.0.1:9000
+      R3_S3_ACCESS_KEY: lego-r3-ci
+      R3_S3_SECRET_KEY: synthetic-r3-silo-secret-123
+      R3_S3_BUCKET: lego-r3-ci-bucket
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Enforce independent private package boundary
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { readFileSync } from 'node:fs';
+          import { assertNoLifecycleHooks } from './scripts/lego-package-lifecycle-policy.mjs';
+          const p=JSON.parse(readFileSync('addons/storage-s3/package.json','utf8'));
+          assert.equal(p.private,true);
+          assert.equal(p.name,'@kit-fundador/storage-s3');
+          assert.equal(p.packageManager,'pnpm@11.25.0');
+          assert.equal(p.dependencies['@aws-sdk/client-s3'],'3.1149.0');
+          assert.deepEqual(p.peerDependencies,{fastify:'^5.0.0'});
+          assertNoLifecycleHooks(p.scripts);
+          console.log('LEGO_R3_PRIVATE_BOUNDARY_PASS');
+          NODE
+      # Silo RELEASE.2026-10-18T00-00-00Z; OCI digest recorded in a passing CI pull.
+      - name: Start digest-pinned Silo S3 in ephemeral container
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker pull docker.io/pgsty/silo@sha256:2636fc4155d9a7e41ff58cdb65ddd13ba9304e67184e13c25bc5cb34016269d7
+          CID="$(docker run -d --rm -p 127.0.0.1:9000:9000 \
+            -e MINIO_ROOT_USER="$R3_S3_ACCESS_KEY" \
+            -e MINIO_ROOT_PASSWORD="$R3_S3_SECRET_KEY" \
+            docker.io/pgsty/silo@sha256:2636fc4155d9a7e41ff58cdb65ddd13ba9304e67184e13c25bc5cb34016269d7 server /data)"
+          echo "R3_SILO_CONTAINER=$CID" >> "$GITHUB_ENV"
+          for attempt in $(seq 1 30); do
+            if docker exec "$CID" silo healthcheck ready >/dev/null 2>&1; then
+              echo 'LEGO_R3_SILO_READY'
+              exit 0
+            fi
+            sleep 1
+          done
+          echo 'Ephemeral S3 service unavailable'
+          exit 1
+      - name: Install committed dependency graph with frozen lockfile
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd addons/storage-s3
+          pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
+      - name: Prove unmodified Fastify Core remains standalone
+        run: node addons/storage-s3/scripts/verify-core-off.mjs
+      - name: Verify strict types and real S3 object operations
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd addons/storage-s3
+          pnpm run typecheck
+          pnpm test
+      - name: Audit package dependency tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd addons/storage-s3
+          pnpm audit --prod --no-optional
+          pnpm audit --audit-level high
+      - name: Verify private S3 package from clean consumer
+        shell: bash
+        run: node addons/storage-s3/scripts/verify-external.mjs
+      - name: Clean up ephemeral S3 server
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "$R3_SILO_CONTAINER" ]; then
+            docker rm -f "$R3_SILO_CONTAINER" >/dev/null || true
+          fi
