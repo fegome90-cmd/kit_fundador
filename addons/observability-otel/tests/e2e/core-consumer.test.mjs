@@ -18,6 +18,7 @@ await copyFile(new URL('./consumer-entry.mjs', import.meta.url), join(core, 'r4-
 const sentinel = 'SYNTHETIC_R4_E2E_DO_NOT_LOG';
 const valid = { enabled: true, serviceName: 'lego-r4-e2e', endpoint: 'http://127.0.0.1:4318' };
 
+/** Bound an asynchronous operation without keeping a timeout alive after it settles. */
 async function deadline(promise, ms, label) {
   let timer;
   try {
@@ -27,6 +28,10 @@ async function deadline(promise, ms, label) {
   } finally { clearTimeout(timer); }
 }
 
+/**
+ * Start an isolated real Core child with synthetic configuration inputs.
+ * Register cleanup immediately so failed readiness checks cannot leak processes.
+ */
 function start(t, input, endpoint) {
   const env = { ...process.env, HOST: '127.0.0.1', PORT: '0',
     OTEL_EXPORTER_OTLP_ENDPOINT: endpoint, OTEL_SERVICE_NAME: sentinel };
@@ -64,6 +69,7 @@ function start(t, input, endpoint) {
   return { child, exited, listening, output: () => stdout + stderr };
 }
 
+/** Issue a bounded HTTP health or route request to the real Core listener. */
 function get(url) {
   return new Promise((resolve, reject) => {
     const req = request(url, { method: 'GET', headers: { connection: 'close' }, timeout: 2000 }, res => {
@@ -79,6 +85,7 @@ function get(url) {
   });
 }
 
+/** Count connections to a loopback destination; close it after each scenario. */
 async function networkWitness(t) {
   let connections = 0;
   const server = createServer((_req, res) => res.end());

@@ -49,6 +49,10 @@ El 2026-11-03T13:27Z CodeRabbit completó la revisión sustantiva de los 14 arch
 
 Verificación auxiliar reproducida: Node 22.16.0, TypeScript 5.8.3; typecheck/build y dos canarios locales en verde (DNS + lectura ambiental). Estos recibos NO sustituyen CI Node24, Core ni E2E; la promoción exige nuevos runs del SHA reparado y **otra revisión sustantiva del HEAD cambiado**. El nuevo conteo esperado del arnés es 65 (antes 64, un canario añadido).
 
+## Warning editorial detectado por CodeRabbit tras `c8cdcef`
+
+La revisión terminada del HEAD `c8cdcef1efc7c05d5cec44457368655acc8abe9f` calificó el riesgo de merge como mínimo y no registró reparos nuevos del código, pero su pre-merge check **Docstring Coverage** mostró una advertencia de cobertura 75% frente al mínimo 80% (4 funciones analizadas). Por la condición de cero reparos, no se interpretó el check CodeRabbit `success` como habilitación automática de merge. Se agregaron docstrings exclusivamente a los cuatro helpers existentes del test de lifecycle E2E (`deadline`, `start`, `get`, `networkWitness`), sin modificar lógica, casos ni configuración. El resultado del umbral debe ser comprobado con otra revisión completa del SHA nuevo y CI Node24/E2E nuevas; no se da por resuelto por declaración.
+
 ## Revisión y promoción
 
 **Standards:** tipos propios strict/skipLibCheck false, configuración sin dependencias, resultado congelado, errores constantes, tests de JS compilado, consumidores/procesos aislados, artefactos sintéticos y cambios acotados.
