@@ -15,7 +15,7 @@ GOAL R4-A: consumidor Fastify con telemetría opt-in sin alterar Core ni depende
 
 `resolveObservabilityOptions(input?: unknown)` es puro. Devuelve una unión readonly e inmutable OFF/ON. Sin configuración, con objeto vacío o `enabled:false`, devuelve OFF sin leer entorno ni exigir endpoint. No crea SDK, conexiones, timers, listeners, rutas ni procesos. Sólo se leen propiedades propias del objeto; no se acepta activación ni valores heredados.
 
-ON admite `enabled`, `serviceName`, `endpoint`, `sampleRatio`, `exportTimeoutMs`, `shutdownTimeoutMs`; rechaza otras claves enumerables de texto. No coerciona flags. Servicio: identificador ASCII minúsculo de 3–63 caracteres, suministrado por la aplicación, no identidad de usuario. La entrada es configuración controlada, no objetos JavaScript hostiles con getters/proxies.
+ON admite `enabled`, `serviceName`, `endpoint`, `sampleRatio`, `exportTimeoutMs`, `shutdownTimeoutMs`; rechaza otras claves enumerables de texto. No coerciona flags. Servicio: identificador ASCII minúsculo de 3–63 caracteres, suministrado por la aplicación, no identidad de usuario. La entrada es configuración controlada: accesores propios se rechazan sin ejecutar sus getters ni filtrar su mensaje de error. No se promete pureza frente a objetos `Proxy` hostiles, que quedan fuera del contrato.
 
 Endpoint: origen OTLP HTTP(S), sin credenciales, path distinto de `/`, query ni fragment; puerto explícito distinto de 0. HTTP sólo para hostname normalizado `127.0.0.1`, `localhost` o `[::1]`; fuera de ellos exige HTTPS. No verifica DNS, TLS, autenticación, disponibilidad, redirecciones ni SSRF. R4-A1 deberá evitar redirecciones y autodetección de exportadores/recursos por entorno.
 

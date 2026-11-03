@@ -68,7 +68,12 @@ export function resolveObservabilityOptions(input?: unknown): ObservabilityConfi
   }
   const options = input as Record<string, unknown>;
   // Configuration must be explicit; inherited values cannot enable or tune it.
-  const own = (key: string): unknown => Object.hasOwn(options, key) ? options[key] : undefined;
+  const own = (key: string): unknown => {
+    const descriptor = Object.getOwnPropertyDescriptor(options, key);
+    if (!descriptor) return undefined;
+    if (!('value' in descriptor)) throw new Error('Invalid observability options');
+    return descriptor.value;
+  };
   const enabled = own('enabled');
   if (enabled !== undefined && typeof enabled !== 'boolean') {
     throw new Error('Invalid observability enabled flag');

@@ -39,6 +39,10 @@ Consumidor Core externo con lockfile congelado y ruta con espacios → módulo c
 
 El E2E necesita dependencias reales de Core. El entorno auxiliar no tiene DNS para instalarlas; la ejecución completa corresponde a GitHub Actions, no se sustituye por simulaciones. El run final, SHA, logs y resultado se registran en la PR y en el artefacto `r4-a0-verification-<run_id>`. Este documento no anticipa su PASS.
 
+## Revisión adicional del 3 de noviembre: accesores propios
+
+La auditoría independiente del cierre detectó que una propiedad propia declarada mediante getter (por ejemplo `enabled` o `endpoint`) podía ejecutarse en `own()` y lanzar una excepción con un centinela sensible. Reproducción local sobre JavaScript compilado: `touched=1` y mensaje `SYNTHETIC_SECRET_EXPOSED` sin sanitizar. Se escribieron dos pruebas antes del fix y ambas quedaron RED (2 fallos, exit 1); se cambió la lectura de propiedades por `Object.getOwnPropertyDescriptor`, rechazando accesores con un error fijo sin ejecutarlos. El recorrido local posterior pasó 64/64 registros de `node:test` con Node 22.16.0 / TypeScript 5.8.3, `tsc --noEmit` y build compilado. Estos resultados sólo acreditan el entorno auxiliar: hay que repetir el E2E y el conjunto de CI sobre el **SHA nuevo** antes de afirmar GO. Los proxies siguen fuera del contrato de entrada.
+
 ## Revisión y promoción
 
 **Standards:** tipos propios strict/skipLibCheck false, configuración sin dependencias, resultado congelado, errores constantes, tests de JS compilado, consumidores/procesos aislados, artefactos sintéticos y cambios acotados.

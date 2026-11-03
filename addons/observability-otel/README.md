@@ -6,7 +6,7 @@ Este directorio contiene el **contrato de configuración R4-A0**. No inicia Open
 
 `resolveObservabilityOptions` es puro: OFF por defecto, ON explícito, opciones acotadas y errores sin valores de entrada. Usa sólo propiedades propias; el prototipo no puede activarlo ni proporcionar sus valores. Requiere HTTPS fuera del loopback admitido y rechaza credenciales/query/path/fragment y puerto 0. No verifica DNS, TLS, disponibilidad ni autorización de red y no constituye una barrera SSRF.
 
-La entrada es configuración controlada por la aplicación, no un objeto JavaScript hostil con getters/proxies. Validar un timeout no demuestra cancelación de un futuro exportador. El manifiesto permanece `private:true`, versión `0.0.0`, sin SDK, scripts de instalación ni entrypoints de distribución.
+La entrada es configuración controlada por la aplicación: se rechazan propiedades accesoras propias sin ejecutar sus getters (para evitar efectos laterales y exposición de errores), pero no se promete neutralizar objetos `Proxy` hostiles. Validar un timeout no demuestra cancelación de un futuro exportador. El manifiesto permanece `private:true`, versión `0.0.0`, sin SDK, scripts de instalación ni entrypoints de distribución.
 
 ## Verificación reproducible
 

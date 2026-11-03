@@ -48,3 +48,24 @@ test('own properties on a null-prototype data object remain supported', () => {
   const input = Object.assign(Object.create(null), valid, { sampleRatio: 0.5 });
   assert.equal(resolve(input).sampleRatio, 0.5);
 });
+
+// Accessor properties are executable code; option resolution must not invoke them.
+test('own enabled getter cannot execute code or leak a thrown secret', () => {
+  let touched = 0;
+  const input = { get enabled() { touched++; throw new Error('SYNTHETIC_OWN_GETTER_SECRET'); } };
+  assert.throws(() => resolve(input), { message: 'Invalid observability options' });
+  assert.equal(touched, 0);
+});
+
+test('ON rejects accessors in endpoint and optional fields without evaluating them', () => {
+  for (const key of ['serviceName', 'endpoint', 'sampleRatio', 'exportTimeoutMs', 'shutdownTimeoutMs']) {
+    let touched = 0;
+    const input = { ...valid };
+    Object.defineProperty(input, key, {
+      enumerable: true,
+      get() { touched++; throw new Error('SYNTHETIC_OWN_GETTER_SECRET'); },
+    });
+    assert.throws(() => resolve(input), { message: 'Invalid observability options' });
+    assert.equal(touched, 0, `Getter executed: ${key}`);
+  }
+});
