@@ -4,6 +4,7 @@ import dns from 'node:dns';
 import http from 'node:http';
 import https from 'node:https';
 import dgram from 'node:dgram';
+import { syncBuiltinESMExports } from 'node:module';
 
 const beforeEnv = { ...process.env };
 const beforeListeners = new Map(process.eventNames().map(name => [name, process.listenerCount(name)]));
@@ -16,6 +17,7 @@ http.request = deny;
 https.request = deny;
 dgram.createSocket = deny;
 globalThis.fetch = deny;
+syncBuiltinESMExports();
 const { resolveObservabilityOptions: resolve } = await import('../dist/config.js');
 assert.deepEqual(resolve(), { enabled: false });
 assert.deepEqual(resolve({ enabled: false, endpoint: 'not-a-destination' }), { enabled: false });

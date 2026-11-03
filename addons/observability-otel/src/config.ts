@@ -30,7 +30,7 @@ function endpointOrigin(value: unknown): string {
   const loopback = ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
   if (!['http:', 'https:'].includes(url.protocol) || !url.hostname ||
       (url.protocol === 'http:' && !loopback) || url.username || url.password ||
-      url.pathname !== '/' || url.search || url.hash) {
+      url.pathname !== '/' || url.search || url.hash || url.port === '0') {
     throw new Error(invalid);
   }
   return url.origin;
@@ -58,25 +58,29 @@ export function resolveObservabilityOptions(input?: unknown): ObservabilityConfi
     throw new Error('Invalid observability options');
   }
   const options = input as Record<string, unknown>;
-  if (options.enabled !== undefined && typeof options.enabled !== 'boolean') {
+  // Configuration must be explicit; inherited values cannot enable or tune it.
+  const own = (key: string): unknown => Object.hasOwn(options, key) ? options[key] : undefined;
+  const enabled = own('enabled');
+  if (enabled !== undefined && typeof enabled !== 'boolean') {
     throw new Error('Invalid observability enabled flag');
   }
-  if (options.enabled !== true) return disabled;
+  if (enabled !== true) return disabled;
   if (Object.keys(options).some((key) => !allowedKeys.has(key))) {
     throw new Error('Unknown observability option');
   }
-  const serviceName = options.serviceName;
+  const serviceName = own('serviceName');
   if (typeof serviceName !== 'string' || !/^[a-z][a-z0-9._-]{2,62}$/.test(serviceName)) {
     throw new Error('Invalid observability serviceName');
   }
-  const endpoint = endpointOrigin(options.endpoint);
-  const sampleRatio = options.sampleRatio === undefined ? 1 : options.sampleRatio;
+  const endpoint = endpointOrigin(own('endpoint'));
+  const requestedRatio = own('sampleRatio');
+  const sampleRatio = requestedRatio === undefined ? 1 : requestedRatio;
   if (typeof sampleRatio !== 'number' || !Number.isFinite(sampleRatio) ||
       sampleRatio < 0 || sampleRatio > 1) {
     throw new Error('Invalid observability sampleRatio');
   }
-  const exportTimeoutMs = boundedInteger(options.exportTimeoutMs, 'exportTimeoutMs', 1000, 5000);
-  const shutdownTimeoutMs = boundedInteger(options.shutdownTimeoutMs, 'shutdownTimeoutMs', 2000, 10000);
+  const exportTimeoutMs = boundedInteger(own('exportTimeoutMs'), 'exportTimeoutMs', 1000, 5000);
+  const shutdownTimeoutMs = boundedInteger(own('shutdownTimeoutMs'), 'shutdownTimeoutMs', 2000, 10000);
   if (shutdownTimeoutMs < exportTimeoutMs) {
     throw new Error('Observability shutdown timeout must cover export timeout');
   }

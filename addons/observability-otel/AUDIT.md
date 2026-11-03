@@ -1,43 +1,54 @@
-# R4-A0 · evidencia inicial y límites
+# R4-A0 · auditoría y límites de evidencia
 
 Fecha: 2026-11-03. Work Unit: `KIT-LEGO-R4-A-20261103`.
-Baseline remoto: `f3112674e8d12fdd88f98c791c743a86847a5b2d`.
+Baseline: `main@f3112674e8d12fdd88f98c791c743a86847a5b2d`.
+Primer candidato: `24ccf67927d4c422e71f2f0280e1dc8c5ea0b56d`.
 
-## Claim permitido
+## Alcance y autorización
 
-Implementado y probado localmente el resolver puro de configuración R4-A0. No se ha implementado el SDK, exportación OTLP, instrumentación Fastify, métricas ni Collector. R4-A y R4 completo permanecen abiertos.
+El usuario autorizó iniciar R4 y luego revisar, probar E2E, reparar y fusionar **esta entrega** si no quedan hallazgos pendientes. El corte evaluado es R4-A0, no el cierre de R4-A ni R4 completo. La prohibición inicial de merge se sustituye sólo por la autorización condicionada al SHA final, CI/E2E y revisión final satisfactoria. No autoriza publicación, despliegue ni datos reales.
 
-## TDD observado en este episodio
+El claim permitido es un contrato de configuración probado. No se ha implementado SDK, OTLP, instrumentación Fastify, métricas ni Collector. Timeout validado no equivale a cancelación implementada; destino validado no equivale a DNS/TLS/SSRF/IAM verificados.
 
-1. RED inicial: TypeScript compiló el scaffold `export {};`; el test falló con `R4_RED_MISSING_CONFIG_CONTRACT`, esperado `function`, observado `undefined`. Exit 1; 1 test fallido. No fue un error de descarga ni del runner.
-2. GREEN inicial: implementación mínima, 47 subcasos y contenedor (48 tests reportados), 0 fallos.
-3. RED de revisión: seis variantes de endpoint se aceptaban porque `URL` normaliza paths, marcadores vacíos y caracteres antes de inspeccionar sus campos. Se añadieron primero seis pruebas; fallaron las seis por ausencia de la excepción esperada.
-4. GREEN final: validación de la forma original del origen antes de `new URL`; 53 subcasos + contenedor (54 tests reportados), 0 fallos, exit 0.
+## Evidencia inicial conservada
 
-Comandos realmente ejecutados desde `addons/observability-otel`:
+La revisión inicial está registrada en el historial `24ccf679` y en la PR. Su TDD observó: scaffold compilable sin export → assertion RED; GREEN de 47 subcasos; seis regresiones RED por normalización de URL; GREEN de 53 subcasos, 54 registros con el contenedor. El paquete de evidencia de la conversación conserva los logs y el historial local, que no es un clon del repositorio remoto.
+
+CI inicial R4: run `41625400722`, Node 24.22.1, pnpm 11.25.0, TypeScript 5.9.3; Core 13/13 y R4 54/54 registros. CI raíz inicial: `41625400745`. Estas ejecuciones sólo prueban aquel candidato, no los commits posteriores.
+
+## Reparaciones de la revisión actual
+
+| Hallazgo | Reproducción previa | Cambio y verificación local |
+|---|---|---|
+| Puerto 0 aceptado | Destinos HTTP(S) con puerto 0 se resolvían | Rechazo explícito y regresión |
+| Configuración heredada | Un prototipo podía activar o proporcionar valores | Sólo propiedades propias; siete casos, seis RED y uno de compatibilidad; GREEN posterior |
+| Carpeta con espacios | `URL.pathname` conservaba `%20`; el subproceso no encontraba el archivo | `fileURLToPath`; mismo recorrido pasa en carpeta con espacios |
+| Imports ESM nombrados eludían el arnés | Hallazgo CodeRabbit confirmado: copia temporal con `lookup` insertado recibía PASS indebidamente | `syncBuiltinESMExports`; canario detecta la mutación y el resolver real sigue verde |
+
+Después de estas reparaciones, las pruebas locales de JS compilado reportan 62/62 registros (incluido el contenedor original), typecheck y build strict. Entorno auxiliar: Node 22.16.0 / TypeScript 5.8.3; no sustituye la CI Node 24.
 
 ```sh
-node --version                 # v22.16.0, entorno auxiliar
-tsc --version                  # Version 5.8.3, entorno auxiliar
 tsc -p tsconfig.json --noEmit
 tsc -p tsconfig.json
-node --test tests/config.test.mjs
+node --test tests/*.test.mjs
 ```
 
-El resultado local no sustituye Node 24/TypeScript fijado por Core. La evidencia de CI se vincula al SHA remoto en la PR; no se hereda automáticamente de este documento. Las salidas RED/GREEN del episodio se conservan en el paquete de trabajo adjunto a la conversación.
+## E2E del corte A0
 
-## Revisión del ejecutor, no auditoría independiente
+Consumidor Core externo con lockfile congelado y ruta con espacios → módulo compilado copiado → resolución de configuración → proceso Fastify real → HTTP → cierre limpio y puerto libre. Tres escenarios válidos y tres inválidos. El destino testigo no debe recibir conexiones; los logs no deben contener centinelas sintéticos. No se usa un mock de Fastify.
 
-**Standards:** código propio strict/skipLibCheck false, sin dependencias, red ni mutaciones ambientales; resultado congelado; errores constantes; tests sobre JS compilado; manifiesto privado sin publicación. Se observó y corrigió la normalización prematura de URL mediante regresiones. Pendiente revisión independiente.
+El E2E necesita dependencias reales de Core. El entorno auxiliar no tiene DNS para instalarlas; la ejecución completa corresponde a GitHub Actions, no se sustituye por simulaciones. El run final, SHA, logs y resultado se registran en la PR y en el artefacto `r4-a0-verification-<run_id>`. Este documento no anticipa su PASS.
 
-**Spec:** A0 cubierto por los casos declarados; A1–A3 y B no ejecutados. No se reclasifica la validación de configuración como prueba de telemetría. El gate OFF del futuro SDK permanece pendiente. No se ha medido rendimiento.
+## Revisión y promoción
 
-## Entorno y calibración
+**Standards:** tipos propios strict/skipLibCheck false, configuración sin dependencias, resultado congelado, errores constantes, tests de JS compilado, consumidores/procesos aislados, artefactos sintéticos y cambios acotados.
 
-El contenedor auxiliar no resolvió GitHub por DNS; Commander no respondió al probe de sólo lectura. Se utiliza el conector GitHub para una rama aislada y CI Node 24, sin depender de un checkout remoto accesible. No se afirma haber ejecutado subagentes, CodeRabbit ni Docker. Los tests de la raíz no se pudieron ejecutar localmente por ausencia de dependencias; su CI existente sigue siendo gate separado.
+**Spec:** A0 y su lifecycle E2E son el corte. A1–A3/B no se ejecutaron y mantienen sus gates; no hay rendimiento medido ni E2E de telemetría. La revisión del ejecutor no reemplaza CodeRabbit ni la decisión de Felipe.
 
-La validación de endpoints evita credenciales en URL y exige HTTPS fuera del loopback permitido. No es una barrera SSRF, prueba de identidad DNS/TLS, autorización de red ni garantía de seguridad del futuro exportador. No hay secretos ni datos clínicos; todos los centinelas son sintéticos.
+Merge permitido únicamente después de revisión terminada sobre el SHA final, CI/E2E verde, cero hallazgos pendientes con disposición verificable, diff permitido y comprobación del SHA al fusionar. Ausencia provisional de comentarios no significa revisión concluida. Cero hallazgos pendientes se limita al alcance revisado; no significa ausencia absoluta de defectos.
 
-## Promoción y reversibilidad
+## Protección y reversibilidad
 
-Estado: **inicio verificable de R4-A0; no apto para merge, distribución ni producción**. `main`, Core, otros add-ons y lockfiles existentes no se modifican. La PR permanece draft hasta completar los gates de R4-A o acordar explícitamente otro corte de integración. Cerrar la PR deja `main` intacto; cualquier merge requiere aprobación de Felipe.
+Core/OpenAPI, DB/Auth/Jobs/S3, Express y manifiestos/lockfiles existentes permanecen intactos. Sólo cambia el add-on, su workflow y documentación focal. Antes de merge, cerrar la PR conserva `main`; después, un revert requeriría decisión explícita y comprobación del estado actual. No se fuerza el merge ni se eluden protecciones.
+
+La CI inicial emitió deprecaciones del tooling/Actions v4. No se reinterpretan como fallo del resolver ni como ejecución libre de advertencias. Las suites de otros add-ons no se declaran reejecutadas si no existen runs que lo prueben.

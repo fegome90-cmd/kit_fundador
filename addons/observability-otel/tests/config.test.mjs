@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import * as candidate from '../dist/config.js';
 
 const sentinel = 'SYNTHETIC_R4_SECRET_DO_NOT_EXPORT';
@@ -123,7 +124,7 @@ test('R4-A0 explicit observability configuration contract', async (t) => {
     assert.fail('expected rejected endpoint');
   });
   await t.test('import and resolution have no network, process-listener, or env effects', () => {
-    const child = spawnSync(process.execPath, [new URL('./no-side-effects.mjs', import.meta.url).pathname],
+    const child = spawnSync(process.execPath, [fileURLToPath(new URL('./no-side-effects.mjs', import.meta.url))],
       { encoding: 'utf8', timeout: 5000 });
     assert.equal(child.error, undefined);
     assert.equal(child.status, 0, child.stderr + child.stdout);
