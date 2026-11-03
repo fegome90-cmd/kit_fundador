@@ -43,6 +43,12 @@ El E2E necesita dependencias reales de Core. El entorno auxiliar no tiene DNS pa
 
 La auditoría independiente del cierre detectó que una propiedad propia declarada mediante getter (por ejemplo `enabled` o `endpoint`) podía ejecutarse en `own()` y lanzar una excepción con un centinela sensible. Reproducción local sobre JavaScript compilado: `touched=1` y mensaje `SYNTHETIC_SECRET_EXPOSED` sin sanitizar. Se escribieron dos pruebas antes del fix y ambas quedaron RED (2 fallos, exit 1); se cambió la lectura de propiedades por `Object.getOwnPropertyDescriptor`, rechazando accesores con un error fijo sin ejecutarlos. El recorrido local posterior pasó 64/64 registros de `node:test` con Node 22.16.0 / TypeScript 5.8.3, `tsc --noEmit` y build compilado. Estos resultados sólo acreditan el entorno auxiliar: hay que repetir el E2E y el conjunto de CI sobre el **SHA nuevo** antes de afirmar GO. Los proxies siguen fuera del contrato de entrada.
 
+## Revisión externa final sobre `8000a0c9`: lectura ambiental OFF
+
+El 2026-11-03T13:27Z CodeRabbit completó la revisión sustantiva de los 14 archivos hasta `8000a0c9d9d131cbebc022413c062071881b4103`. Identificó una brecha menor del arnés: comprobaba mutación del entorno, no lecturas de `process.env` ignoradas en las llamadas OFF. Se reprodujo el defecto del arnés con una copia **temporal** del JS compilado que ejecutaba `void process.env.R4_IGNORED_ENV_READ` al entrar en el resolver: el test antiguo terminaba PASS indebidamente. Al instrumentar la lectura de claves del entorno con `Proxy` sólo durante las dos llamadas OFF, la misma mutación fue RED (exit 1, `R4_UNEXPECTED_ENV_READ`), mientras el resolver real volvió a GREEN. El descriptor original se restaura en un `finally` antes de la llamada ON. Un segundo canario automatiza este escenario sin cambiar producción ni eliminar los controles existentes.
+
+Verificación auxiliar reproducida: Node 22.16.0, TypeScript 5.8.3; typecheck/build y dos canarios locales en verde (DNS + lectura ambiental). Estos recibos NO sustituyen CI Node24, Core ni E2E; la promoción exige nuevos runs del SHA reparado y **otra revisión sustantiva del HEAD cambiado**. El nuevo conteo esperado del arnés es 65 (antes 64, un canario añadido).
+
 ## Revisión y promoción
 
 **Standards:** tipos propios strict/skipLibCheck false, configuración sin dependencias, resultado congelado, errores constantes, tests de JS compilado, consumidores/procesos aislados, artefactos sintéticos y cambios acotados.
