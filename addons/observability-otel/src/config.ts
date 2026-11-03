@@ -17,6 +17,11 @@ const allowedKeys = new Set([
   'exportTimeoutMs', 'shutdownTimeoutMs',
 ]);
 
+/**
+ * Validate an explicit OTLP base origin before URL normalization removes syntax.
+ * Plain HTTP is restricted to normalized loopback hosts; this performs no DNS,
+ * connection, or authorization checks. Rejections never expose the input URL.
+ */
 function endpointOrigin(value: unknown): string {
   const invalid = 'Invalid observability endpoint';
   // Validate the raw shape before URL normalization can erase path/query markers.
@@ -36,6 +41,10 @@ function endpointOrigin(value: unknown): string {
   return url.origin;
 }
 
+/**
+ * Resolve an optional timeout to its default or validate integer milliseconds
+ * within [100, maximum]. `field` is an internal label, not caller-supplied data.
+ */
 function boundedInteger(
   value: unknown, field: string, fallback: number, maximum: number,
 ): number {
