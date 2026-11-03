@@ -1,0 +1,26 @@
+import assert from 'node:assert/strict';
+import net from 'node:net';
+import dns from 'node:dns';
+import http from 'node:http';
+import https from 'node:https';
+import dgram from 'node:dgram';
+
+const beforeEnv = { ...process.env };
+const beforeListeners = new Map(process.eventNames().map(name => [name, process.listenerCount(name)]));
+let attempted = 0;
+const deny = () => { attempted++; throw new Error('R4_UNEXPECTED_NETWORK'); };
+net.Socket.prototype.connect = deny;
+dns.lookup = deny;
+dns.resolve = deny;
+http.request = deny;
+https.request = deny;
+dgram.createSocket = deny;
+globalThis.fetch = deny;
+const { resolveObservabilityOptions: resolve } = await import('../dist/config.js');
+assert.deepEqual(resolve(), { enabled: false });
+assert.deepEqual(resolve({ enabled: false, endpoint: 'not-a-destination' }), { enabled: false });
+resolve({ enabled: true, serviceName: 'lego-r4-api', endpoint: 'http://127.0.0.1:4318' });
+assert.equal(attempted, 0);
+assert.deepEqual({ ...process.env }, beforeEnv);
+assert.deepEqual(new Map(process.eventNames().map(name => [name, process.listenerCount(name)])), beforeListeners);
+console.log('R4_CONFIG_NO_SIDE_EFFECTS_PASS');

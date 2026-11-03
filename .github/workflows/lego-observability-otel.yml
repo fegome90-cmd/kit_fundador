@@ -1,0 +1,71 @@
+name: LEGO Observability R4-A (entry contract)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - addons/observability-otel/**
+      - templates/fastify-core/**
+      - .github/workflows/lego-observability-otel.yml
+      - dev-docs/plans/lego-observability-otel-2026-11-03.md
+  push:
+    branches: [main]
+    paths:
+      - addons/observability-otel/**
+      - templates/fastify-core/**
+      - .github/workflows/lego-observability-otel.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lego-r4-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  entry-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Prove Core baseline and compile R4 entry contract with existing frozen toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$PWD"
+          scratch="$(mktemp -d)"
+          trap 'rm -rf "$scratch"' EXIT
+          cp -R templates/fastify-core "$scratch/core"
+          cd "$scratch/core"
+          pnpm install --frozen-lockfile --strict-peer-dependencies --ignore-scripts
+          pnpm run typecheck
+          pnpm test
+          pnpm exec tsc --version
+          pnpm exec tsc --project "$root/addons/observability-otel/tsconfig.json" --noEmit
+          pnpm exec tsc --project "$root/addons/observability-otel/tsconfig.json"
+          cd "$root"
+          node --test addons/observability-otel/tests/config.test.mjs
+          echo 'LEGO_R4_A0_CONFIG_CONTRACT_PASS'
+      - name: Enforce non-distribution boundary
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { readFileSync } from 'node:fs';
+          const p = JSON.parse(readFileSync('addons/observability-otel/package.json', 'utf8'));
+          assert.equal(p.private, true);
+          assert.equal(p.version, '0.0.0');
+          assert.equal(p.dependencies, undefined);
+          assert.equal(p.exports, undefined);
+          assert.equal(p.scripts, undefined);
+          console.log('LEGO_R4_A0_NOT_DISTRIBUTED_PASS');
+          NODE
