@@ -35,7 +35,7 @@ node --test tests/*.test.mjs
 
 ## E2E del corte A0
 
-Consumidor Core externo con lockfile congelado y ruta con espacios → módulo compilado copiado → resolución de configuración → proceso Fastify real → HTTP → cierre limpio y puerto libre. Tres escenarios válidos y tres inválidos. El destino testigo no debe recibir conexiones; los logs no deben contener centinelas sintéticos. No se usa un mock de Fastify.
+Consumidor Core externo con lockfile congelado y ruta con espacios → módulo compilado copiado → resolución de configuración → proceso Fastify real → HTTP → cierre limpio y puerto libre. Cuatro escenarios válidos y tres inválidos. El destino testigo no debe recibir conexiones; los logs no deben contener centinelas sintéticos. No se usa un mock de Fastify.
 
 El E2E necesita dependencias reales de Core. El entorno auxiliar no tiene DNS para instalarlas; la ejecución completa corresponde a GitHub Actions, no se sustituye por simulaciones. El run final, SHA, logs y resultado se registran en la PR y en el artefacto `r4-a0-verification-<run_id>`. Este documento no anticipa su PASS.
 
@@ -52,6 +52,14 @@ Verificación auxiliar reproducida: Node 22.16.0, TypeScript 5.8.3; typecheck/bu
 ## Warning editorial detectado por CodeRabbit tras `c8cdcef`
 
 La revisión terminada del HEAD `c8cdcef1efc7c05d5cec44457368655acc8abe9f` calificó el riesgo de merge como mínimo y no registró reparos nuevos del código, pero su pre-merge check **Docstring Coverage** mostró una advertencia de cobertura 75% frente al mínimo 80% (4 funciones analizadas). Por la condición de cero reparos, no se interpretó el check CodeRabbit `success` como habilitación automática de merge. Se agregaron docstrings exclusivamente a los cuatro helpers existentes del test de lifecycle E2E (`deadline`, `start`, `get`, `networkWitness`), sin modificar lógica, casos ni configuración. El resultado del umbral debe ser comprobado con otra revisión completa del SHA nuevo y CI Node24/E2E nuevas; no se da por resuelto por declaración.
+
+## Revisión sustantiva del 3 de noviembre (17:14Z) y regresiones adicionales
+
+CodeRabbit completó el review del HEAD `5ed6f801b1ce568b9cd98ffcf9c9501caad36a85` con check SUCCESS, riesgo de merge mínimo y cinco pre-merge checks conformes. **Docstring Coverage pasó a 100%**, sobre el umbral 80%. Pese a ello, produjo dos observaciones menores válidas de cobertura de pruebas: (1) la trampa `process.env` se instalaba después de importar `dist/config.js`, por lo que una lectura ambiental ignorada durante evaluación del módulo escapaba; (2) el E2E explícitamente OFF cubría destino inválido, pero no un destino válido suministrado en las opciones OFF bajo vigilancia HTTP.
+
+La primera brecha fue reproducida localmente con un módulo sintético que lee `process.env.R4_IGNORED_IMPORT_ENV_READ` en su nivel superior: el arnés antiguo reportó PASS (exit 0) indebidamente. La nueva trampa permanece activa durante el import dinámico y durante las llamadas OFF; filtra sólo accesos cuyo stack señala el módulo compilado, para distinguirlos de sondas internas del cargador ESM (por ejemplo `WATCH_REPORT_DEPENDENCIES` observado bajo Node 22). En la reproducción auxiliar, el módulo mutado terminó RED con `R4_UNEXPECTED_ENV_READ` y el módulo limpio terminó GREEN. Se añade un canario automatizado de import-time sin alterar el resolver.
+
+La segunda se cubre añadiendo un séptimo E2E: OFF con endpoint válido del testigo local, con aserción de cero conexiones. Se conserva el caso anterior de destino inválido inactivo y los tres rechazos. **Resultados auxiliares no reemplazan Node24 ni E2E real.** Después del nuevo commit deben pasar Core 13, contrato/arnés 66 y E2E 7, y obtenerse una nueva revisión sustantiva sin reparos antes de merge. No se modifica el comportamiento de producción ni se extiende A0 a SDK/Collector.
 
 ## Revisión y promoción
 

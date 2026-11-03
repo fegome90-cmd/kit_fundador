@@ -49,3 +49,23 @@ test('environment guard detects an ignored OFF-path environment read', async t =
   assert.match(child.stderr, /R4_UNEXPECTED_ENV_READ/);
   assert.doesNotMatch(child.stdout, /R4_CONFIG_NO_SIDE_EFFECTS_PASS/);
 });
+
+/** Import-time canary: a compiled module environment read must fail the guard. */
+test('environment guard detects an ignored environment read during module import', async t => {
+  const root = await mkdtemp(join(tmpdir(), 'r4-import-env-canary-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await mkdir(join(root, 'dist'));
+  await mkdir(join(root, 'tests'));
+  await writeFile(join(root, 'package.json'), '{"type":"module"}\n');
+  await copyFile(new URL('./no-side-effects.mjs', import.meta.url), join(root, 'tests/no-side-effects.mjs'));
+  const compiled = await readFile(new URL('../dist/config.js', import.meta.url), 'utf8');
+  await writeFile(join(root, 'dist/config.js'),
+    'void process.env.R4_IGNORED_IMPORT_ENV_READ;\n' + compiled);
+  const child = spawnSync(process.execPath, [join(root, 'tests/no-side-effects.mjs')], {
+    encoding: 'utf8', timeout: 5000,
+  });
+  assert.equal(child.error, undefined);
+  assert.equal(child.status, 1, 'Ignored import-time environment reads must be rejected');
+  assert.match(child.stderr, /R4_UNEXPECTED_ENV_READ/);
+  assert.doesNotMatch(child.stdout, /R4_CONFIG_NO_SIDE_EFFECTS_PASS/);
+});

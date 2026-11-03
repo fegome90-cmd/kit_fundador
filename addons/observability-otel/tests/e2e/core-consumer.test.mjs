@@ -104,6 +104,7 @@ async function networkWitness(t) {
 for (const scenario of [
   { name: 'omitted config remains OFF despite OTEL environment', make: () => undefined, enabled: false, signal: 'SIGTERM' },
   { name: 'explicit OFF tolerates inactive invalid destination', make: () => ({ enabled: false, endpoint: sentinel }), enabled: false, signal: 'SIGINT' },
+  { name: 'explicit OFF does not contact configured valid destination', make: endpoint => ({ enabled: false, endpoint }), enabled: false, signal: 'SIGINT' },
   { name: 'ON configuration is validated without starting telemetry in A0', make: endpoint => ({ ...valid, endpoint }), enabled: true, signal: 'SIGTERM' },
 ]) {
   test(`E2E ${scenario.name}: isolated consumer → real HTTP → clean shutdown`, { timeout: 20000 }, async t => {

@@ -18,30 +18,35 @@ https.request = deny;
 dgram.createSocket = deny;
 globalThis.fetch = deny;
 syncBuiltinESMExports();
-const { resolveObservabilityOptions: resolve } = await import('../dist/config.js');
+// Node's ESM loader can read its own environment while importing; restrict the
+// guard to reads whose call stack includes the compiled module under test.
+const configUrl = new URL('../dist/config.js', import.meta.url);
+/** Distinguish direct configuration-module environment reads from loader probes. */
+const moduleReadsEnv = () => new Error().stack?.includes(configUrl.href);
 // The OFF path must not even inspect environment values it subsequently ignores.
 const envDescriptor = Object.getOwnPropertyDescriptor(process, 'env');
 assert.ok(envDescriptor);
 const envReads = [];
-let omitted, explicitOff;
+let resolve, omitted, explicitOff;
 Object.defineProperty(process, 'env', {
   ...envDescriptor,
   value: new Proxy(process.env, {
     get(target, property, receiver) {
-      envReads.push(String(property));
+      if (moduleReadsEnv()) envReads.push(String(property));
       return Reflect.get(target, property, receiver);
     },
     has(target, property) {
-      envReads.push(String(property));
+      if (moduleReadsEnv()) envReads.push(String(property));
       return Reflect.has(target, property);
     },
     ownKeys(target) {
-      envReads.push('[keys]');
+      if (moduleReadsEnv()) envReads.push('[keys]');
       return Reflect.ownKeys(target);
     },
   }),
 });
 try {
+  ({ resolveObservabilityOptions: resolve } = await import(configUrl));
   omitted = resolve();
   explicitOff = resolve({ enabled: false, endpoint: 'not-a-destination' });
 } finally {

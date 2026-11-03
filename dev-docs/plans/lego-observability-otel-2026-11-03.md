@@ -39,7 +39,7 @@ Pruebas contra `dist/config.js`, no contra un mock del resolver. El historial in
 
 La CI instala una copia real de Core fuera del checkout, con Node 24/pnpm fijado y lockfile congelado, compila el resolver y ejecuta su suite también desde una carpeta con espacios. No altera dependencias de Core. El entorno auxiliar local Node 22.16.0/TypeScript 5.8.3 sólo aporta evidencia suplementaria; sin DNS no puede reemplazar la CI real.
 
-E2E: copia compilada del módulo → configuración → proceso Fastify real → HTTP → SIGTERM/SIGINT → salida normal y puerto libre. Configuración omitida, OFF y ON-resuelto mantienen Core independiente y cero conexiones al destino testigo. Tres inputs inválidos fallan antes del arranque sin filtrar centinelas. El servidor testigo no es Collector; no se afirma OTLP ni distribución por npm.
+E2E: copia compilada del módulo → configuración → proceso Fastify real → HTTP → SIGTERM/SIGINT → salida normal y puerto libre. Configuración omitida, OFF (incluido destino válido testigo) y ON-resuelto mantienen Core independiente y cero conexiones al destino testigo. Tres inputs inválidos fallan antes del arranque sin filtrar centinelas. El servidor testigo no es Collector; no se afirma OTLP ni distribución por npm.
 
 La CI raíz conserva sus gates. Las suites DB/Auth/Jobs/S3 no se declaran ejecutadas por transitividad. Logs sintéticos se conservan como artefacto y se vinculan a SHA/run en la PR. Un cambio de candidato invalida la evidencia afectada.
 

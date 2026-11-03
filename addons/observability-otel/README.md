@@ -12,7 +12,7 @@ La entrada es configuración controlada por la aplicación: se rechazan propieda
 
 La CI `LEGO Observability R4-A0 (config and lifecycle E2E)` instala el lockfile congelado de una copia de Core fuera del checkout con Node 24/pnpm 11.25.0. Usa su TypeScript para compilar este contrato, sin modificar dependencias ni lockfiles de Core. Ejecuta sus 13 pruebas y las pruebas del resolver sobre JS compilado, también desde una carpeta con espacios.
 
-El E2E copia el módulo compilado al consumidor y ejecuta procesos Node y solicitudes HTTP reales, sin mockear Fastify. Comprueba configuración omitida, OFF y ON-resuelto; `/health`, ausencia de rutas OTel/docs, logs sin centinelas, cero conexiones al destino testigo, cierre SIGTERM/SIGINT y puerto liberado. Rechaza credenciales en URL, HTTP fuera de loopback y puerto 0 antes del arranque.
+El E2E copia el módulo compilado al consumidor y ejecuta procesos Node y solicitudes HTTP reales, sin mockear Fastify. Comprueba configuración omitida, OFF con destino inactivo inválido, OFF con destino válido testigo y ON-resuelto; `/health`, ausencia de rutas OTel/docs, logs sin centinelas, cero conexiones al destino testigo, cierre SIGTERM/SIGINT y puerto liberado. Rechaza credenciales en URL, HTTP fuera de loopback y puerto 0 antes del arranque.
 
 Este recorrido es **configuración → Core HTTP → cierre**, no `HTTP → SDK → Collector`. El servidor HTTP testigo cuenta conexiones; no se presenta como Collector. Un canario adicional verifica que el arnés detecta una llamada DNS insertada mediante import ESM nombrado en una copia temporal del módulo.
 
